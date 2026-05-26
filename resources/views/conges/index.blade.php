@@ -1,0 +1,151 @@
+@extends('layouts.app')
+@section('page-title', 'Congés & Permissions')
+
+@section('header-actions')
+    @can('créer congés')
+    <a href="{{ route('leaves.create') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i> Nouvelle demande
+    </a>
+    @endcan
+@endsection
+
+@section('content')
+
+<div class="filter-card">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-6 col-md-2">
+            <label>Type</label>
+            <select name="type" class="form-select form-select-sm">
+                <option value="">Tous</option>
+                <option value="annual"      {{ request('type') === 'annual'      ? 'selected' : '' }}>Congé annuel</option>
+                <option value="sick"        {{ request('type') === 'sick'        ? 'selected' : '' }}>Maladie</option>
+                <option value="permission"  {{ request('type') === 'permission'  ? 'selected' : '' }}>Permission</option>
+                <option value="exceptional" {{ request('type') === 'exceptional' ? 'selected' : '' }}>Exceptionnel</option>
+                <option value="maternity"   {{ request('type') === 'maternity'   ? 'selected' : '' }}>Maternité</option>
+                <option value="paternity"   {{ request('type') === 'paternity'   ? 'selected' : '' }}>Paternité</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label>Statut</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">Tous</option>
+                <option value="pending"  {{ request('status') === 'pending'  ? 'selected' : '' }}>En attente</option>
+                <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approuvé</option>
+                <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Refusé</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label>Mois</label>
+            <input type="month" name="month" value="{{ request('month') }}" class="form-control form-control-sm">
+        </div>
+        <div class="col-6 col-md-4">
+            <label>Employé</label>
+            <div class="search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" name="search" value="{{ request('search') }}"
+                       class="form-control form-control-sm" placeholder="Nom de l'employé...">
+            </div>
+        </div>
+        <div class="col-12 col-md-2 d-flex gap-2">
+            <button class="btn btn-primary btn-sm w-100">Filtrer</button>
+            <a href="{{ route('leaves.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span>Demandes <span class="text-muted fw-normal">({{ $leaves->total() }})</span></span>
+        <span class="badge bg-warning text-dark">{{ $pendingCount }} en attente</span>
+    </div>
+
+    <div class="table-responsive">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Employé</th>
+                <th>Type</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Durée</th>
+                <th>Statut</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @forelse($leaves as $leave)
+        <tr>
+            <td class="text-muted small">{{ $leave->leave_number }}</td>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="avatar-initials"
+                         style="width:28px;height:28px;font-size:10px;background:#E6F1FB;color:#185FA5">
+                        {{ $leave->employee->initials }}
+                    </div>
+                    <span class="fw-medium">{{ $leave->employee->full_name }}</span>
+                </div>
+            </td>
+            <td><span class="badge bg-secondary badge-status">{{ $leave->type_label }}</span></td>
+            <td class="small">{{ $leave->start_date->format('d M Y') }}</td>
+            <td class="small">{{ $leave->end_date->format('d M Y') }}</td>
+            <td><strong>{{ $leave->duration_days }}j</strong></td>
+            <td>{!! $leave->status_badge !!}</td>
+            <td class="text-center">
+                <div class="btn-group btn-group-sm">
+                    <a href="{{ route('leaves.show', $leave) }}" class="btn btn-outline-secondary" title="Voir">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    @if($leave->status === 'pending')
+                        @can('valider congés')
+                        <form method="POST" action="{{ route('leaves.approve', $leave) }}" class="d-inline">
+                            @csrf
+                            <button class="btn btn-outline-success" title="Approuver">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('leaves.reject', $leave) }}" class="d-inline"
+                              onsubmit="return confirm('Confirmer le refus ?')">
+                            @csrf
+                            <button class="btn btn-outline-danger" title="Refuser">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </form>
+                        @endcan
+                        @can('modifier congés')
+                        <a href="{{ route('leaves.edit', $leave) }}" class="btn btn-outline-primary" title="Modifier">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        @endcan
+                    @endif
+                    @if($leave->status === 'approved')
+                    <a href="{{ route('leaves.print', $leave) }}" class="btn btn-outline-dark" title="Attestation PDF" target="_blank">
+                        <i class="bi bi-printer"></i>
+                    </a>
+                    @endif
+                </div>
+            </td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="8" class="text-center text-muted py-5">
+                <i class="bi bi-calendar-x fs-1 d-block mb-2 opacity-25"></i>
+                Aucune demande trouvée
+            </td>
+        </tr>
+        @endforelse
+        </tbody>
+    </table>
+    </div>
+
+    <div class="card-footer d-flex justify-content-between align-items-center py-2">
+        <small class="text-muted">
+            {{ $leaves->firstItem() ?? 0 }}–{{ $leaves->lastItem() ?? 0 }} sur {{ $leaves->total() }}
+        </small>
+        {{ $leaves->links() }}
+    </div>
+</div>
+
+@endsection
