@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('contracts.renew');
 
     // ── Congés & Permissions ─────────────────────────────────
-    Route::resource('leaves', LeaveController::class);
+    Route::resource('leaves', LeaveController::class) ->parameters(['leaves' => 'leave']);
     Route::post('/leaves/{leave}/approve', [LeaveController::class, 'approve'])
         ->name('leaves.approve');
     Route::post('/leaves/{leave}/reject', [LeaveController::class, 'reject'])
