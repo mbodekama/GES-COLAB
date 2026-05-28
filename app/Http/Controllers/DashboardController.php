@@ -67,19 +67,40 @@ class DashboardController extends Controller
             ];
         }
 
-        // ── KPI 3 — Jours de congés validés (tous employés) ───────
-        $totalApprovedDays = Leave::approved()
-            ->whereYear('start_date', now()->year)
-            ->sum('duration_days');
+// ── KPI 3 — Jours de congés validés (admin/rh uniquement) ─────
+        if ($isAdmin || $user->hasRole('rh')) {
+            $totalApprovedDays = Leave::approved()
+                ->whereYear('start_date', now()->year)
+                ->sum('duration_days');
 
-        $kpi3 = [
-            'label' => 'Jours congés validés',
-            'value' => $totalApprovedDays,
-            'delta' => 'En '.now()->year,
-            'color' => '#3B6D11',
-            'bg'    => '#EAF3DE',
-            'icon'  => 'bi-calendar-check-fill',
-        ];
+            $kpi3 = [
+                'label' => 'Jours congés validés',
+                'value' => $totalApprovedDays,
+                'delta' => 'En '.now()->year,
+                'color' => '#3B6D11',
+                'bg'    => '#EAF3DE',
+                'icon'  => 'bi-calendar-check-fill',
+                'show'  => true,
+            ];
+        } else {
+            // Autres rôles : afficher les congés pris personnellement
+            $myApprovedDays = $employee
+                ? Leave::where('employee_id', $employee->id)
+                    ->approved()
+                    ->whereYear('start_date', now()->year)
+                    ->sum('duration_days')
+                : 0;
+
+            $kpi3 = [
+                'label' => 'Mes jours pris',
+                'value' => $myApprovedDays,
+                'delta' => 'Approuvés en '.now()->year,
+                'color' => '#3B6D11',
+                'bg'    => '#EAF3DE',
+                'icon'  => 'bi-calendar2-check',
+                'show'  => false, // ← masqué pour les autres rôles
+            ];
+        }
 
         // ── KPI 4 — Solde congés de l'utilisateur connecté ────────
         $leaveBalance  = $employee?->leave_balance ?? 0;

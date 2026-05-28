@@ -54,41 +54,52 @@
             </div>
 
             {{-- ACTIONS N+1 --}}
+            {{-- ACTIONS N+1 --}}
             @if($leave->workflow_step === 'pending_n1')
-                @role('superviseur|admin|superadmin')
-                <div class="card mb-3">
-                    <div class="card-header" style="background:#E6F1FB">
-                        <i class="bi bi-person-check me-2" style="color:#185FA5"></i>
-                        <span style="color:#185FA5;font-weight:600">Action requise — N+1</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="small text-muted mb-3">
-                            Cette demande de permission attend votre validation avant transmission au RH.
-                        </p>
+                @php $canValidateN1 = auth()->user()->hasRole(['superadmin','admin'])
+                       || auth()->user()->employee?->poste?->can_be_n1 === true; @endphp
 
-                        {{-- Approuver N+1 --}}
-                        <form method="POST" action="{{ route('leaves.approve.n1', $leave) }}" class="mb-2">
-                            @csrf
-                            <div class="mb-2">
-                                <label class="form-label small fw-medium">
-                                    Commentaire <small class="text-muted">(optionnel)</small>
-                                </label>
-                                <textarea name="comment" class="form-control form-control-sm"
-                                          rows="2" placeholder="Votre commentaire..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-success w-100">
-                                <i class="bi bi-check-circle me-2"></i>Valider & Transmettre au RH
+                @if($canValidateN1 && $leave->employee->user_id !== auth()->id())
+                    <div class="card mb-3">
+                        <div class="card-header" style="background:#E6F1FB">
+                            <i class="bi bi-person-check me-2" style="color:#185FA5"></i>
+                            <span style="color:#185FA5;font-weight:600">
+                Action requise — N+1
+            </span>
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">
+                                Cette demande de permission attend votre validation
+                                avant transmission au RH.
+                            </p>
+
+                            <form method="POST"
+                                  action="{{ route('leaves.approve.n1', $leave) }}"
+                                  class="mb-2">
+                                @csrf
+                                <div class="mb-2">
+                                    <label class="form-label small fw-medium">
+                                        Commentaire
+                                        <small class="text-muted">(optionnel)</small>
+                                    </label>
+                                    <textarea name="comment" class="form-control form-control-sm"
+                                              rows="2"
+                                              placeholder="Votre commentaire..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Valider & Transmettre au RH
+                                </button>
+                            </form>
+
+                            <button class="btn btn-outline-danger w-100 btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#rejectN1Modal">
+                                <i class="bi bi-x-circle me-2"></i>Refuser
                             </button>
-                        </form>
-
-                        {{-- Refuser N+1 --}}
-                        <button class="btn btn-outline-danger w-100 btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#rejectN1Modal">
-                            <i class="bi bi-x-circle me-2"></i>Refuser
-                        </button>
+                        </div>
                     </div>
-                </div>
-                @endrole
+                @endif
             @endif
 
             {{-- ACTIONS RH --}}

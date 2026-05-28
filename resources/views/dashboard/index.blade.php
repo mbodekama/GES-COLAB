@@ -6,6 +6,10 @@
     {{-- KPI CARDS --}}
     <div class="row g-3 mb-4">
         @foreach([$kpi1, $kpi2, $kpi3, $kpi4] as $kpi)
+            {{-- KPI 3 : masqué pour les rôles non admin/rh --}}
+            @if(isset($kpi['show']) && !$kpi['show'])
+                @continue
+            @endif
             <div class="col-6 col-md-3">
                 <div class="card h-100">
                     <div class="card-body d-flex align-items-center gap-3 p-3">

@@ -10,16 +10,25 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <style>
+
+        /* ── BASE ────────────────────────────────────────────── */
+        html { font-size: 16px; }
+
         :root {
-            --sidebar-w: 245px;
-            --topbar-h: 58px;
+            --sidebar-w: 250px;
+            --topbar-h: 62px;
             --blue: #185FA5;
             --blue-light: #E6F1FB;
             --sidebar-bg: #0d1b2e;
         }
 
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; margin: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            font-size: 15px;
+        }
 
         /* ── SIDEBAR ─────────────────────────────────────────── */
         #sidebar {
@@ -39,13 +48,13 @@
             flex-shrink: 0;
         }
         .brand-icon {
-            width: 36px; height: 36px; background: var(--blue);
+            width: 38px; height: 38px; background: var(--blue);
             border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-size: 18px; font-weight: 700;
+            justify-content: center; font-size: 20px; font-weight: 700;
             color: #fff; flex-shrink: 0;
         }
-        .brand-name { color: #fff; font-weight: 600; font-size: 15px; line-height: 1.1; }
-        .brand-sub  { color: rgba(255,255,255,.4); font-size: 10px; }
+        .brand-name { color: #fff; font-weight: 600; font-size: 16px; line-height: 1.1; }
+        .brand-sub  { color: rgba(255,255,255,.4); font-size: 11px; }
 
         .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
         .sidebar-nav::-webkit-scrollbar { width: 4px; }
@@ -53,28 +62,28 @@
 
         .nav-section {
             padding: 14px 18px 4px;
-            font-size: 10px; font-weight: 600;
+            font-size: 11px; font-weight: 600;
             letter-spacing: .08em; text-transform: uppercase;
             color: rgba(255,255,255,.3);
         }
         .nav-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 9px 18px; color: rgba(255,255,255,.65);
-            font-size: 13.5px; text-decoration: none;
+            padding: 10px 18px; color: rgba(255,255,255,.65);
+            font-size: 14.5px; text-decoration: none;
             transition: background .15s, color .15s;
             position: relative; cursor: pointer;
         }
-        .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+        .nav-item:hover  { background: rgba(255,255,255,.06); color: #fff; }
         .nav-item.active { background: rgba(24,95,165,.35); color: #fff; }
         .nav-item.active::before {
             content: ''; position: absolute; left: 0; top: 4px; bottom: 4px;
             width: 3px; background: var(--blue); border-radius: 0 2px 2px 0;
         }
-        .nav-item i { font-size: 16px; width: 20px; flex-shrink: 0; }
+        .nav-item i { font-size: 17px; width: 20px; flex-shrink: 0; }
         .nav-badge {
-            margin-left: auto; padding: 1px 7px;
+            margin-left: auto; padding: 2px 8px;
             background: #dc3545; color: #fff;
-            font-size: 10px; font-weight: 600; border-radius: 99px;
+            font-size: 11px; font-weight: 600; border-radius: 99px;
         }
 
         .sidebar-footer {
@@ -83,13 +92,13 @@
         }
         .user-pill { display: flex; align-items: center; gap: 10px; }
         .user-avatar {
-            width: 32px; height: 32px; border-radius: 50%;
+            width: 34px; height: 34px; border-radius: 50%;
             background: var(--blue); color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 600; flex-shrink: 0;
+            font-size: 13px; font-weight: 600; flex-shrink: 0;
         }
-        .user-name { color: #fff; font-size: 13px; font-weight: 500; line-height: 1.2; }
-        .user-role { color: rgba(255,255,255,.45); font-size: 11px; }
+        .user-name { color: #fff; font-size: 14px; font-weight: 500; line-height: 1.2; }
+        .user-role { color: rgba(255,255,255,.45); font-size: 12px; }
 
         /* ── TOPBAR ──────────────────────────────────────────── */
         #topbar {
@@ -99,9 +108,9 @@
             background: #fff;
             border-bottom: 1px solid #e8ecf0;
             display: flex; align-items: center;
-            padding: 0 20px; gap: 12px;
+            padding: 0 22px; gap: 12px;
         }
-        .page-title { font-size: 16px; font-weight: 600; color: #1a1a2e; flex: 1; }
+        .page-title { font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1; }
 
         /* ── CONTENT ─────────────────────────────────────────── */
         #content-wrapper {
@@ -109,39 +118,60 @@
             padding-top: var(--topbar-h);
             min-height: 100vh;
         }
-        .content-inner { padding: 24px; }
+        .content-inner { padding: 26px; }
 
         /* ── CARDS ───────────────────────────────────────────── */
-        .card { border: 1px solid #e8ecf0; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+        .card {
+            border: 1px solid #e8ecf0;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        }
         .card-header {
-            background: #fff; border-bottom: 1px solid #e8ecf0;
+            background: #fff;
+            border-bottom: 1px solid #e8ecf0;
             border-radius: 12px 12px 0 0 !important;
-            padding: 14px 18px; font-weight: 600; font-size: 14px;
+            padding: 15px 18px;
+            font-weight: 600; font-size: 15px;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .card-footer { background: #fafbfc; border-top: 1px solid #e8ecf0; border-radius: 0 0 12px 12px !important; }
+        .card-footer {
+            background: #fafbfc;
+            border-top: 1px solid #e8ecf0;
+            border-radius: 0 0 12px 12px !important;
+        }
 
         /* ── TABLES ──────────────────────────────────────────── */
         .table th {
-            font-size: 11px; font-weight: 600;
+            font-size: 12px; font-weight: 600;
             text-transform: uppercase; letter-spacing: .05em;
             color: #6c757d; border-bottom-width: 1px;
-            white-space: nowrap; padding: 10px 14px;
+            white-space: nowrap; padding: 11px 14px;
         }
-        .table td { font-size: 13px; vertical-align: middle; padding: 10px 14px; }
+        .table td {
+            font-size: 14px; vertical-align: middle; padding: 11px 14px;
+        }
         .table-hover tbody tr:hover td { background: #f8f9ff; }
 
         /* ── BADGES ──────────────────────────────────────────── */
-        .badge-status { font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 500; }
+        .badge-status {
+            font-size: 12px; padding: 4px 11px;
+            border-radius: 99px; font-weight: 500;
+        }
 
         /* ── FILTER CARD ─────────────────────────────────────── */
         .filter-card {
             background: #fff; border: 1px solid #e8ecf0;
-            border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;
+            border-radius: 12px; padding: 15px 18px; margin-bottom: 20px;
         }
-        .filter-card label { font-size: 11px; font-weight: 600; color: #6c757d; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .04em; }
+        .filter-card label {
+            font-size: 12px; font-weight: 600; color: #6c757d;
+            margin-bottom: 3px;
+            text-transform: uppercase; letter-spacing: .04em;
+        }
 
         /* ── BUTTONS ─────────────────────────────────────────── */
+        .btn { font-size: 14px; }
+        .btn-sm { font-size: 13px; }
         .btn-primary { background: var(--blue); border-color: var(--blue); }
         .btn-primary:hover { background: #0C447C; border-color: #0C447C; }
         .btn-outline-primary { color: var(--blue); border-color: var(--blue); }
@@ -149,21 +179,49 @@
 
         /* ── AVATAR ──────────────────────────────────────────── */
         .avatar-initials {
-            width: 34px; height: 34px; border-radius: 50%;
+            width: 36px; height: 36px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 600; flex-shrink: 0;
+            font-size: 13px; font-weight: 600; flex-shrink: 0;
         }
 
         /* ── SEARCH ──────────────────────────────────────────── */
         .search-wrapper { position: relative; }
         .search-wrapper .bi-search {
             position: absolute; left: 10px; top: 50%;
-            transform: translateY(-50%); color: #adb5bd; font-size: 13px;
+            transform: translateY(-50%); color: #adb5bd; font-size: 14px;
         }
-        .search-wrapper input { padding-left: 30px; }
+        .search-wrapper input { padding-left: 32px; }
 
         /* ── ALERTS ──────────────────────────────────────────── */
-        .alert { border-radius: 10px; border: none; font-size: 13.5px; }
+        .alert { border-radius: 10px; border: none; font-size: 14.5px; }
+
+        /* ── FORMULAIRES ─────────────────────────────────────── */
+        .form-control, .form-select {
+            font-size: 14px;
+        }
+        .form-label {
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+        .form-text {
+            font-size: 12px;
+        }
+        .form-check-label {
+            font-size: 14px;
+        }
+
+        /* ── MODALES ─────────────────────────────────────────── */
+        .modal-title { font-size: 16px; }
+        .modal-body  { font-size: 14px; }
+
+        /* ── DROPDOWNS ───────────────────────────────────────── */
+        .dropdown-item { font-size: 14px; }
+
+        /* ── PAGINATION ──────────────────────────────────────── */
+        .pagination { font-size: 14px; }
+
+        /* ── SMALL ───────────────────────────────────────────── */
+        small, .small { font-size: 12.5px !important; }
 
         /* ── RESPONSIVE ──────────────────────────────────────── */
         @media (max-width: 768px) {
@@ -195,6 +253,7 @@
     </div>
 
     <div class="sidebar-nav">
+
         <div class="nav-section">Principal</div>
 
         <a href="{{ route('dashboard') }}"
@@ -214,44 +273,81 @@
         <div class="nav-section">Ressources Humaines</div>
 
         @can('voir employés')
-        <a href="{{ route('employees.index') }}"
-           class="nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-            <i class="bi bi-people-fill"></i> Employés
-        </a>
+            <a href="{{ route('employees.index') }}"
+               class="nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                <i class="bi bi-people-fill"></i> Employés
+            </a>
         @endcan
 
         @can('voir contrats')
-        <a href="{{ route('contracts.index') }}"
-           class="nav-item {{ request()->routeIs('contracts.*') ? 'active' : '' }}">
-            <i class="bi bi-file-earmark-text-fill"></i> Contrats
-        </a>
+            <a href="{{ route('contracts.index') }}"
+               class="nav-item {{ request()->routeIs('contracts.*') ? 'active' : '' }}">
+                <i class="bi bi-file-earmark-text-fill"></i> Contrats
+            </a>
         @endcan
 
         @can('voir congés')
-        <a href="{{ route('leaves.index') }}"
-           class="nav-item {{ request()->routeIs('leaves.*') ? 'active' : '' }}">
-            <i class="bi bi-calendar-check-fill"></i> Congés & Permissions
-            @php $pending = \App\Models\Leave::pending()->count(); @endphp
-            @if($pending > 0)
-                <span class="nav-badge">{{ $pending }}</span>
-            @endif
-        </a>
+            <a href="{{ route('leaves.index') }}"
+               class="nav-item {{ request()->routeIs('leaves.*') ? 'active' : '' }}">
+                <i class="bi bi-calendar-check-fill"></i> Congés & Permissions
+
+                @php
+                    $user     = auth()->user();
+                    $employee = $user->employee;
+
+                    if ($user->hasRole(['superadmin', 'admin'])) {
+                        $badgeCount = \App\Models\Leave::whereIn('workflow_step', [
+                            'pending_n1', 'pending_rh'
+                        ])->count();
+
+                    } elseif ($user->hasRole('rh')) {
+                        $badgeCount = \App\Models\Leave::where('workflow_step', 'pending_rh')
+                                                       ->count();
+
+                    } elseif ($employee?->poste?->can_be_n1) {
+                        $subordinateIds = \App\Models\Employee::where('supervisor_id', $employee->id)
+                                                              ->pluck('id')
+                                                              ->toArray();
+                        $badgeCount = empty($subordinateIds) ? 0
+                                    : \App\Models\Leave::where('workflow_step', 'pending_n1')
+                                                       ->whereIn('employee_id', $subordinateIds)
+                                                       ->count();
+                    } else {
+                        $badgeCount = $employee
+                            ? \App\Models\Leave::where('employee_id', $employee->id)
+                                               ->where('status', 'pending')
+                                               ->count()
+                            : 0;
+                    }
+                @endphp
+
+                @if($badgeCount > 0)
+                    <span class="nav-badge">{{ $badgeCount }}</span>
+                @endif
+            </a>
         @endcan
+
+        @role('superadmin|admin|rh')
+        <a href="{{ route('postes.index') }}"
+           class="nav-item {{ request()->routeIs('postes.*') ? 'active' : '' }}">
+            <i class="bi bi-diagram-3-fill"></i> Postes & Hiérarchie
+        </a>
+        @endrole
 
         <div class="nav-section">Paie</div>
 
         @can('voir fiches de paie')
-        <a href="{{ route('payroll.index') }}"
-           class="nav-item {{ request()->routeIs('payroll.*') ? 'active' : '' }}">
-            <i class="bi bi-receipt-cutoff"></i> Gestion de la paie
-        </a>
+            <a href="{{ route('payroll.index') }}"
+               class="nav-item {{ request()->routeIs('payroll.*') ? 'active' : '' }}">
+                <i class="bi bi-receipt-cutoff"></i> Gestion de la paie
+            </a>
         @endcan
 
         @can('voir grilles salariales')
-        <a href="{{ route('salary-grids.index') }}"
-           class="nav-item {{ request()->routeIs('salary-grids.*') ? 'active' : '' }}">
-            <i class="bi bi-table"></i> Grilles salariales
-        </a>
+            <a href="{{ route('salary-grids.index') }}"
+               class="nav-item {{ request()->routeIs('salary-grids.*') ? 'active' : '' }}">
+                <i class="bi bi-table"></i> Grilles salariales
+            </a>
         @endcan
 
         @role('superadmin|admin')
@@ -267,6 +363,7 @@
             <i class="bi bi-gear-fill"></i> Configuration
         </a>
         @endrole
+
     </div>
 
     <div class="sidebar-footer">
@@ -278,8 +375,12 @@
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;padding:4px" title="Déconnexion">
-                    <i class="bi bi-box-arrow-right" style="font-size:17px"></i>
+                <button type="submit"
+                        style="background:none;border:none;
+                               color:rgba(255,255,255,.4);
+                               cursor:pointer;padding:4px"
+                        title="Déconnexion">
+                    <i class="bi bi-box-arrow-right" style="font-size:18px"></i>
                 </button>
             </form>
         </div>
@@ -296,66 +397,86 @@
     <span class="page-title">@yield('page-title', 'Tableau de bord')</span>
 
     <div class="d-flex align-items-center gap-2">
+
         {{-- Recherche globale --}}
         <div class="search-wrapper d-none d-lg-block">
             <i class="bi bi-search"></i>
-            <input type="text" id="global-search" class="form-control form-control-sm"
-                   placeholder="Rechercher un employé..." style="width:200px">
+            <input type="text" id="global-search"
+                   class="form-control form-control-sm"
+                   placeholder="Rechercher un employé..."
+                   style="width:210px;font-size:13.5px">
         </div>
 
         {{-- Notifications --}}
         <div class="dropdown">
-            <button class="btn btn-light btn-sm position-relative" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-bell"></i>
+            <button class="btn btn-light btn-sm position-relative"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell" style="font-size:16px"></i>
                 @if(isset($unread) && $unread > 0)
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:9px">
+                    <span class="position-absolute top-0 start-100 translate-middle
+                                 badge rounded-pill bg-danger" style="font-size:10px">
                         {{ $unread }}
                     </span>
                 @endif
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="width:280px;padding:8px">
-                <li><h6 class="dropdown-header small">Notifications</h6></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm"
+                style="width:290px;padding:8px">
+                <li><h6 class="dropdown-header" style="font-size:12px">Notifications</h6></li>
                 @php $pendingLeaves = \App\Models\Leave::pending()->count(); @endphp
                 @if($pendingLeaves)
                     <li>
-                        <a class="dropdown-item small py-2" href="{{ route('leaves.index') }}?status=pending">
+                        <a class="dropdown-item py-2" style="font-size:13.5px"
+                           href="{{ route('leaves.index') }}?status=pending">
                             <i class="bi bi-calendar-x text-warning me-2"></i>
                             {{ $pendingLeaves }} demande(s) de congé en attente
                         </a>
                     </li>
                 @else
-                    <li><span class="dropdown-item-text text-muted small">Aucune notification</span></li>
+                    <li>
+                    <span class="dropdown-item-text text-muted" style="font-size:13.5px">
+                        Aucune notification
+                    </span>
+                    </li>
                 @endif
             </ul>
         </div>
 
-        {{-- Profil --}}
+        {{-- Menu profil --}}
         <div class="dropdown">
-            <button class="btn btn-light btn-sm d-flex align-items-center gap-2" data-bs-toggle="dropdown">
-                <div class="avatar-initials" style="width:26px;height:26px;font-size:10px;background:#E6F1FB;color:#185FA5">
+            <button class="btn btn-light btn-sm d-flex align-items-center gap-2"
+                    data-bs-toggle="dropdown">
+                <div class="avatar-initials"
+                     style="width:28px;height:28px;font-size:11px;
+                            background:#E6F1FB;color:#185FA5">
                     {{ auth()->user()->initials }}
                 </div>
-                <span class="d-none d-md-inline small">{{ auth()->user()->name }}</span>
-                <i class="bi bi-chevron-down" style="font-size:10px"></i>
+                <span class="d-none d-md-inline" style="font-size:13.5px">
+                    {{ auth()->user()->name }}
+                </span>
+                <i class="bi bi-chevron-down" style="font-size:11px"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                 <li>
-                    <a class="dropdown-item small" href="{{ route('profile.edit') }}">
+                    <a class="dropdown-item" style="font-size:14px"
+                       href="{{ route('profile.edit') }}">
                         <i class="bi bi-person me-2"></i>Mon profil
                     </a>
                 </li>
                 @can('voir fiches de paie')
-                <li>
-                    <a class="dropdown-item small" href="{{ route('payroll.index') }}">
-                        <i class="bi bi-receipt me-2"></i>Mes fiches de paie
-                    </a>
-                </li>
+                    <li>
+                        <a class="dropdown-item" style="font-size:14px"
+                           href="{{ route('payroll.index') }}">
+                            <i class="bi bi-receipt me-2"></i>Mes fiches de paie
+                        </a>
+                    </li>
                 @endcan
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="dropdown-item small text-danger">
+                        <button type="submit"
+                                class="dropdown-item text-danger"
+                                style="font-size:14px">
                             <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
                         </button>
                     </form>
@@ -371,7 +492,6 @@
 <div id="content-wrapper">
     <div class="content-inner">
 
-        {{-- Alertes flash --}}
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -405,13 +525,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="{{ asset('js/app.js') }}"></script>
 <script>
-// Recherche globale
-document.getElementById('global-search')?.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && this.value.trim()) {
-        window.location.href = '{{ route('employees.index') }}?search=' + encodeURIComponent(this.value.trim());
-    }
-});
+    document.getElementById('global-search')?.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && this.value.trim()) {
+            window.location.href = '{{ route('employees.index') }}?search='
+                + encodeURIComponent(this.value.trim());
+        }
+    });
 </script>
 @stack('scripts')
 </body>

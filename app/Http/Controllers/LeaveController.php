@@ -16,35 +16,42 @@ class LeaveController extends Controller
         $employee = $user->employee;
 
         $query = Leave::with(['employee', 'n1Validator', 'approvedBy'])->latest();
-
+        //dd($this->isN1($user));
         if ($user->hasRole(['superadmin', 'admin'])) {
             // Tout voir sans restriction
 
         } elseif ($user->hasRole('rh')) {
-            // RH : demandes qui lui sont destinées
+            // RH : demandes qui lui sont destinées (pending_rh + clôturées)
             $query->whereIn('workflow_step', [
                 'pending_rh', 'approved', 'rejected',
             ]);
 
-        } elseif ($this->isN1($user)) {
-            // N+1 : uniquement les demandes de ses subalternes directs
+        } elseif ($this->isN1($user) && $employee) {
+            // N+1 : SES demandes + celles de ses subalternes directs
             $subordinateIds = $this->getSubordinateIds($employee);
 
-            abort_if(empty($subordinateIds), 403,
-                'Aucun subalterne assigné à votre compte.');
+            $query->where(function ($q) use ($user, $subordinateIds) {
+                // Ses propres demandes
+                $q->whereHas('employee',
+                    fn($sub) => $sub->where('user_id', $user->id)
+                );
 
-            $query->whereHas('employee', function ($q) use ($subordinateIds) {
-                $q->whereIn('id', $subordinateIds);
+                // OU les demandes de ses subalternes
+                if (!empty($subordinateIds)) {
+                    $q->orWhereHas('employee',
+                        fn($sub) => $sub->whereIn('id', $subordinateIds)
+                    );
+                }
             });
 
         } else {
-            // Employé standard : ses propres demandes uniquement
+            // Employé standard : ses demandes uniquement
             $query->whereHas('employee',
                 fn($q) => $q->where('user_id', $user->id)
             );
         }
 
-        // ── Filtres ───────────────────────────────────────────
+        // ── Filtres ───────────────────────────────────────────────
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
@@ -375,15 +382,13 @@ class LeaveController extends Controller
     // Vérifier si un user a un rôle N+1
     private function isN1($user): bool
     {
-        return $user->hasRole([
-            'superadmin',
-            'admin',
-            'superviseur',
-            'chef d\'agence',
-            'responsable de distribution',
-            'chef de service',
-            'dgo',
-        ]);
+        // Admins : toujours N+1
+        if ($user->hasRole(['superadmin', 'admin'])) {
+            return true;
+        }
+
+        // Vérifier si l'employé a un poste marqué can_be_n1 = true
+        return $user->employee?->poste?->can_be_n1 === true;
     }
 
     // Vérifier si $supervisor est bien le N+1 direct de $employee
@@ -444,19 +449,24 @@ class LeaveController extends Controller
     // Vérifier les droits de consultation d'une demande
     private function authorizeView(Leave $leave): void
     {
+        //dd($leave);
         $user     = auth()->user();
         $employee = $user->employee;
 
         // Admin et RH voient tout
         if ($user->hasRole(['superadmin', 'admin', 'rh'])) return;
 
-        // N+1 voit les demandes de ses subalternes
+        // N+1 : voit ses propres demandes + celles de ses subalternes
         if ($this->isN1($user) && $employee) {
+            // Sa propre demande
+            if ($leave->employee->user_id === $user->id) return;
+
+            // Demande d'un subalterne direct
             $subordinateIds = $this->getSubordinateIds($employee);
             if (in_array($leave->employee_id, $subordinateIds)) return;
         }
 
-        // Employé voit ses propres demandes
+        // Employé standard : ses propres demandes uniquement
         abort_if(
             $leave->employee->user_id !== $user->id,
             403, 'Accès non autorisé.'

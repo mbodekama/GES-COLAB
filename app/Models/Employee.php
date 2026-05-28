@@ -17,7 +17,8 @@ class Employee extends Model
         'user_id', 'matricule', 'first_name', 'last_name', 'email',
         'phone', 'birth_date', 'birth_place', 'nationality',
         'marital_status', 'children_count', 'address', 'cnps_number',
-        'position', 'department', 'hire_date', 'leave_balance', 'status',
+        'position', 'poste_id', 'department', 'hire_date',
+        'leave_balance', 'supervisor_id', 'status',
     ];
 
     protected $casts = [
@@ -31,6 +32,21 @@ class Employee extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function poste(): BelongsTo
+    {
+        return $this->belongsTo(Poste::class, 'poste_id');
+    }
+
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'supervisor_id');
+    }
+
+    public function subordinates(): HasMany
+    {
+        return $this->hasMany(Employee::class, 'supervisor_id');
+    }
+
     public function contracts(): HasMany
     {
         return $this->hasMany(Contract::class);
@@ -38,7 +54,9 @@ class Employee extends Model
 
     public function activeContract(): HasOne
     {
-        return $this->hasOne(Contract::class)->where('status', 'active')->latestOfMany();
+        return $this->hasOne(Contract::class)
+                    ->where('status', 'active')
+                    ->latestOfMany();
     }
 
     public function leaves(): HasMany
@@ -50,28 +68,6 @@ class Employee extends Model
     {
         return $this->hasMany(Payroll::class);
     }
-
-    // ── Supervisor (N+1) ─────────────────────────────────────────
-    public function supervisor(): BelongsTo
-    {
-        return $this->belongsTo(Employee::class, 'supervisor_id');
-    }
-
-    public function subordinates(): HasMany
-    {
-        return $this->hasMany(Employee::class, 'supervisor_id');
-    }
-
-// Rôles considérés comme N+1
-    public const SUPERVISOR_ROLES = [
-        'superviseur',
-        'chef d\'agence',
-        'responsable de distribution',
-        'chef de service',
-        'dgo',
-        'admin',
-        'superadmin',
-    ];
 
     // ── Scopes ───────────────────────────────────────────────
     public function scopeActive($query)
@@ -88,10 +84,10 @@ class Employee extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('first_name', 'like', "%{$search}%")
-                ->orWhere('last_name',  'like', "%{$search}%")
-                ->orWhere('matricule',  'like', "%{$search}%")
-                ->orWhere('position',   'like', "%{$search}%")
-                ->orWhere('email',      'like', "%{$search}%");
+              ->orWhere('last_name',  'like', "%{$search}%")
+              ->orWhere('matricule',  'like', "%{$search}%")
+              ->orWhere('position',   'like', "%{$search}%")
+              ->orWhere('email',      'like', "%{$search}%");
         });
     }
 
@@ -107,6 +103,12 @@ class Employee extends Model
             substr($this->first_name, 0, 1) .
             substr($this->last_name,  0, 1)
         );
+    }
+
+    public function getPositionLabelAttribute(): string
+    {
+        // Priorité : titre du poste lié, sinon champ position texte
+        return $this->poste?->title ?? $this->position ?? '—';
     }
 
     public function getSeniorityLabelAttribute(): string
@@ -152,5 +154,18 @@ class Employee extends Model
         $last = static::withTrashed()->latest('id')->first();
         $next = $last ? (intval(substr($last->matricule, 4)) + 1) : 1;
         return 'EMP-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+    }
+
+    // Récupérer les N+1 possibles selon le niveau du poste de l'employé
+    public static function getPossibleN1(int $currentPosteLevel): \Illuminate\Support\Collection
+    {
+        return static::active()
+            ->whereHas('poste', function ($q) use ($currentPosteLevel) {
+                $q->where('can_be_n1', true)
+                  ->where('level', '>', $currentPosteLevel);
+            })
+            ->with('poste')
+            ->orderBy('last_name')
+            ->get();
     }
 }
