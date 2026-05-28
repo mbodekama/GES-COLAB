@@ -14,13 +14,21 @@ class Leave extends Model
         'employee_id', 'approved_by', 'leave_number', 'type',
         'start_date', 'end_date', 'duration_days', 'reason',
         'attachment', 'status', 'rejection_reason', 'approved_at',
+        'workflow_step', 'n1_validator_id', 'n1_validated_at', 'n1_comment',
     ];
 
     protected $casts = [
-        'start_date'  => 'date',
-        'end_date'    => 'date',
-        'approved_at' => 'datetime',
+        'start_date'       => 'date',
+        'end_date'         => 'date',
+        'approved_at'      => 'datetime',
+        'n1_validated_at'  => 'datetime',
     ];
+
+    // Types nécessitant validation N+1
+    const NEEDS_N1 = ['permission'];
+
+    // Types allant directement au RH
+    const DIRECT_RH = ['annual', 'sick', 'exceptional', 'maternity', 'paternity'];
 
     // ── Relations ────────────────────────────────────────────
     public function employee(): BelongsTo
@@ -33,6 +41,11 @@ class Leave extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    public function n1Validator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'n1_validator_id');
+    }
+
     // ── Scopes ───────────────────────────────────────────────
     public function scopePending($query)
     {
@@ -42,6 +55,16 @@ class Leave extends Model
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved');
+    }
+
+    public function scopePendingN1($query)
+    {
+        return $query->where('workflow_step', 'pending_n1');
+    }
+
+    public function scopePendingRh($query)
+    {
+        return $query->where('workflow_step', 'pending_rh');
     }
 
     // ── Accessors ────────────────────────────────────────────
@@ -68,6 +91,28 @@ class Leave extends Model
         };
     }
 
+    public function getWorkflowBadgeAttribute(): string
+    {
+        return match ($this->workflow_step) {
+            'pending_n1' => '<span class="badge bg-info badge-status">En attente N+1</span>',
+            'pending_rh' => '<span class="badge bg-warning text-dark badge-status">En attente RH</span>',
+            'approved' => '<span class="badge bg-success badge-status">Approuvé</span>',
+            'rejected' => '<span class="badge bg-danger badge-status">Refusé</span>',
+            default => '<span class="badge bg-secondary badge-status">' . $this->workflow_step . '</span>',
+        };
+    }
+
+    public function getWorkflowStepLabelAttribute(): string
+    {
+        return match ($this->workflow_step) {
+            'pending_n1' => 'En attente validation N+1',
+            'pending_rh' => 'En attente validation RH',
+            'approved'   => 'Approuvé',
+            'rejected'   => 'Refusé',
+            default      => $this->workflow_step,
+        };
+    }
+
     // ── Helpers ──────────────────────────────────────────────
     public static function generateNumber(): string
     {
@@ -76,8 +121,16 @@ class Leave extends Model
         return 'LVE-' . date('Y') . '-' . str_pad($next, 4, '0', STR_PAD_LEFT);
     }
 
-    public static function calculateDays(\Carbon\Carbon $start, \Carbon\Carbon $end): int
-    {
+    public static function calculateDays(
+        \Carbon\Carbon $start,
+        \Carbon\Carbon $end
+    ): int {
         return max(1, $start->diffInDays($end) + 1);
+    }
+
+    // Déterminer l'étape initiale selon le type
+    public static function initialWorkflowStep(string $type): string
+    {
+        return in_array($type, self::NEEDS_N1) ? 'pending_n1' : 'pending_rh';
     }
 }

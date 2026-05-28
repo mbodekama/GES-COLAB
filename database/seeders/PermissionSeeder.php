@@ -34,6 +34,8 @@ class PermissionSeeder extends Seeder
             'voir grilles salariales', 'gérer grilles salariales',
             // Admin
             'gérer rôles', 'gérer configuration', 'voir statistiques',
+            'valider congés n1',
+            'valider permissions n1',
         ];
 
         foreach ($permissions as $permission) {

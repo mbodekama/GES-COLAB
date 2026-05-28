@@ -86,6 +86,18 @@
                             <option>Commercial</option><option>Logistique</option>
                         </datalist>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-medium">Supérieur hiérarchique (N+1)</label>
+                        <select name="supervisor_id" class="form-select">
+                            <option value="">— Aucun —</option>
+                            @foreach($supervisors as $sup)
+                                <option value="{{ $sup->id }}"
+                                    {{ old('supervisor_id', $employee->supervisor_id) == $sup->id ? 'selected' : '' }}>
+                                    {{ $sup->full_name }} — {{ $sup->position }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-medium">Date d'embauche <span class="text-danger">*</span></label>
                         <input type="date" name="hire_date" value="{{ old('hire_date', $employee->hire_date->format('Y-m-d')) }}" class="form-control" required>

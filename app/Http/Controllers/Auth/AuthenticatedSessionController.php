@@ -16,14 +16,6 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard'));
-    }
-
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
@@ -31,5 +23,19 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
+
+        // ── Enregistrer la dernière connexion ─────────────────
+        $request->user()->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $request->ip(),
+        ]);
+
+        return redirect()->intended(route('dashboard'));
     }
 }

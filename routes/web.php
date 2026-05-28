@@ -40,13 +40,19 @@ Route::middleware(['auth'])->group(function () {
         ->name('contracts.renew');
 
     // ── Congés & Permissions ─────────────────────────────────
-    Route::resource('leaves', LeaveController::class) ->parameters(['leaves' => 'leave']);
+    Route::resource('leaves', LeaveController::class)->parameters(['leaves' => 'leave']);
     Route::post('/leaves/{leave}/approve', [LeaveController::class, 'approve'])
         ->name('leaves.approve');
     Route::post('/leaves/{leave}/reject', [LeaveController::class, 'reject'])
         ->name('leaves.reject');
     Route::get('/leaves/{leave}/print', [LeaveController::class, 'print'])
         ->name('leaves.print');
+
+    // Workflow N+1
+    Route::post('/leaves/{leave}/approve-n1', [LeaveController::class, 'approveN1'])
+        ->name('leaves.approve.n1');
+    Route::post('/leaves/{leave}/reject-n1',  [LeaveController::class, 'rejectN1'])
+        ->name('leaves.reject.n1');
 
     // ── Paie ─────────────────────────────────────────────────
     Route::middleware(['role:superadmin|admin|comptable'])->group(function () {

@@ -7,6 +7,9 @@ if (! function_exists('setting')) {
             return \DB::table('settings')->pluck('value', 'key')->toArray();
         });
 
-        return $settings[$key] ?? config('gescolab.' . $key, $default);
+        // Priorité : DB → config/gescolab.php → $default
+        return $settings[$key]
+            ?? config('gescolab.' . $key)
+            ?? $default;
     }
 }

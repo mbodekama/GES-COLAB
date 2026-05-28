@@ -105,6 +105,21 @@
                         @error('department')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label small fw-medium">Supérieur hiérarchique (N+1)</label>
+                        <select name="supervisor_id" class="form-select">
+                            <option value="">— Aucun —</option>
+                            @foreach($supervisors as $sup)
+                                <option value="{{ $sup->id }}"
+                                    {{ old('supervisor_id') == $sup->id ? 'selected' : '' }}>
+                                    {{ $sup->full_name }} — {{ $sup->position }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="form-text">
+                            Superviseur, Chef de service, DGO, etc.
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label small fw-medium">Date d'embauche <span class="text-danger">*</span></label>
                         <input type="date" name="hire_date" value="{{ old('hire_date', date('Y-m-d')) }}"
                                class="form-control @error('hire_date') is-invalid @enderror" required>

@@ -34,6 +34,25 @@
                 <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Refusé</option>
             </select>
         </div>
+        {{-- Ajouter dans le filtre --}}
+        <div class="col-6 col-md-2">
+            <label>Étape</label>
+            <select name="workflow_step" class="form-select form-select-sm">
+                <option value="">Toutes</option>
+                <option value="pending_n1" {{ request('workflow_step') === 'pending_n1' ? 'selected' : '' }}>
+                    En attente N+1
+                </option>
+                <option value="pending_rh" {{ request('workflow_step') === 'pending_rh' ? 'selected' : '' }}>
+                    En attente RH
+                </option>
+                <option value="approved"   {{ request('workflow_step') === 'approved'   ? 'selected' : '' }}>
+                    Approuvé
+                </option>
+                <option value="rejected"   {{ request('workflow_step') === 'rejected'   ? 'selected' : '' }}>
+                    Refusé
+                </option>
+            </select>
+        </div>
         <div class="col-6 col-md-2">
             <label>Mois</label>
             <input type="month" name="month" value="{{ request('month') }}" class="form-control form-control-sm">
@@ -71,7 +90,7 @@
                 <th>Début</th>
                 <th>Fin</th>
                 <th>Durée</th>
-                <th>Statut</th>
+                <th>Etapes</th>
                 <th class="text-center">Actions</th>
             </tr>
         </thead>
@@ -92,41 +111,95 @@
             <td class="small">{{ $leave->start_date->format('d M Y') }}</td>
             <td class="small">{{ $leave->end_date->format('d M Y') }}</td>
             <td><strong>{{ $leave->duration_days }}j</strong></td>
-            <td>{!! $leave->status_badge !!}</td>
+            <td>{!! $leave->workflow_badge !!}</td>
             <td class="text-center">
                 <div class="btn-group btn-group-sm">
-                    <a href="{{ route('leaves.show', $leave) }}" class="btn btn-outline-secondary" title="Voir">
+                    <a href="{{ route('leaves.show', $leave) }}"
+                       class="btn btn-outline-secondary" title="Voir">
                         <i class="bi bi-eye"></i>
                     </a>
-                    @if($leave->status === 'pending')
-                        @can('valider congés')
-                        <form method="POST" action="{{ route('leaves.approve', $leave) }}" class="d-inline">
+
+                    {{-- Boutons N+1 --}}
+                    @if($leave->workflow_step === 'pending_n1')
+                        @role('superviseur|chef d\'agence|responsable de distribution|chef de service|dgo|admin|superadmin')
+                        <form method="POST" action="{{ route('leaves.approve.n1', $leave) }}" class="d-inline">
                             @csrf
-                            <button class="btn btn-outline-success" title="Approuver">
+                            <button class="btn btn-outline-info" title="Valider (N+1)">
                                 <i class="bi bi-check-lg"></i>
                             </button>
                         </form>
-                        <form method="POST" action="{{ route('leaves.reject', $leave) }}" class="d-inline"
-                              onsubmit="return confirm('Confirmer le refus ?')">
+                        <form method="POST" action="{{ route('leaves.reject.n1', $leave) }}" class="d-inline"
+                              onsubmit="return confirm('Refuser cette demande ?')">
                             @csrf
-                            <button class="btn btn-outline-danger" title="Refuser">
+                            <button class="btn btn-outline-danger" title="Refuser (N+1)">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </form>
-                        @endcan
-                        @can('modifier congés')
-                        <a href="{{ route('leaves.edit', $leave) }}" class="btn btn-outline-primary" title="Modifier">
-                            <i class="bi bi-pencil"></i>
-                        </a>
+                        @endrole
+                    @endif
+
+                    {{-- Boutons RH --}}
+                    @if($leave->workflow_step === 'pending_rh')
+                        @can('valider congés')
+                            <form method="POST" action="{{ route('leaves.approve', $leave) }}" class="d-inline">
+                                @csrf
+                                <button class="btn btn-outline-success" title="Approuver (RH)">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ route('leaves.reject', $leave) }}" class="d-inline"
+                                  onsubmit="return confirm('Refuser cette demande ?')">
+                                @csrf
+                                <button class="btn btn-outline-danger" title="Refuser (RH)">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </form>
                         @endcan
                     @endif
+
                     @if($leave->status === 'approved')
-                    <a href="{{ route('leaves.print', $leave) }}" class="btn btn-outline-dark" title="Attestation PDF" target="_blank">
-                        <i class="bi bi-printer"></i>
-                    </a>
+                        <a href="{{ route('leaves.print', $leave) }}"
+                           class="btn btn-outline-dark" title="Attestation PDF" target="_blank">
+                            <i class="bi bi-printer"></i>
+                        </a>
                     @endif
                 </div>
             </td>
+{{--            <td>{!! $leave->status_badge !!}</td>--}}
+{{--            <td class="text-center">--}}
+{{--                <div class="btn-group btn-group-sm">--}}
+{{--                    <a href="{{ route('leaves.show', $leave) }}" class="btn btn-outline-secondary" title="Voir">--}}
+{{--                        <i class="bi bi-eye"></i>--}}
+{{--                    </a>--}}
+{{--                    @if($leave->status === 'pending')--}}
+{{--                        @can('valider congés')--}}
+{{--                        <form method="POST" action="{{ route('leaves.approve', $leave) }}" class="d-inline">--}}
+{{--                            @csrf--}}
+{{--                            <button class="btn btn-outline-success" title="Approuver">--}}
+{{--                                <i class="bi bi-check-lg"></i>--}}
+{{--                            </button>--}}
+{{--                        </form>--}}
+{{--                        <form method="POST" action="{{ route('leaves.reject', $leave) }}" class="d-inline"--}}
+{{--                              onsubmit="return confirm('Confirmer le refus ?')">--}}
+{{--                            @csrf--}}
+{{--                            <button class="btn btn-outline-danger" title="Refuser">--}}
+{{--                                <i class="bi bi-x-lg"></i>--}}
+{{--                            </button>--}}
+{{--                        </form>--}}
+{{--                        @endcan--}}
+{{--                        @can('modifier congés')--}}
+{{--                        <a href="{{ route('leaves.edit', $leave) }}" class="btn btn-outline-primary" title="Modifier">--}}
+{{--                            <i class="bi bi-pencil"></i>--}}
+{{--                        </a>--}}
+{{--                        @endcan--}}
+{{--                    @endif--}}
+{{--                    @if($leave->status === 'approved')--}}
+{{--                    <a href="{{ route('leaves.print', $leave) }}" class="btn btn-outline-dark" title="Attestation PDF" target="_blank">--}}
+{{--                        <i class="bi bi-printer"></i>--}}
+{{--                    </a>--}}
+{{--                    @endif--}}
+{{--                </div>--}}
+{{--            </td>--}}
         </tr>
         @empty
         <tr>

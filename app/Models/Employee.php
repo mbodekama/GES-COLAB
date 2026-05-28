@@ -51,6 +51,28 @@ class Employee extends Model
         return $this->hasMany(Payroll::class);
     }
 
+    // ── Supervisor (N+1) ─────────────────────────────────────────
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'supervisor_id');
+    }
+
+    public function subordinates(): HasMany
+    {
+        return $this->hasMany(Employee::class, 'supervisor_id');
+    }
+
+// Rôles considérés comme N+1
+    public const SUPERVISOR_ROLES = [
+        'superviseur',
+        'chef d\'agence',
+        'responsable de distribution',
+        'chef de service',
+        'dgo',
+        'admin',
+        'superadmin',
+    ];
+
     // ── Scopes ───────────────────────────────────────────────
     public function scopeActive($query)
     {

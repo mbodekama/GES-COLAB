@@ -35,6 +35,7 @@
                     ['bi-building',        'Département',     $employee->department],
                     ['bi-calendar3',       'Date d\'embauche',$employee->hire_date->format('d M Y')],
                     ['bi-clock-history',   'Ancienneté',      $employee->seniority_label],
+                    ['bi-person-up',   'Superieur N+1',       $employee->supervisor?->full_name ?? '—' ],
                     ['bi-calendar-check',  'Solde congés',    $employee->leave_balance.' jours'],
                 ] as [$icon, $label, $value])
                 <div class="d-flex justify-content-between align-items-center mb-2" style="font-size:13px">
@@ -98,6 +99,49 @@
                     @endif
                 </div>
             </div>
+            {{-- Et dans les infos professionnelles --}}
+            <div class="col-md-6">
+                <div class="text-muted" style="font-size:11px;text-transform:uppercase">
+                    Supérieur hiérarchique (N+1)
+                </div>
+                <div class="fw-medium">
+                    @if($employee->supervisor)
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-initials"
+                                 style="width:26px;height:26px;font-size:10px;
+                            background:#E6F1FB;color:#185FA5">
+                                {{ $employee->supervisor->initials }}
+                            </div>
+                            <div>
+                                <div>{{ $employee->supervisor->full_name }}</div>
+                                <div class="small text-muted">
+                                    {{ $employee->supervisor->position }}
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <span class="text-muted">Non défini</span>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Subalternes (si N+1) --}}
+            @if($employee->subordinates->count())
+                <div class="col-12">
+                    <div class="text-muted" style="font-size:11px;text-transform:uppercase">
+                        Subalternes directs ({{ $employee->subordinates->count() }})
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                        @foreach($employee->subordinates as $sub)
+                            <a href="{{ route('employees.show', $sub) }}"
+                               class="badge bg-light text-dark border text-decoration-none"
+                               style="font-size:12px;padding:5px 10px">
+                                <i class="bi bi-person me-1"></i>{{ $sub->full_name }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         {{-- CONTRAT ACTIF --}}

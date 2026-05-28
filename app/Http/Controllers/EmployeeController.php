@@ -42,7 +42,10 @@ class EmployeeController extends Controller
         $salaryGrids = SalaryGrid::active()->orderByDesc('level')->get();
         $roles       = Role::orderBy('name')->get();
 
-        return view('employees.create', compact('salaryGrids', 'roles'));
+        // Employés pouvant être N+1
+        $supervisors = $this->getSupervisors();
+
+        return view('employees.create', compact('salaryGrids', 'roles', 'supervisors'));
     }
 
     public function store(Request $request)
@@ -63,6 +66,7 @@ class EmployeeController extends Controller
             'department'        => 'required|string|max:100',
             'hire_date'         => 'required|date',
             'leave_balance'     => 'nullable|integer|min:0',
+            'supervisor_id'     => 'nullable|exists:employees,id',
             'contract_type'     => 'required|in:cdi,cdd,internship,consulting',
             'base_salary'       => 'required|numeric|min:0',
             'salary_grid_id'    => 'nullable|exists:salary_grids,id',
@@ -72,37 +76,35 @@ class EmployeeController extends Controller
         ]);
 
         DB::transaction(function () use ($validated) {
-            // Créer l'utilisateur
             $user = User::create([
-                'name'     => $validated['first_name'] . ' ' . $validated['last_name'],
+                'name'     => $validated['first_name'].' '.$validated['last_name'],
                 'email'    => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
             $user->assignRole($validated['role']);
 
-            // Créer l'employé
             $employee = Employee::create([
                 'user_id'        => $user->id,
                 'matricule'      => Employee::generateMatricule(),
                 'first_name'     => $validated['first_name'],
                 'last_name'      => $validated['last_name'],
                 'email'          => $validated['email'],
-                'phone'          => $validated['phone'] ?? null,
-                'birth_date'     => $validated['birth_date'] ?? null,
-                'birth_place'    => $validated['birth_place'] ?? null,
-                'nationality'    => $validated['nationality'] ?? 'Ivoirienne',
+                'phone'          => $validated['phone']          ?? null,
+                'birth_date'     => $validated['birth_date']     ?? null,
+                'birth_place'    => $validated['birth_place']    ?? null,
+                'nationality'    => $validated['nationality']    ?? 'Ivoirienne',
                 'marital_status' => $validated['marital_status'],
                 'children_count' => $validated['children_count'] ?? 0,
-                'address'        => $validated['address'] ?? null,
-                'cnps_number'    => $validated['cnps_number'] ?? null,
+                'address'        => $validated['address']        ?? null,
+                'cnps_number'    => $validated['cnps_number']    ?? null,
                 'position'       => $validated['position'],
                 'department'     => $validated['department'],
                 'hire_date'      => $validated['hire_date'],
-                'leave_balance'  => $validated['leave_balance'] ?? 30,
+                'leave_balance'  => $validated['leave_balance']  ?? 30,
+                'supervisor_id'  => $validated['supervisor_id']  ?? null,
                 'status'         => 'active',
             ]);
 
-            // Créer le contrat initial
             $employee->contracts()->create([
                 'contract_number' => \App\Models\Contract::generateNumber(),
                 'type'            => $validated['contract_type'],
@@ -118,13 +120,7 @@ class EmployeeController extends Controller
         });
 
         return redirect()->route('employees.index')
-                         ->with('success', 'Employé créé avec succès.');
-    }
-
-    public function show(Employee $employee)
-    {
-        $employee->load(['activeContract', 'leaves', 'payrolls']);
-        return view('employees.show', compact('employee'));
+            ->with('success', 'Employé créé avec succès.');
     }
 
     public function edit(Employee $employee)
@@ -132,7 +128,12 @@ class EmployeeController extends Controller
         $salaryGrids = SalaryGrid::active()->orderByDesc('level')->get();
         $roles       = Role::orderBy('name')->get();
 
-        return view('employees.edit', compact('employee', 'salaryGrids', 'roles'));
+        // Exclure l'employé lui-même de la liste des N+1
+        $supervisors = $this->getSupervisors($employee->id);
+
+        return view('employees.edit', compact(
+            'employee', 'salaryGrids', 'roles', 'supervisors'
+        ));
     }
 
     public function update(Request $request, Employee $employee)
@@ -153,26 +154,59 @@ class EmployeeController extends Controller
             'department'     => 'required|string|max:100',
             'hire_date'      => 'required|date',
             'leave_balance'  => 'nullable|integer|min:0',
+            'supervisor_id'  => 'nullable|exists:employees,id',
             'status'         => 'required|in:active,on_leave,suspended,terminated',
         ]);
 
         DB::transaction(function () use ($employee, $validated, $request) {
             $employee->update($validated);
 
-            // Mettre à jour le nom de l'utilisateur associé
             $employee->user?->update([
-                'name'  => $validated['first_name'] . ' ' . $validated['last_name'],
+                'name'  => $validated['first_name'].' '.$validated['last_name'],
                 'email' => $validated['email'],
             ]);
 
-            // Changer le rôle si demandé
             if ($request->filled('role')) {
                 $employee->user?->syncRoles([$request->role]);
             }
         });
 
         return redirect()->route('employees.show', $employee)
-                         ->with('success', 'Employé mis à jour avec succès.');
+            ->with('success', 'Employé mis à jour.');
+    }
+
+// ── Helper : récupérer les superviseurs potentiels ─────────────
+    private function getSupervisors(?int $excludeId = null): \Illuminate\Support\Collection
+    {
+        return Employee::with('user.roles')
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+            ->whereHas('user.roles', function ($q) {
+                $q->whereIn('name', [
+                    'superadmin',
+                    'admin',
+                    'rh',
+                    'superviseur',
+                    'chef d\'agence',
+                    'responsable de distribution',
+                    'chef de service',
+                    'dgo',
+                ]);
+            })
+            ->orderBy('last_name')
+            ->get();
+    }
+
+    public function show(Employee $employee)
+    {
+        $employee->load([
+            'activeContract',
+            'leaves',
+            'payrolls',
+            'supervisor',
+            'subordinates',
+        ]);
+
+        return view('employees.show', compact('employee'));
     }
 
     public function destroy(Employee $employee)

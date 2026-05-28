@@ -26,23 +26,7 @@ class RoleController extends Controller
         return view('roles.create', compact('permissions'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name'        => 'required|string|max:60|unique:roles,name',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'exists:permissions,id',
-        ]);
 
-        $role = Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
-
-        if (!empty($validated['permissions'])) {
-            $role->syncPermissions($validated['permissions']);
-        }
-
-        return redirect()->route('roles.index')
-                         ->with('success', "Rôle « {$role->name} » créé.");
-    }
 
     public function edit(Role $role)
     {
@@ -50,21 +34,6 @@ class RoleController extends Controller
             ->groupBy(fn($p) => explode(' ', $p->name)[1] ?? 'autre');
 
         return view('roles.edit', compact('role', 'permissions'));
-    }
-
-    public function update(Request $request, Role $role)
-    {
-        $validated = $request->validate([
-            'name'          => 'required|string|max:60|unique:roles,name,'.$role->id,
-            'permissions'   => 'nullable|array',
-            'permissions.*' => 'exists:permissions,id',
-        ]);
-
-        $role->update(['name' => $validated['name']]);
-        $role->syncPermissions($validated['permissions'] ?? []);
-
-        return redirect()->route('roles.index')
-                         ->with('success', "Rôle « {$role->name} » mis à jour.");
     }
 
     public function destroy(Role $role)
@@ -79,6 +48,44 @@ class RoleController extends Controller
                          ->with('success', 'Rôle supprimé.');
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name'          => 'required|string|max:60|unique:roles,name',
+            'permissions'   => 'nullable|array',
+            'permissions.*' => 'exists:permissions,id',
+        ]);
+
+        $role = Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
+
+        if (!empty($validated['permissions'])) {
+            // ── Récupérer les objets Permission par ID ────────────
+            $permissions = Permission::whereIn('id', $validated['permissions'])->get();
+            $role->syncPermissions($permissions);
+        }
+
+        return redirect()->route('roles.index')
+            ->with('success', "Rôle « {$role->name} » créé.");
+    }
+
+    public function update(Request $request, Role $role)
+    {
+        $validated = $request->validate([
+            'name'          => 'required|string|max:60|unique:roles,name,'.$role->id,
+            'permissions'   => 'nullable|array',
+            'permissions.*' => 'exists:permissions,id',
+        ]);
+
+        $role->update(['name' => $validated['name']]);
+
+        // ── Récupérer les objets Permission par ID ────────────────
+        $permissions = Permission::whereIn('id', $validated['permissions'] ?? [])->get();
+        $role->syncPermissions($permissions);
+
+        return redirect()->route('roles.index')
+            ->with('success', "Rôle « {$role->name} » mis à jour.");
+    }
+
     public function updatePermissions(Request $request, Role $role)
     {
         $request->validate([
@@ -86,7 +93,9 @@ class RoleController extends Controller
             'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $role->syncPermissions($request->permissions ?? []);
+        // ── Récupérer les objets Permission par ID ────────────────
+        $permissions = Permission::whereIn('id', $request->permissions ?? [])->get();
+        $role->syncPermissions($permissions);
 
         return back()->with('success', 'Permissions mises à jour.');
     }

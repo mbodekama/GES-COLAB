@@ -9,20 +9,54 @@ use Illuminate\Http\Request;
 
 class LeaveController extends Controller
 {
+    // ── Liste des demandes ────────────────────────────────────
     public function index(Request $request)
     {
-        $query = Leave::with('employee')->latest();
+        $user     = auth()->user();
+        $employee = $user->employee;
 
-        // Filtrer selon le rôle : un utilisateur basique ne voit que ses propres congés
-        if (auth()->user()->hasRole('user')) {
-            $query->whereHas('employee', fn($q) => $q->where('user_id', auth()->id()));
+        $query = Leave::with(['employee', 'n1Validator', 'approvedBy'])->latest();
+
+        if ($user->hasRole(['superadmin', 'admin'])) {
+            // Tout voir sans restriction
+
+        } elseif ($user->hasRole('rh')) {
+            // RH : demandes qui lui sont destinées
+            $query->whereIn('workflow_step', [
+                'pending_rh', 'approved', 'rejected',
+            ]);
+
+        } elseif ($this->isN1($user)) {
+            // N+1 : uniquement les demandes de ses subalternes directs
+            $subordinateIds = $this->getSubordinateIds($employee);
+
+            abort_if(empty($subordinateIds), 403,
+                'Aucun subalterne assigné à votre compte.');
+
+            $query->whereHas('employee', function ($q) use ($subordinateIds) {
+                $q->whereIn('id', $subordinateIds);
+            });
+
+        } else {
+            // Employé standard : ses propres demandes uniquement
+            $query->whereHas('employee',
+                fn($q) => $q->where('user_id', $user->id)
+            );
         }
 
-        if ($request->filled('type'))   $query->where('type', $request->type);
-        if ($request->filled('status')) $query->where('status', $request->status);
+        // ── Filtres ───────────────────────────────────────────
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('workflow_step')) {
+            $query->where('workflow_step', $request->workflow_step);
+        }
         if ($request->filled('month')) {
-            $query->whereYear('start_date', substr($request->month, 0, 4))
-                  ->whereMonth('start_date', substr($request->month, 5, 2));
+            $query->whereYear('start_date',  substr($request->month, 0, 4))
+                ->whereMonth('start_date', substr($request->month, 5, 2));
         }
         if ($request->filled('search')) {
             $query->whereHas('employee', fn($q) => $q->search($request->search));
@@ -32,17 +66,21 @@ class LeaveController extends Controller
         }
 
         $leaves       = $query->paginate(20)->withQueryString();
-        $pendingCount = Leave::pending()->count();
+        $pendingCount = $this->getPendingCount($user, $employee);
 
         return view('conges.index', compact('leaves', 'pendingCount'));
     }
 
+    // ── Formulaire de création ────────────────────────────────
     public function create()
     {
+        $user      = auth()->user();
         $employees = Employee::active()->orderBy('last_name')->get();
+
         return view('conges.create', compact('employees'));
     }
 
+    // ── Enregistrer une nouvelle demande ──────────────────────
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -54,13 +92,41 @@ class LeaveController extends Controller
             'attachment'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
+        $employee = Employee::findOrFail($validated['employee_id']);
+
+        // Vérifier que l'employé a un N+1 pour les permissions
+        if ($validated['type'] === 'permission' && !$employee->supervisor_id) {
+            return back()
+                ->withInput()
+                ->with('error',
+                    'Cet employé n\'a pas de supérieur hiérarchique (N+1) assigné. '
+                    .'Contactez le service RH.'
+                );
+        }
+
         $start = \Carbon\Carbon::parse($validated['start_date']);
         $end   = \Carbon\Carbon::parse($validated['end_date']);
 
+        // Vérifier le solde de congés
+        $duration = Leave::calculateDays($start, $end);
+        if (in_array($validated['type'], ['annual', 'maternity', 'paternity'])
+            && $employee->leave_balance < $duration) {
+            return back()
+                ->withInput()
+                ->with('error',
+                    "Solde insuffisant. Solde disponible : {$employee->leave_balance} jour(s), "
+                    ."demande : {$duration} jour(s)."
+                );
+        }
+
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('leaves', 'public');
+            $attachmentPath = $request->file('attachment')
+                ->store('leaves', 'public');
         }
+
+        // Déterminer l'étape initiale du workflow
+        $workflowStep = Leave::initialWorkflowStep($validated['type']);
 
         Leave::create([
             'employee_id'   => $validated['employee_id'],
@@ -68,29 +134,54 @@ class LeaveController extends Controller
             'type'          => $validated['type'],
             'start_date'    => $validated['start_date'],
             'end_date'      => $validated['end_date'],
-            'duration_days' => Leave::calculateDays($start, $end),
+            'duration_days' => $duration,
             'reason'        => $validated['reason'] ?? null,
             'attachment'    => $attachmentPath,
             'status'        => 'pending',
+            'workflow_step' => $workflowStep,
         ]);
 
-        return redirect()->route('leaves.index')
-                         ->with('success', 'Demande de congé soumise avec succès.');
+        $message = $workflowStep === 'pending_n1'
+            ? 'Demande soumise. En attente de validation par votre N+1 ('
+            .$employee->supervisor->full_name.').'
+            : 'Demande soumise. En attente de validation par le service RH.';
+
+        return redirect()->route('leaves.index')->with('success', $message);
     }
 
+    // ── Détail d'une demande ──────────────────────────────────
     public function show(Leave $leave)
     {
-        $leave->load(['employee', 'approvedBy']);
+        // Vérifier les droits d'accès
+        $this->authorizeView($leave);
+
+        $leave->load(['employee', 'approvedBy', 'n1Validator',
+            'employee.supervisor']);
+
         return view('conges.show', compact('leave'));
     }
 
+    // ── Formulaire d'édition ──────────────────────────────────
     public function edit(Leave $leave)
     {
-        abort_if($leave->status !== 'pending', 403, 'Seules les demandes en attente peuvent être modifiées.');
+        abort_if($leave->status !== 'pending', 403,
+            'Seules les demandes en attente peuvent être modifiées.');
+
+        // Seul l'employé concerné ou un admin peut modifier
+        $user = auth()->user();
+        if (!$user->hasRole(['superadmin', 'admin', 'rh'])) {
+            abort_if(
+                $leave->employee->user_id !== $user->id,
+                403, 'Accès non autorisé.'
+            );
+        }
+
         $employees = Employee::active()->orderBy('last_name')->get();
+
         return view('conges.edit', compact('leave', 'employees'));
     }
 
+    // ── Mettre à jour une demande ─────────────────────────────
     public function update(Request $request, Leave $leave)
     {
         abort_if($leave->status !== 'pending', 403);
@@ -102,68 +193,273 @@ class LeaveController extends Controller
             'reason'     => 'nullable|string|max:500',
         ]);
 
-        $start = \Carbon\Carbon::parse($validated['start_date']);
-        $end   = \Carbon\Carbon::parse($validated['end_date']);
+        $start    = \Carbon\Carbon::parse($validated['start_date']);
+        $end      = \Carbon\Carbon::parse($validated['end_date']);
+        $duration = Leave::calculateDays($start, $end);
 
         $leave->update([
             ...$validated,
-            'duration_days' => Leave::calculateDays($start, $end),
+            'duration_days' => $duration,
+            'workflow_step' => Leave::initialWorkflowStep($validated['type']),
         ]);
 
         return redirect()->route('leaves.show', $leave)
-                         ->with('success', 'Demande mise à jour.');
+            ->with('success', 'Demande mise à jour.');
     }
 
+    // ── Supprimer une demande ─────────────────────────────────
     public function destroy(Leave $leave)
     {
-        abort_if($leave->status !== 'pending', 403);
+        abort_if($leave->status !== 'pending', 403,
+            'Seules les demandes en attente peuvent être supprimées.');
+
+        $user = auth()->user();
+        if (!$user->hasRole(['superadmin', 'admin'])) {
+            abort_if(
+                $leave->employee->user_id !== $user->id,
+                403, 'Accès non autorisé.'
+            );
+        }
+
         $leave->delete();
+
         return redirect()->route('leaves.index')
-                         ->with('success', 'Demande supprimée.');
+            ->with('success', 'Demande supprimée.');
     }
 
-    public function approve(Leave $leave)
+    // ── Validation N+1 ────────────────────────────────────────
+    public function approveN1(Request $request, Leave $leave)
     {
-        abort_if($leave->status !== 'pending', 403, 'Cette demande ne peut plus être approuvée.');
+        $user     = auth()->user();
+        $employee = $user->employee;
+
+        // Superadmin et admin peuvent toujours valider
+        if (!$user->hasRole(['superadmin', 'admin'])) {
+            // Vérifier que c'est bien le N+1 de cet employé
+            abort_unless(
+                $this->isN1OfEmployee($employee, $leave->employee),
+                403,
+                'Vous n\'êtes pas le N+1 de cet employé.'
+            );
+        }
+
+        abort_if($leave->workflow_step !== 'pending_n1', 403,
+            'Cette demande n\'est pas à l\'étape de validation N+1.');
 
         $leave->update([
-            'status'      => 'approved',
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
+            'workflow_step'   => 'pending_rh',
+            'n1_validator_id' => $user->id,
+            'n1_validated_at' => now(),
+            'n1_comment'      => $request->comment,
+        ]);
+
+        return back()->with('success',
+            "Permission de {$leave->employee->full_name} "
+            ."validée et transmise au RH."
+        );
+    }
+
+    // ── Refus N+1 ─────────────────────────────────────────────
+    public function rejectN1(Request $request, Leave $leave)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:500',
+        ]);
+
+        $user     = auth()->user();
+        $employee = $user->employee;
+
+        if (!$user->hasRole(['superadmin', 'admin'])) {
+            abort_unless(
+                $this->isN1OfEmployee($employee, $leave->employee),
+                403,
+                'Vous n\'êtes pas le N+1 de cet employé.'
+            );
+        }
+
+        abort_if($leave->workflow_step !== 'pending_n1', 403);
+
+        $leave->update([
+            'workflow_step'    => 'rejected',
+            'status'           => 'rejected',
+            'n1_validator_id'  => $user->id,
+            'n1_validated_at'  => now(),
+            'n1_comment'       => $request->comment,
+            'rejection_reason' => $request->comment,
+        ]);
+
+        return back()->with('success',
+            "Demande de {$leave->employee->full_name} refusée."
+        );
+    }
+
+    // ── Validation RH (validateur final) ──────────────────────
+    public function approve(Leave $leave)
+    {
+        abort_unless(
+            auth()->user()->hasRole(['rh', 'admin', 'superadmin']),
+            403, 'Action réservée au service RH.'
+        );
+
+        abort_if($leave->workflow_step !== 'pending_rh', 403,
+            'Cette demande doit d\'abord être validée par le N+1.'
+        );
+
+        $leave->update([
+            'status'        => 'approved',
+            'workflow_step' => 'approved',
+            'approved_by'   => auth()->id(),
+            'approved_at'   => now(),
         ]);
 
         // Déduire du solde de congés
         $leave->employee->decrement('leave_balance', $leave->duration_days);
 
-        // Mettre à jour le statut de l'employé si congé annuel
+        // Mettre le statut employé à "en congé"
         if (in_array($leave->type, ['annual', 'maternity', 'paternity'])) {
             $leave->employee->update(['status' => 'on_leave']);
         }
 
-        return back()->with('success', "Congé de {$leave->employee->full_name} approuvé.");
+        return back()->with('success',
+            "Congé de {$leave->employee->full_name} approuvé."
+        );
     }
 
+    // ── Refus RH ──────────────────────────────────────────────
     public function reject(Request $request, Leave $leave)
     {
-        abort_if($leave->status !== 'pending', 403);
+        $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        abort_unless(
+            auth()->user()->hasRole(['rh', 'admin', 'superadmin']),
+            403, 'Action réservée au service RH.'
+        );
+
+        abort_if(!in_array($leave->workflow_step, ['pending_rh', 'pending_n1']),
+            403, 'Cette demande ne peut plus être refusée.'
+        );
 
         $leave->update([
             'status'           => 'rejected',
+            'workflow_step'    => 'rejected',
             'approved_by'      => auth()->id(),
             'rejection_reason' => $request->reason,
         ]);
 
-        return back()->with('success', "Demande de {$leave->employee->full_name} refusée.");
+        return back()->with('success',
+            "Demande de {$leave->employee->full_name} refusée."
+        );
     }
 
+    // ── Imprimer l'attestation PDF ────────────────────────────
     public function print(Leave $leave)
     {
-        abort_if($leave->status !== 'approved', 403, 'Seuls les congés approuvés peuvent être imprimés.');
-        $leave->load(['employee', 'approvedBy']);
+        abort_if($leave->status !== 'approved', 403,
+            'Seuls les congés approuvés peuvent être imprimés.'
+        );
+
+        $leave->load(['employee', 'approvedBy', 'n1Validator']);
 
         $pdf = Pdf::loadView('conges.pdf.attestation', compact('leave'))
-                  ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'portrait');
 
         return $pdf->stream("conge-{$leave->leave_number}.pdf");
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // HELPERS PRIVÉS
+    // ─────────────────────────────────────────────────────────
+
+    // Vérifier si un user a un rôle N+1
+    private function isN1($user): bool
+    {
+        return $user->hasRole([
+            'superadmin',
+            'admin',
+            'superviseur',
+            'chef d\'agence',
+            'responsable de distribution',
+            'chef de service',
+            'dgo',
+        ]);
+    }
+
+    // Vérifier si $supervisor est bien le N+1 direct de $employee
+    private function isN1OfEmployee(
+        ?Employee $supervisor,
+        Employee $employee
+    ): bool {
+        if (!$supervisor) return false;
+
+        // Superadmin et admin peuvent toujours
+        if (auth()->user()->hasRole(['superadmin', 'admin'])) {
+            return true;
+        }
+
+        // Vérifier le lien supervisor_id
+        return $employee->supervisor_id === $supervisor->id;
+    }
+
+    // Récupérer les IDs des subalternes directs
+    private function getSubordinateIds(?Employee $supervisor): array
+    {
+        if (!$supervisor) return [];
+
+        return Employee::where('supervisor_id', $supervisor->id)
+            ->pluck('id')
+            ->toArray();
+    }
+
+    // Compter les demandes en attente selon le rôle
+    private function getPendingCount($user, $employee): int
+    {
+        if ($user->hasRole(['superadmin', 'admin'])) {
+            return Leave::whereIn('workflow_step', [
+                'pending_n1', 'pending_rh',
+            ])->count();
+        }
+
+        if ($user->hasRole('rh')) {
+            return Leave::where('workflow_step', 'pending_rh')->count();
+        }
+
+        if ($this->isN1($user) && $employee) {
+            $subordinateIds = $this->getSubordinateIds($employee);
+            return Leave::where('workflow_step', 'pending_n1')
+                ->whereHas('employee', function ($q) use ($subordinateIds) {
+                    $q->whereIn('id', $subordinateIds);
+                })
+                ->count();
+        }
+
+        return $employee
+            ? Leave::where('employee_id', $employee->id)
+                ->pending()
+                ->count()
+            : 0;
+    }
+
+    // Vérifier les droits de consultation d'une demande
+    private function authorizeView(Leave $leave): void
+    {
+        $user     = auth()->user();
+        $employee = $user->employee;
+
+        // Admin et RH voient tout
+        if ($user->hasRole(['superadmin', 'admin', 'rh'])) return;
+
+        // N+1 voit les demandes de ses subalternes
+        if ($this->isN1($user) && $employee) {
+            $subordinateIds = $this->getSubordinateIds($employee);
+            if (in_array($leave->employee_id, $subordinateIds)) return;
+        }
+
+        // Employé voit ses propres demandes
+        abort_if(
+            $leave->employee->user_id !== $user->id,
+            403, 'Accès non autorisé.'
+        );
     }
 }
