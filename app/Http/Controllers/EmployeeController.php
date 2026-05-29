@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class EmployeeController extends Controller
@@ -57,6 +58,8 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+        $this->logEntry(['email' => $request->input('email')]);
+
         $validated = $request->validate([
             'first_name'        => 'required|string|max:100',
             'last_name'         => 'required|string|max:100',
@@ -130,6 +133,11 @@ class EmployeeController extends Controller
                 'signed_at'       => now(),
             ]);
         });
+
+        Log::info('Nouvel employé créé', [
+            'matricule'  => Employee::latest()->value('matricule'),
+            'created_by' => auth()->id(),
+        ]);
 
         return redirect()->route('employees.index')
                          ->with('success', 'Employé créé avec succès.');
@@ -209,6 +217,8 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        $this->logEntry(['matricule' => $employee->matricule]);
+
         $employee->delete();
 
         return redirect()->route('employees.index')
