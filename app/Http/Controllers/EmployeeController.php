@@ -17,6 +17,7 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
+        $this->logEntry();
         $query = Employee::with(['activeContract', 'poste'])->latest();
 
         if ($request->filled('department')) {
