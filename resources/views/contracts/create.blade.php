@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('page-title', 'Nouveau contrat')
 
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Contrats', 'url' => route('contracts.index')],
+    ['label' => 'Nouveau contrat'],
+]" />
+@endsection
+
 @section('header-actions')
     <a href="{{ route('contracts.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Retour

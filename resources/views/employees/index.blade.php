@@ -72,9 +72,9 @@
     <table class="table table-hover mb-0">
         <thead>
             <tr>
-                <th>Matricule</th>
+                <x-sort-th column="matricule" label="Matricule" />
                 <x-sort-th column="last_name" label="Nom & Prénom" />
-                <th>Poste</th>
+                <x-sort-th column="position" label="Poste" />
                 <x-sort-th column="department" label="Département" />
                 <th>Contrat</th>
                 <x-sort-th column="hire_date" label="Ancienneté" />

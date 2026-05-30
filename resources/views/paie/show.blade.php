@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('page-title', 'Bulletin de paie')
 
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Gestion de la paie', 'url' => route('payroll.index')],
+    ['label' => $payroll->employee->full_name.' — '.\Carbon\Carbon::parse($payroll->period.'-01')->isoFormat('MMMM YYYY')],
+]" />
+@endsection
+
 @section('header-actions')
     <a href="{{ route('payroll.print.design', $payroll) }}" class="btn btn-primary btn-sm" target="_blank">
         <i class="bi bi-file-earmark-richtext me-1"></i> Bulletin PDF

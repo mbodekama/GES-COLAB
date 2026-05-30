@@ -73,9 +73,9 @@
             <table class="table table-hover mb-0">
                 <thead>
                 <tr>
-                    <th>N° Contrat</th>
+                    <x-sort-th column="contract_number" label="N° Contrat" />
                     <th>Employé</th>
-                    <th>Poste</th>
+                    <x-sort-th column="position" label="Poste" />
                     <x-sort-th column="type" label="Type" />
                     <x-sort-th column="start_date" label="Début" />
                     <x-sort-th column="end_date" label="Fin" />

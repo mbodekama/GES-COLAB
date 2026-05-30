@@ -13,7 +13,7 @@ class PayrollController extends Controller
     {
         $period = $request->get('period', now()->format('Y-m'));
 
-        $allowed = ['gross_salary', 'net_salary'];
+        $allowed = ['gross_salary', 'cnps_employee', 'igr', 'net_salary'];
         $sortBy  = in_array($request->get('sort_by'), $allowed) ? $request->get('sort_by') : 'created_at';
         $sortDir = $request->get('sort_dir') === 'asc' ? 'asc' : 'desc';
         $query = Payroll::with('employee')->forPeriod($period)->orderBy($sortBy, $sortDir);

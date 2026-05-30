@@ -81,8 +81,8 @@
                 <th>Employé</th>
                 <th>Département</th>
                 <x-sort-th column="gross_salary" label="Brut" />
-                <th>CNPS salarié</th>
-                <th>IGR</th>
+                <x-sort-th column="cnps_employee" label="CNPS salarié" />
+                <x-sort-th column="igr" label="IGR" />
                 <x-sort-th column="net_salary" label="Net à payer" />
                 <th class="text-center">Actions</th>
             </tr>

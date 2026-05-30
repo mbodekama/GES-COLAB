@@ -1,6 +1,14 @@
 @extends('layouts.app')
 @section('page-title', 'Modifier — '.ucfirst($role->name))
 
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Rôles & Permissions', 'url' => route('roles.index')],
+    ['label' => ucfirst($role->name)],
+    ['label' => 'Modifier'],
+]" />
+@endsection
+
 @section('header-actions')
     <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Retour

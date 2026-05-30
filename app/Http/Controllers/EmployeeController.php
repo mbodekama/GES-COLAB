@@ -19,7 +19,7 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $this->logEntry();
-        $allowed = ['last_name', 'department', 'hire_date', 'status'];
+        $allowed = ['matricule', 'last_name', 'position', 'department', 'hire_date', 'status'];
         $sortBy  = in_array($request->get('sort_by'), $allowed) ? $request->get('sort_by') : 'created_at';
         $sortDir = $request->get('sort_dir') === 'asc' ? 'asc' : 'desc';
         $query = Employee::with(['activeContract', 'poste'])->orderBy($sortBy, $sortDir);
@@ -42,7 +42,7 @@ class EmployeeController extends Controller
             $query->search($request->search);
         }
 
-        $employees   = $query->paginate(20)->withQueryString();
+        $employees   = $query->paginate(5)->withQueryString();
         $departments = Employee::distinct()->orderBy('department')->pluck('department');
         $postes      = Poste::active()->orderedByLevel()->get();
         $salaryGrids = SalaryGrid::active()->orderByDesc('level')->get();

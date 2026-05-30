@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('page-title', 'Nouvelle demande de congé')
 
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Congés & Permissions', 'url' => route('leaves.index')],
+    ['label' => 'Nouvelle demande'],
+]" />
+@endsection
+
 @section('header-actions')
     <a href="{{ route('leaves.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Retour

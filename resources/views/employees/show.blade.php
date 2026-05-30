@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('page-title', $employee->full_name)
 
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Employés', 'url' => route('employees.index')],
+    ['label' => $employee->full_name],
+]" />
+@endsection
+
 @section('header-actions')
     @can('modifier employés')
     <a href="{{ route('employees.edit', $employee) }}" class="btn btn-outline-primary btn-sm">

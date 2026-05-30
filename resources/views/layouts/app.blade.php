@@ -249,11 +249,53 @@
             #sidebar, #topbar { display: none !important; }
             #content-wrapper { margin: 0; padding: 0; }
         }
+
+        /* ── SIDEBAR COLLAPSIBLE ─────────────────────────────── */
+        #sidebar         { transition: width .25s ease, transform .25s ease; }
+        #topbar          { transition: left .25s ease; }
+        #content-wrapper { transition: margin-left .25s ease; }
+
+        @media (min-width: 769px) {
+            body.sidebar-collapsed #sidebar         { width: 70px; }
+            body.sidebar-collapsed #topbar          { left: 70px; }
+            body.sidebar-collapsed #content-wrapper { margin-left: 70px; }
+
+            body.sidebar-collapsed .nav-label,
+            body.sidebar-collapsed .nav-section,
+            body.sidebar-collapsed .brand-name,
+            body.sidebar-collapsed .brand-sub,
+            body.sidebar-collapsed .user-name,
+            body.sidebar-collapsed .user-role { display: none; }
+
+            body.sidebar-collapsed .sidebar-brand   { justify-content: center; padding: 0; gap: 0; }
+            body.sidebar-collapsed .nav-item        { justify-content: center; padding: 11px 0; position: relative; }
+            body.sidebar-collapsed .nav-item i      { width: auto; }
+            body.sidebar-collapsed .nav-badge       {
+                position: absolute; top: 4px; right: 6px;
+                margin-left: 0; font-size: 9px; padding: 1px 5px;
+            }
+            body.sidebar-collapsed .sidebar-footer  { padding: 12px 0; }
+            body.sidebar-collapsed .user-pill       { justify-content: center; }
+            body.sidebar-collapsed .user-pill > div:not(.user-avatar),
+            body.sidebar-collapsed .user-pill > form { display: none; }
+        }
+
+        /* Toggle button */
+        .sidebar-toggle-btn {
+            background: none; border: none; cursor: pointer;
+            color: #6c757d; padding: 6px 8px; border-radius: 6px;
+            align-items: center; display: none;
+            font-size: 18px; line-height: 1;
+            transition: color .15s, background .15s;
+        }
+        .sidebar-toggle-btn:hover { background: #f0f2f5; color: #1a1a2e; }
+        @media (min-width: 769px) { .sidebar-toggle-btn { display: flex; } }
     </style>
 
     @stack('styles')
 </head>
 <body>
+<script>if(localStorage.getItem('gescolab_sidebar_collapsed')==='1')document.body.classList.add('sidebar-collapsed');</script>
 
 {{-- ── SIDEBAR ────────────────────────────────────────────── --}}
 <nav id="sidebar">
@@ -270,13 +312,15 @@
         <div class="nav-section">Principal</div>
 
         <a href="{{ route('dashboard') }}"
-           class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="bi bi-grid-1x2-fill"></i> Tableau de bord
+           class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+           data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Tableau de bord">
+            <i class="bi bi-grid-1x2-fill"></i> <span class="nav-label">Tableau de bord</span>
         </a>
 
         <a href="{{ route('messages.index') }}"
-           class="nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
-            <i class="bi bi-chat-dots-fill"></i> Messagerie
+           class="nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}"
+           data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Messagerie">
+            <i class="bi bi-chat-dots-fill"></i> <span class="nav-label">Messagerie</span>
             @php $unread = auth()->user()->unreadMessagesCount(); @endphp
             @if($unread > 0)
                 <span class="nav-badge">{{ $unread }}</span>
@@ -287,22 +331,25 @@
 
         @can('voir employés')
             <a href="{{ route('employees.index') }}"
-               class="nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-                <i class="bi bi-people-fill"></i> Employés
+               class="nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}"
+               data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Employés">
+                <i class="bi bi-people-fill"></i> <span class="nav-label">Employés</span>
             </a>
         @endcan
 
         @can('voir contrats')
             <a href="{{ route('contracts.index') }}"
-               class="nav-item {{ request()->routeIs('contracts.*') ? 'active' : '' }}">
-                <i class="bi bi-file-earmark-text-fill"></i> Contrats
+               class="nav-item {{ request()->routeIs('contracts.*') ? 'active' : '' }}"
+               data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Contrats">
+                <i class="bi bi-file-earmark-text-fill"></i> <span class="nav-label">Contrats</span>
             </a>
         @endcan
 
         @can('voir congés')
             <a href="{{ route('leaves.index') }}"
-               class="nav-item {{ request()->routeIs('leaves.*') ? 'active' : '' }}">
-                <i class="bi bi-calendar-check-fill"></i> Congés & Permissions
+               class="nav-item {{ request()->routeIs('leaves.*') ? 'active' : '' }}"
+               data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Congés &amp; Permissions">
+                <i class="bi bi-calendar-check-fill"></i> <span class="nav-label">Congés & Permissions</span>
 
                 @php
                     $user     = auth()->user();
@@ -342,8 +389,9 @@
 
         @role('superadmin|admin|rh')
         <a href="{{ route('postes.index') }}"
-           class="nav-item {{ request()->routeIs('postes.*') ? 'active' : '' }}">
-            <i class="bi bi-diagram-3-fill"></i> Postes & Hiérarchie
+           class="nav-item {{ request()->routeIs('postes.*') ? 'active' : '' }}"
+           data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Postes &amp; Hiérarchie">
+            <i class="bi bi-diagram-3-fill"></i> <span class="nav-label">Postes & Hiérarchie</span>
         </a>
         @endrole
 
@@ -351,15 +399,17 @@
 
         @can('voir fiches de paie')
             <a href="{{ route('payroll.index') }}"
-               class="nav-item {{ request()->routeIs('payroll.*') ? 'active' : '' }}">
-                <i class="bi bi-receipt-cutoff"></i> Gestion de la paie
+               class="nav-item {{ request()->routeIs('payroll.*') ? 'active' : '' }}"
+               data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Gestion de la paie">
+                <i class="bi bi-receipt-cutoff"></i> <span class="nav-label">Gestion de la paie</span>
             </a>
         @endcan
 
         @can('voir grilles salariales')
             <a href="{{ route('salary-grids.index') }}"
-               class="nav-item {{ request()->routeIs('salary-grids.*') ? 'active' : '' }}">
-                <i class="bi bi-table"></i> Grilles salariales
+               class="nav-item {{ request()->routeIs('salary-grids.*') ? 'active' : '' }}"
+               data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Grilles salariales">
+                <i class="bi bi-table"></i> <span class="nav-label">Grilles salariales</span>
             </a>
         @endcan
 
@@ -367,13 +417,15 @@
         <div class="nav-section">Administration</div>
 
         <a href="{{ route('roles.index') }}"
-           class="nav-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
-            <i class="bi bi-shield-lock-fill"></i> Rôles & Permissions
+           class="nav-item {{ request()->routeIs('roles.*') ? 'active' : '' }}"
+           data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Rôles &amp; Permissions">
+            <i class="bi bi-shield-lock-fill"></i> <span class="nav-label">Rôles & Permissions</span>
         </a>
 
         <a href="{{ route('config.index') }}"
-           class="nav-item {{ request()->routeIs('config.*') ? 'active' : '' }}">
-            <i class="bi bi-gear-fill"></i> Configuration
+           class="nav-item {{ request()->routeIs('config.*') ? 'active' : '' }}"
+           data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Configuration">
+            <i class="bi bi-gear-fill"></i> <span class="nav-label">Configuration</span>
         </a>
         @endrole
 
@@ -405,6 +457,10 @@
     <button class="btn btn-link d-md-none p-0 me-2 text-dark"
             onclick="document.getElementById('sidebar').classList.toggle('show')">
         <i class="bi bi-list fs-4"></i>
+    </button>
+
+    <button id="sidebar-toggle" class="sidebar-toggle-btn me-1" title="Réduire la barre latérale">
+        <i class="bi bi-layout-sidebar"></i>
     </button>
 
     <span class="page-title">@yield('page-title', 'Tableau de bord')</span>
@@ -532,6 +588,8 @@
             </div>
         @endif
 
+        @yield('breadcrumb')
+
         @yield('content')
     </div>
 </div>
@@ -546,6 +604,45 @@
                 + encodeURIComponent(this.value.trim());
         }
     });
+</script>
+<script>
+(function () {
+    var STORAGE_KEY = 'gescolab_sidebar_collapsed';
+    var body   = document.body;
+    var toggle = document.getElementById('sidebar-toggle');
+
+    // Init Bootstrap tooltips on nav items — disabled by default, enabled when collapsed
+    var navTooltipEls = document.querySelectorAll('.nav-item[data-bs-toggle="tooltip"]');
+    var navTooltips   = Array.from(navTooltipEls).map(function (el) {
+        return new bootstrap.Tooltip(el, { trigger: 'hover' });
+    });
+
+    function syncTooltips(collapsed) {
+        navTooltips.forEach(function (t) { collapsed ? t.enable() : t.disable(); });
+    }
+
+    function syncIcon(collapsed) {
+        if (!toggle) return;
+        var icon = toggle.querySelector('i');
+        icon.className    = collapsed ? 'bi bi-layout-sidebar-reverse' : 'bi bi-layout-sidebar';
+        toggle.title      = collapsed ? 'Agrandir la barre latérale' : 'Réduire la barre latérale';
+    }
+
+    // Apply initial state (body class was set by inline script; sync UI)
+    var isCollapsed = body.classList.contains('sidebar-collapsed');
+    syncTooltips(isCollapsed);
+    syncIcon(isCollapsed);
+
+    if (toggle) {
+        toggle.addEventListener('click', function () {
+            isCollapsed = !isCollapsed;
+            body.classList.toggle('sidebar-collapsed', isCollapsed);
+            localStorage.setItem(STORAGE_KEY, isCollapsed ? '1' : '0');
+            syncTooltips(isCollapsed);
+            syncIcon(isCollapsed);
+        });
+    }
+})();
 </script>
 @stack('scripts')
 </body>

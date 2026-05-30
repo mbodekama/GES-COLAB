@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('page-title', 'Demande — '.$leave->leave_number)
 
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Congés & Permissions', 'url' => route('leaves.index')],
+    ['label' => $leave->leave_number],
+]" />
+@endsection
+
 @section('header-actions')
     @if($leave->status === 'approved')
         <a href="{{ route('leaves.print.design', $leave) }}" class="btn btn-primary btn-sm" target="_blank">

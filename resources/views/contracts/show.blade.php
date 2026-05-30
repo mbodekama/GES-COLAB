@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('page-title', 'Contrat — '.$contract->contract_number)
 
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Contrats', 'url' => route('contracts.index')],
+    ['label' => $contract->contract_number],
+]" />
+@endsection
+
 @section('header-actions')
     @can('modifier contrats')
         <a href="{{ route('contracts.edit', $contract) }}" class="btn btn-outline-primary btn-sm">
