@@ -21,7 +21,7 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Rôle</th>
+                        <x-sort-th column="name" label="Rôle" />
                         <th>Utilisateurs</th>
                         <th>Permissions</th>
                         <th class="text-center">Actions</th>

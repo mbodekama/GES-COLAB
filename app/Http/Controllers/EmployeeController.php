@@ -19,7 +19,10 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $this->logEntry();
-        $query = Employee::with(['activeContract', 'poste'])->latest();
+        $allowed = ['last_name', 'department', 'hire_date', 'status'];
+        $sortBy  = in_array($request->get('sort_by'), $allowed) ? $request->get('sort_by') : 'created_at';
+        $sortDir = $request->get('sort_dir') === 'asc' ? 'asc' : 'desc';
+        $query = Employee::with(['activeContract', 'poste'])->orderBy($sortBy, $sortDir);
 
         if ($request->filled('department')) {
             $query->byDepartment($request->department);

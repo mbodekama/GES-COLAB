@@ -76,11 +76,11 @@
                     <th>N° Contrat</th>
                     <th>Employé</th>
                     <th>Poste</th>
-                    <th>Type</th>
-                    <th>Début</th>
-                    <th>Fin</th>
-                    <th>Salaire brut</th>
-                    <th>Statut</th>
+                    <x-sort-th column="type" label="Type" />
+                    <x-sort-th column="start_date" label="Début" />
+                    <x-sort-th column="end_date" label="Fin" />
+                    <x-sort-th column="base_salary" label="Salaire brut" />
+                    <x-sort-th column="status" label="Statut" />
                     <th class="text-center">Actions</th>
                 </tr>
                 </thead>
@@ -141,7 +141,7 @@
                             <span class="badge bg-{{ $color }} badge-status">{{ $label }}</span>
                         </td>
                         <td class="text-center">
-                            <div class="btn-group btn-group-md d-flex justify-content-around">
+                            <div class="btn-group btn-group-md d-flex justify-content-start gap-2">
                                 <div>
                                     <a href="{{ route('contracts.show', $contract) }}"
                                        class="btn btn-outline-secondary" title="Voir">

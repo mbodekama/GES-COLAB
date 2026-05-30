@@ -84,9 +84,9 @@
         <thead>
             <tr>
                 <th>Code</th>
-                <th>Titre du poste</th>
-                <th>Département</th>
-                <th>Niveau</th>
+                <x-sort-th column="title" label="Titre du poste" />
+                <x-sort-th column="department" label="Département" />
+                <x-sort-th column="level" label="Niveau" />
                 <th class="text-center">Peut être N+1</th>
                 <th class="text-center">Employés</th>
                 <th>Statut</th>

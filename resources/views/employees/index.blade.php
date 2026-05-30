@@ -73,12 +73,12 @@
         <thead>
             <tr>
                 <th>Matricule</th>
-                <th>Nom & Prénom</th>
+                <x-sort-th column="last_name" label="Nom & Prénom" />
                 <th>Poste</th>
-                <th>Département</th>
+                <x-sort-th column="department" label="Département" />
                 <th>Contrat</th>
-                <th>Ancienneté</th>
-                <th>Statut</th>
+                <x-sort-th column="hire_date" label="Ancienneté" />
+                <x-sort-th column="status" label="Statut" />
                 <th class="text-center">Actions</th>
             </tr>
         </thead>

@@ -11,7 +11,10 @@ class ContractController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Contract::with('employee')->latest('start_date');
+        $allowed = ['type', 'start_date', 'end_date', 'base_salary', 'status'];
+        $sortBy  = in_array($request->get('sort_by'), $allowed) ? $request->get('sort_by') : 'start_date';
+        $sortDir = $request->get('sort_dir') === 'asc' ? 'asc' : 'desc';
+        $query = Contract::with('employee')->orderBy($sortBy, $sortDir);
 
         if ($request->filled('type'))   $query->where('type', $request->type);
         if ($request->filled('status')) $query->where('status', $request->status);

@@ -86,13 +86,13 @@
     <table class="table table-hover mb-0">
         <thead>
             <tr>
-                <th>N°</th>
+                <x-sort-th column="leave_number" label="N°" />
                 <th>Employé</th>
-                <th>Type</th>
-                <th>Début</th>
-                <th>Fin</th>
-                <th>Durée</th>
-                <th>Etapes</th>
+                <x-sort-th column="type" label="Type" />
+                <x-sort-th column="start_date" label="Début" />
+                <x-sort-th column="end_date" label="Fin" />
+                <x-sort-th column="duration_days" label="Durée" />
+                <th>Étapes</th>
                 <th class="text-center">Actions</th>
             </tr>
         </thead>

@@ -9,9 +9,10 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $roles       = Role::with(['permissions', 'users'])->orderBy('name')->get();
+        $sortDir = $request->get('sort_dir') === 'desc' ? 'desc' : 'asc';
+        $roles   = Role::with(['permissions', 'users'])->orderBy('name', $sortDir)->get();
         $permissions = Permission::orderBy('name')->get();
         $users       = User::orderBy('name')->get();
 

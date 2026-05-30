@@ -80,10 +80,10 @@
             <tr>
                 <th>Employé</th>
                 <th>Département</th>
-                <th>Brut</th>
+                <x-sort-th column="gross_salary" label="Brut" />
                 <th>CNPS salarié</th>
                 <th>IGR</th>
-                <th>Net à payer</th>
+                <x-sort-th column="net_salary" label="Net à payer" />
                 <th class="text-center">Actions</th>
             </tr>
         </thead>

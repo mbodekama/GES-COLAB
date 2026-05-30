@@ -17,7 +17,10 @@ class LeaveController extends Controller
         $user     = auth()->user();
         $employee = $user->employee;
 
-        $query = Leave::with(['employee', 'n1Validator', 'approvedBy'])->latest();
+        $allowed = ['type', 'start_date', 'end_date', 'duration_days', 'leave_number'];
+        $sortBy  = in_array($request->get('sort_by'), $allowed) ? $request->get('sort_by') : 'created_at';
+        $sortDir = $request->get('sort_dir') === 'asc' ? 'asc' : 'desc';
+        $query = Leave::with(['employee', 'n1Validator', 'approvedBy'])->orderBy($sortBy, $sortDir);
         //dd($this->isN1($user));
         if ($user->hasRole(['superadmin', 'admin'])) {
             // Tout voir sans restriction

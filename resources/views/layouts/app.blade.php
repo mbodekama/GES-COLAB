@@ -231,6 +231,19 @@
             #content-wrapper { margin-left: 0; }
         }
 
+        /* ── SORT HEADERS ───────────────────────────────────── */
+        .sort-th {
+            color: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            user-select: none;
+            gap: 2px;
+        }
+        .sort-th:hover { color: #1d4ed8; }
+        .sort-th--active { color: #1d4ed8; font-weight: 600; }
+
         /* ── PRINT ───────────────────────────────────────────── */
         @media print {
             #sidebar, #topbar { display: none !important; }

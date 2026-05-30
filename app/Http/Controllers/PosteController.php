@@ -8,10 +8,14 @@ use Illuminate\Http\Request;
 
 class PosteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $allowed = ['title', 'department', 'level'];
+        $sortBy  = in_array($request->get('sort_by'), $allowed) ? $request->get('sort_by') : 'level';
+        $sortDir = $request->get('sort_dir') === 'asc' ? 'asc' : 'desc';
+
         $postes = Poste::withCount('employees')
-                       ->orderByDesc('level')
+                       ->orderBy($sortBy, $sortDir)
                        ->paginate(20);
 
         return view('postes.index', compact('postes'));
