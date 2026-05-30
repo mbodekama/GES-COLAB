@@ -141,30 +141,38 @@
                             <span class="badge bg-{{ $color }} badge-status">{{ $label }}</span>
                         </td>
                         <td class="text-center">
-                            <div class="btn-group btn-group-sm">
-                                <a href="{{ route('contracts.show', $contract) }}"
-                                   class="btn btn-outline-secondary" title="Voir">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                            <div class="btn-group btn-group-md d-flex justify-content-around">
+                                <div>
+                                    <a href="{{ route('contracts.show', $contract) }}"
+                                       class="btn btn-outline-secondary" title="Voir">
+                                        <i class="bi bi-eye"></i> &nbsp; Voir
+                                    </a>
+                                </div>
                                 @can('modifier contrats')
+                                <div>
                                     <a href="{{ route('contracts.edit', $contract) }}"
                                        class="btn btn-outline-primary" title="Modifier">
-                                        <i class="bi bi-pencil"></i>
+                                        <i class="bi bi-pencil"></i> &nbsp; Modifier
                                     </a>
+                                </div>
                                 @endcan
                                 @if($contract->type !== 'cdi' && $contract->status === 'active')
+                                <div>
                                     <button class="btn btn-outline-warning" title="Renouveler"
                                             data-bs-toggle="modal"
                                             data-bs-target="#renewModal"
                                             data-url="{{ route('contracts.renew', $contract) }}"
                                             onclick="setRenewUrl(this)">
-                                        <i class="bi bi-arrow-clockwise"></i>
+                                        <i class="bi bi-arrow-clockwise"></i> &nbsp; Renouveler
                                     </button>
+                                </div>
                                 @endif
-                                <a href="{{ route('contracts.print.design', $contract) }}"
-                                   class="btn btn-primary" title="Contrat PDF" target="_blank">
-                                    <i class="bi bi-file-earmark-richtext"></i>
-                                </a>
+                                <div>
+                                    <a href="{{ route('contracts.print.design', $contract) }}"
+                                       class="btn btn-primary" title="Contrat PDF" target="_blank">
+                                        <i class="bi bi-file-earmark-richtext"></i> &nbsp; PDF
+                                    </a>
+                                </div>
                             </div>
                         </td>
                     </tr>

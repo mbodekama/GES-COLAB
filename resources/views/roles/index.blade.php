@@ -47,16 +47,22 @@
                     <td>{{ $role->users->count() }}</td>
                     <td>{{ $role->permissions->count() }}</td>
                     <td class="text-center">
-                        <div class="btn-group btn-group-sm">
-                            <a href="{{ route('roles.edit', $role) }}" class="btn btn-outline-primary">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                        <div class="btn-group btn-group-md d-flex justify-content-around">
+                            <div>
+                                <a href="{{ route('roles.edit', $role) }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> &nbsp; Modifier
+                                </a>
+                            </div>
                             @if(!in_array($role->name, ['superadmin', 'admin', 'user']))
-                            <form method="POST" action="{{ route('roles.destroy', $role) }}" class="d-inline"
-                                  onsubmit="return confirm('Supprimer ce rôle ?')">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </form>
+                            <div>
+                                <form method="POST" action="{{ route('roles.destroy', $role) }}" class="d-inline"
+                                      onsubmit="return confirm('Supprimer ce rôle ?')">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i> &nbsp; Supprimer
+                                    </button>
+                                </form>
+                            </div>
                             @endif
                         </div>
                     </td>

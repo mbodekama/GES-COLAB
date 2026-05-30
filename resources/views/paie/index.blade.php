@@ -107,13 +107,17 @@
             <td class="text-danger small">- {{ number_format($payroll->igr, 0, ',', ' ') }}</td>
             <td><strong class="text-success">{{ number_format($payroll->net_salary, 0, ',', ' ') }} FCFA</strong></td>
             <td class="text-center">
-                <div class="btn-group btn-group-sm">
-                    <a href="{{ route('payroll.show', $payroll) }}" class="btn btn-outline-primary" title="Voir">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    <a href="{{ route('payroll.print.design', $payroll) }}" class="btn btn-primary" title="Bulletin PDF" target="_blank">
-                        <i class="bi bi-file-earmark-richtext"></i>
-                    </a>
+                <div class="btn-group btn-group-md d-flex justify-content-around">
+                    <div>
+                        <a href="{{ route('payroll.show', $payroll) }}" class="btn btn-outline-primary" title="Voir">
+                            <i class="bi bi-eye"></i> &nbsp; Voir
+                        </a>
+                    </div>
+                    <div>
+                        <a href="{{ route('payroll.print.design', $payroll) }}" class="btn btn-primary" title="Bulletin PDF" target="_blank">
+                            <i class="bi bi-file-earmark-richtext"></i> &nbsp; PDF
+                        </a>
+                    </div>
                 </div>
             </td>
         </tr>

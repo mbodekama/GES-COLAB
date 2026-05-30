@@ -113,21 +113,27 @@
             <td class="small">{{ $employee->seniority_label }}</td>
             <td>{!! $employee->status_badge !!}</td>
             <td class="text-center">
-                <div class="btn-group btn-group-sm">
-                    <a href="{{ route('employees.show', $employee) }}"
-                       class="btn btn-outline-secondary" title="Voir fiche">
-                        <i class="bi bi-eye"></i>
-                    </a>
+                <div class="btn-group btn-group-md d-flex justify-content-around">
+                    <div>
+                        <a href="{{ route('employees.show', $employee) }}"
+                           class="btn btn-outline-secondary" title="Voir fiche">
+                            <i class="bi bi-eye"></i> &nbsp; Voir
+                        </a>
+                    </div>
                     @can('modifier employés')
-                    <a href="{{ route('employees.edit', $employee) }}"
-                       class="btn btn-outline-primary" title="Modifier">
-                        <i class="bi bi-pencil"></i>
-                    </a>
+                    <div>
+                        <a href="{{ route('employees.edit', $employee) }}"
+                           class="btn btn-outline-primary" title="Modifier">
+                            <i class="bi bi-pencil"></i> &nbsp; Modifier
+                        </a>
+                    </div>
                     @endcan
-                    <a href="{{ route('employees.print.design', $employee) }}"
-                       class="btn btn-primary" title="Fiche PDF" target="_blank">
-                        <i class="bi bi-file-earmark-person"></i>
-                    </a>
+                    <div>
+                        <a href="{{ route('employees.print.design', $employee) }}"
+                           class="btn btn-primary" title="Fiche PDF" target="_blank">
+                            <i class="bi bi-file-earmark-person"></i> &nbsp; PDF
+                        </a>
+                    </div>
                 </div>
             </td>
         </tr>

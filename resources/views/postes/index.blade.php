@@ -133,34 +133,38 @@
                 @endif
             </td>
             <td class="text-center">
-                <div class="btn-group btn-group-sm">
+                <div class="btn-group btn-group-md d-flex justify-content-around">
                     @role('superadmin|admin|rh')
-                    <button class="btn btn-outline-primary"
-                            title="Modifier"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editModal"
-                            data-id="{{ $poste->id }}"
-                            data-title="{{ $poste->title }}"
-                            data-code="{{ $poste->code }}"
-                            data-department="{{ $poste->department }}"
-                            data-level="{{ $poste->level }}"
-                            data-can_be_n1="{{ $poste->can_be_n1 ? 1 : 0 }}"
-                            data-description="{{ $poste->description }}"
-                            data-is_active="{{ $poste->is_active ? 1 : 0 }}"
-                            data-url="{{ route('postes.update', $poste) }}"
-                            onclick="fillEdit(this)">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    @if($poste->employees_count === 0)
-                    <form method="POST"
-                          action="{{ route('postes.destroy', $poste) }}"
-                          class="d-inline"
-                          onsubmit="return confirm('Supprimer le poste « {{ $poste->title }} » ?')">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-outline-danger" title="Supprimer">
-                            <i class="bi bi-trash"></i>
+                    <div>
+                        <button class="btn btn-outline-primary"
+                                title="Modifier"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal"
+                                data-id="{{ $poste->id }}"
+                                data-title="{{ $poste->title }}"
+                                data-code="{{ $poste->code }}"
+                                data-department="{{ $poste->department }}"
+                                data-level="{{ $poste->level }}"
+                                data-can_be_n1="{{ $poste->can_be_n1 ? 1 : 0 }}"
+                                data-description="{{ $poste->description }}"
+                                data-is_active="{{ $poste->is_active ? 1 : 0 }}"
+                                data-url="{{ route('postes.update', $poste) }}"
+                                onclick="fillEdit(this)">
+                            <i class="bi bi-pencil"></i> &nbsp; Modifier
                         </button>
-                    </form>
+                    </div>
+                    @if($poste->employees_count === 0)
+                    <div>
+                        <form method="POST"
+                              action="{{ route('postes.destroy', $poste) }}"
+                              class="d-inline"
+                              onsubmit="return confirm('Supprimer le poste « {{ $poste->title }} » ?')">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-outline-danger" title="Supprimer">
+                                <i class="bi bi-trash"></i> &nbsp; Supprimer
+                            </button>
+                        </form>
+                    </div>
                     @endif
                     @endrole
                 </div>
