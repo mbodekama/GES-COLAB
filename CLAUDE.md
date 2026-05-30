@@ -101,71 +101,181 @@ Ne jamais utiliser `chmod 777` ni ajouter l'hôte au groupe `www-data` — ces c
 
 ### Génération PDF (`app/Pdf`)
 
-Stack : **FPDF** (`setasign/fpdf`) + **fpdf-easytable** (`matthew-elisha/fpdf-easytable`, alias `\exFPDF` + `\easyTable`). DomPDF a été retiré du projet.
+**Stack :** `setasign/fpdf` + `matthew-elisha/fpdf-easytable` (classes globales `\exFPDF`, `\easyTable`) + `bacon/bacon-qr-code` (matrice QR vectorielle, sans GD). DomPDF et easy-pdf ont été retirés.
 
-#### Classe de base `BasePdf`
+> `setasign/fpdf` doit rester en dépendance directe : `fpdf-easytable` l'exige mais ne le déclare pas dans son `composer.json`.
 
-`App\Pdf\BasePdf` est la classe abstraite dont héritent tous les documents PDF. Elle fournit :
+---
 
-- **Palette et constantes** : `ML` (marge 15 mm), `UW` (largeur utile 180 mm), constantes de couleur `BLUE`, `DARK`, `MUTED`, `GRAY_BG`, `BORDER`, `WHITE`, `GREEN`, `RED`.
-- **`drawHeader(string $rightLabel, ?string $rightValue = null)`** — en-tête commun à tous les documents (badge entreprise, raison sociale, adresse). La boîte droite prend deux formes :
-  - `$rightValue` fourni → boîte bordée bleue avec libellé grisé + valeur en bleu (**style référence**, ex. numéro de document)
-  - `$rightValue` null → fond bleu plein avec libellé blanc (**style titre**, ex. "FICHE EMPLOYÉ")
-- **`drawBanner(string $title, string $subtitle = '')`** — bandeau bleu paramétrable sous l'en-tête.
-- **`drawDate(string $city = 'Abidjan')`** — date alignée à droite, utilise `$data['generated_date']`.
-- Helpers couleur/fonte : `fc`, `tc`, `dc`, `n` (normal sombre), `b` (gras bleu), `e` (UTF-8 → ISO-8859-1).
-- Helpers géométriques : `roundedRect`, `ellipse`, `bezierArc`, `SetDash`.
+#### Architecture — `BasePdf` (classe abstraite)
 
-#### Contrat de données minimal (`$data`)
+Tous les documents héritent de `App\Pdf\BasePdf extends \exFPDF`. Ne jamais hériter directement de `\exFPDF` ou `\FPDF`.
 
-Toute classe fille doit recevoir dans son tableau `$data` :
+**Ce que BasePdf fournit :**
+
+| Méthode / constante | Description |
+|---|---|
+| `ML = 15.0`, `UW = 180.0` | Marge gauche et largeur utile (mm) |
+| `FOOTER_H = 24.0` | Hauteur réservée au pied de page |
+| `BLUE`, `DARK`, `MUTED`, `GRAY_BG`, `BORDER`, `WHITE`, `GREEN`, `RED` | Palette partagée `[R,G,B]` |
+| `drawHeader(label, ?value)` | En-tête avec badge initiales + raison sociale + séparateur bleu. `value=null` → boîte bleue pleine (style **titre**) ; `value` fourni → boîte bordée label/valeur (style **référence**) |
+| `drawBanner(title, subtitle='')` | Bandeau bleu sous l'en-tête |
+| `drawDate(city='Abidjan')` | Date alignée à droite, utilise `$data['generated_date']` |
+| `Footer()` | Appelé automatiquement par FPDF : séparateur bleu, QR code vectoriel, message de vérification, numéro de page, URL, téléphone |
+| `drawQrCode(content, x, y, size)` | QR code dessiné en `Rect()` FPDF, sans GD |
+| `fc/tc/dc` | Couleur remplissage / texte / trait |
+| `n(size)` / `b(size)` | Font Helvetica normal sombre / gras bleu |
+| `e(text)` | UTF-8 → ISO-8859-1 (obligatoire pour tout texte passé à FPDF) |
+| `roundedRect`, `ellipse`, `bezierArc`, `SetDash` | Helpers géométriques |
+
+---
+
+#### Contrat de données (`$data`)
+
+Clés lues par `BasePdf` (toujours requises) :
 
 | Clé | Utilisé par |
 |---|---|
-| `company_name` | `drawHeader`, `BasePdf` |
-| `company_address` | `drawHeader`, `BasePdf` |
-| `company_initials` | `drawHeader` — badge (2 lettres). Fallback : 2 premières lettres de `company_name`. |
+| `company_name` | `drawHeader`, `Footer` |
+| `company_initials` | `drawHeader` — badge. Fallback : 2 premières initiales du nom |
+| `company_address` | `drawHeader` |
+| `company_phone` | `Footer` |
+| `company_website` | `Footer` |
 | `generated_date` | `drawDate` |
-| `reference` | `drawHeader` en mode référence |
 
-#### Document de référence : `CongeAttestation`
+Clés optionnelles lues par `Footer()` (fallback gracieux si absentes) :
 
-`App\Pdf\CongeAttestation` est le **patron graphique de référence** pour tous les nouveaux documents. Son en-tête (badge, raison sociale, boîte de référence, bandeau, date) doit être reproduit à l'identique via `BasePdf`. Route : `GET /leaves/{leave}/print-design` (`leaves.print.design`).
+| Clé | Rôle |
+|---|---|
+| `verification_url` | Contenu du QR code (priorité 1) |
+| `reference` | Contenu du QR code (priorité 2) |
 
-Pour créer un nouveau document PDF :
+Toutes ces valeurs sont configurables via `/config` (table `settings`, helper `setting()`).
+
+---
+
+#### Règle d'or : easyTable pour tout le contenu
+
+Tout le contenu des documents (grilles, tableaux, textes) est rendu avec `\easyTable`. Le positionnement absolu `SetXY` + `Cell` est réservé aux éléments graphiques fixes (`drawHeader`, `drawIdentityBlock`).
+
+**Structure type d'une section :**
 
 ```php
+private function drawMaSection(): void
+{
+    $yBefore = $this->GetY();
+
+    $table = new \easyTable($this, '%{22,28,22,28}',
+        'width:180; font-family:Helvetica; border:0;');
+
+    // En-tête de section
+    $table->rowStyle('bgcolor:#f1f5f9; min-height:10;');
+    $table->easyCell('TITRE SECTION',
+        'colspan:4; font-style:B; font-size:8; font-color:#475569; paddingX:5; border:0;');
+    $table->printRow();
+
+    // Ligne de données
+    $table->rowStyle('min-height:11;');
+    $table->easyCell($this->e('LIBELLÉ'),   'bgcolor:#f1f5f9; font-color:#94a3b8; font-style:B; font-size:7.5; paddingY:3; paddingX:4; border:B; border-color:#e2e8f0;');
+    $table->easyCell($this->e($valeur),     'font-style:B; font-size:10; paddingY:3; paddingX:4; border:B; border-color:#e2e8f0;');
+    // ... autres colonnes
+    $table->printRow();
+
+    $table->endTable(0);
+
+    // Bordure arrondie englobante (optionnelle)
+    $this->SetLineWidth(0.35);
+    $this->dc(self::BORDER);
+    $this->roundedRect(self::ML, $yBefore, self::UW, $this->GetY() - $yBefore, 3, 'D');
+
+    $this->SetY($this->GetY() + 5); // marge après section
+}
+```
+
+**Pièges easyTable :**
+- Ne jamais utiliser `font-style:N` — FPDF cherche `helvetican.php` qui n'existe pas. Omettre l'attribut ou ne pas le spécifier pour le style normal.
+- Après un bloc en positionnement absolu (`SetXY`), appeler `$this->SetY($yApres)` avant le premier easyTable — le curseur FPDF n'avance pas avec `SetXY`.
+
+---
+
+#### Créer un nouveau document
+
+```php
+// app/Pdf/MonDocument.php
 class MonDocument extends BasePdf
 {
     public function __construct(array $data)
     {
-        parent::__construct($data); // ou (data, autoPageBreak: true) si multi-page
+        // autoPageBreak: false  → document 1 page (bulletins, attestations, contrats)
+        // autoPageBreak: true   → document multi-page (fiches avec historique long)
+        parent::__construct($data, autoPageBreak: false);
     }
 
     public function build(): static
     {
-        $this->drawHeader('MON LIBELLÉ');                 // style titre
-        // ou : $this->drawHeader('RÉFÉRENCE', $ref);    // style référence
-        $this->drawBanner('TITRE DU DOCUMENT', 'sous-titre optionnel');
+        // 1. En-tête (toujours en premier)
+        $this->drawHeader('TITRE');               // style titre (boîte bleue)
+        // ou : $this->drawHeader('RÉFÉRENCE', $ref); // style référence (boîte bordée)
+
+        // 2. Bandeau + date (documents formels)
+        $this->drawBanner('MON DOCUMENT', 'sous-titre');
         $this->drawDate();
-        // ... sections spécifiques
+
+        // 3. Positionner le curseur après le bloc en-tête
+        $this->SetXY(self::ML, 56);
+
+        // 4. Sections en easyTable
+        $this->drawMaSection();
+        // ...
+
         return $this;
     }
 }
 ```
 
-Appel depuis le contrôleur :
+**Appel depuis le contrôleur (pattern identique pour tous les documents) :**
 
 ```php
-ob_start();
-$content = (new MonDocument($data))->build()->Output('S', '');
-ob_end_clean();
-return response()->make($content, 200, ['Content-Type' => 'application/pdf', ...]);
+public function printDesign(MonModele $model)
+{
+    $model->load(['relation1', 'relation2']);
+
+    $data = [
+        'company_name'     => setting('company_name', 'GES-COLAB'),
+        'company_initials' => setting('company_initials', ''),
+        'company_address'  => setting('company_address', ''),
+        'company_phone'    => setting('company_phone', ''),
+        'company_website'  => setting('company_website', ''),
+        'reference'        => $model->reference_number,
+        'generated_date'   => now()->isoFormat('D MMMM YYYY'),
+        'generated_at'     => now()->format('d/m/Y à H:i'),
+        // ... données spécifiques au document
+    ];
+
+    ob_start();
+    $content = (new \App\Pdf\MonDocument($data))->build()->Output('S', '');
+    ob_end_clean();
+
+    return response()->make($content, 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => "inline; filename=\"mon-doc-{$model->id}.pdf\"",
+        'Content-Length'      => strlen($content),
+        'Cache-Control'       => 'private, max-age=0, must-revalidate',
+        'Pragma'              => 'public',
+    ]);
+}
 ```
 
-#### `EmployeeFiche`
+---
 
-`App\Pdf\EmployeeFiche` hérite également de `BasePdf`. Elle utilise `\easyTable` pour les grilles de données et active le saut de page automatique (`autoPageBreak: true`). Route : `GET /employees/{employee}/print-design` (`employees.print.design`).
+#### Documents existants
+
+| Classe | Route | Style header | Pages | Notes |
+|---|---|---|---|---|
+| `CongeAttestation` | `leaves.print.design` | Référence (N° congé) | 1 | Document de référence graphique |
+| `BulletinPaie` | `payroll.print.design` | Titre | 1 | Toujours 1 page ; `autoPageBreak: false` |
+| `ContratTravail` | `contracts.print.design` | Référence (N° contrat) | 1 | Section notes conditionnelle |
+| `EmployeeFiche` | `employees.print.design` | Titre | 1+ | `autoPageBreak: true` ; `SetY(47)` requis après `drawIdentityBlock()` |
 
 ### Schema notes
 
