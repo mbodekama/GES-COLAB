@@ -19,9 +19,9 @@ abstract class Controller
 
         Log::debug("[TRACE] {$caller}", array_merge([
             'http_method' => request()->method(),
-            'url'         => request()->fullUrl(),
-            'user_id'     => auth()->id(),
-            'ip'          => request()->ip(),
+//            'url'         => request()->fullUrl(),
+//            'user_id'     => auth()->id(),
+//            'ip'          => request()->ip(),
         ], $extra));
     }
 }

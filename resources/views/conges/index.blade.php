@@ -142,15 +142,7 @@
                                     <i class="bi bi-check-lg"></i> &nbsp; Valider
                                 </button>
                             </form>
-{{--                            <form method="POST"--}}
-{{--                                  action="{{ route('leaves.reject.n1', $leave) }}"--}}
-{{--                                  class="d-inline"--}}
-{{--                                  onsubmit="return confirm('Refuser cette demande ?')">--}}
-{{--                                @csrf--}}
-{{--                                <button class="btn btn-outline-danger" title="Refuser (N+1)">--}}
-{{--                                    <i class="bi bi-x-lg"></i>--}}
-{{--                                </button>--}}
-{{--                            </form>--}}
+
                         @endif
 
                     @endif
@@ -172,11 +164,14 @@
 
                     {{-- Impression : uniquement si approuvé --}}
                     @if($leave->status === 'approved')
-                        <a href="{{ route('leaves.print.design', $leave) }}"
-                           class="btn btn-primary btn-sm"
-                           title="Attestation PDF" target="_blank">
-                            <i class="bi bi-file-earmark-richtext"></i> PDF
-                        </a>
+                        <div>
+                            <a href="{{ route('leaves.print.design', $leave) }}"
+                               class="btn btn-primary "
+                               title="Attestation PDF" target="_blank">
+                                <i class="bi bi-file-earmark-richtext"></i> PDF
+                            </a>
+                        </div>
+
                     @endif
                 </div>
             </td>

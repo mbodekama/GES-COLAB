@@ -6,12 +6,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
     container_name: ges_colab_app
     working_dir: /var/www
     volumes:
       - ./:/var/www
     depends_on:
       - mysql
+      - maildev
 
   nginx:
     image: nginx:latest
@@ -35,3 +39,11 @@ services:
       MYSQL_USER: laravel
     ports:
       - "3306:3306"
+
+  maildev:
+    image: maildev/maildev:latest
+    container_name: ges_colab_maildev
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "1080:1080"   # UI web
