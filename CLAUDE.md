@@ -76,6 +76,75 @@ Toutes les vues `index` avec un formulaire de filtre (`conges`, `employees`, `co
 
 Règles : `ms-auto` pousse le bloc à droite de la grille Bootstrap, `justify-content-end` aligne les boutons en son sein, `gap-2` assure l'espacement. Pas de `w-100` sur le bouton de soumission. Icône `bi-search` sur "Lancer la recherche", `bi-arrow-counterclockwise` sur "Réinitialiser".
 
+### Conventions UI — boutons d'actions des datatables
+
+Tous les datatables utilisent le même bloc d'actions :
+
+```html
+<div class="btn-group btn-group-md d-flex justify-content-start gap-2">
+    <div>
+        <a href="..." class="btn btn-outline-secondary" title="Voir">
+            <i class="bi bi-eye"></i> &nbsp; Voir
+        </a>
+    </div>
+    <div>
+        <a href="..." class="btn btn-outline-primary" title="Modifier">
+            <i class="bi bi-pencil"></i> &nbsp; Modifier
+        </a>
+    </div>
+    <div>
+        <a href="..." class="btn btn-primary" target="_blank" title="PDF">
+            <i class="bi bi-file-earmark-richtext"></i> &nbsp; PDF
+        </a>
+    </div>
+</div>
+```
+
+Règles : `btn-group-md` (pas `btn-sm`), `justify-content-start gap-2`, chaque bouton dans son propre `<div>`, icône + `&nbsp;` + texte court. Les boutons POST (approve, reject, delete) restent dans un `<form class="d-inline">` à l'intérieur d'un `<div>`.
+
+### Conventions UI — en-têtes triables des datatables
+
+Utiliser le composant `<x-sort-th column="col_db" label="Libellé" />` pour tout en-tête de colonne triable. Il génère un `<th>` avec lien clic, chevron inactif (`bi-chevron-expand`) ou flèche active (`bi-caret-up/down-fill`), et préserve tous les filtres existants via `fullUrlWithQuery()`.
+
+Dans le contrôleur correspondant, ajouter une whitelist des colonnes autorisées :
+
+```php
+$allowed = ['col1', 'col2', ...];
+$sortBy  = in_array($request->get('sort_by'), $allowed) ? $request->get('sort_by') : 'default_col';
+$sortDir = $request->get('sort_dir') === 'asc' ? 'asc' : 'desc';
+$query   = Model::orderBy($sortBy, $sortDir);
+```
+
+Toute valeur `sort_by` hors whitelist retombe sur la colonne par défaut (protection injection SQL).
+
+### Conventions UI — pagination
+
+La pagination est configurée globalement dans `AppServiceProvider::boot()` :
+
+```php
+Paginator::useBootstrapFive();   // Laravel 11 utilise tailwind par défaut — forcer BS5
+Carbon::setLocale('fr');
+```
+
+La vue de pagination est publiée et personnalisée dans `resources/views/vendor/pagination/bootstrap-5.blade.php` :
+- Pas de texte "Showing X to Y of Z results" — le compteur est dans le card-footer de chaque vue
+- Chevrons via Bootstrap Icons (`bi-chevron-left` / `bi-chevron-right`) au lieu de `&lsaquo;`/`&rsaquo;`
+- `pagination-sm mb-0` pour l'alignement dans les card-footers
+
+Pattern card-footer standard :
+
+```html
+<div class="card-footer d-flex justify-content-between align-items-center py-2">
+    <small class="text-muted">
+        Affichage {{ $items->firstItem() ?? 0 }}–{{ $items->lastItem() ?? 0 }}
+        sur {{ $items->total() }}
+    </small>
+    {{ $items->links() }}
+</div>
+```
+
+Ne jamais appeler `Paginator::defaultView('tailwind')` ni utiliser `->links('pagination::tailwind')` — l'app est Bootstrap 5, pas Tailwind.
+
 ### Docker — permissions fichiers (UID mapping)
 
 Le container `app` tourne sous `www-data` remappé sur `uid=1000` (utilisateur hôte `mbodekama`). Les valeurs sont lues depuis `.env` (`USER_ID=1000` / `GROUP_ID=1000`) et injectées au build via `docker-compose.yml` → `Dockerfile` (`ARG USER_ID / GROUP_ID` + `usermod/groupmod`).
