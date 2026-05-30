@@ -13,6 +13,7 @@ class EmployeeFiche extends BasePdf
     {
         $this->drawHeader('FICHE EMPLOYÉ');
         $this->drawIdentityBlock();
+        $this->SetY(47);  // positionne après le bloc identité (y=28, h=17) + marge
         $this->drawSectionTitle('Informations personnelles');
         $this->drawPersonalInfo();
         $this->drawSectionTitle('Informations professionnelles & Contrat');
@@ -22,7 +23,6 @@ class EmployeeFiche extends BasePdf
             $this->drawLeaveHistory();
         }
         $this->drawSignatures();
-        $this->drawFooter();
         return $this;
     }
 
@@ -233,20 +233,4 @@ class EmployeeFiche extends BasePdf
         $this->Cell($cw - 4, 4, $this->e('Cachet & Signature'), 0, 0, 'C');
     }
 
-    private function drawFooter(): void
-    {
-        $y = $this->GetY() + 6;
-        $this->SetLineWidth(0.3);
-        $this->dc(self::BORDER);
-        $this->Line(self::ML, $y, self::ML + self::UW, $y);
-
-        $this->SetFont('Helvetica', '', 8);
-        $this->tc(self::MUTED);
-        $this->SetXY(self::ML, $y + 3);
-        $this->Cell(60, 4, $this->e('Généré le ' . $this->data['generated_at']), 0, 0, 'L');
-        $this->SetXY(self::ML + 60, $y + 3);
-        $this->Cell(60, 4, $this->e('Document confidentiel — Usage interne'), 0, 0, 'C');
-        $this->SetXY(self::ML + 120, $y + 3);
-        $this->Cell(60, 4, $this->e('GES-COLAB — Gestion RH'), 0, 0, 'R');
-    }
 }
