@@ -15,6 +15,7 @@ class SalaryGridController extends Controller
 
     public function store(Request $request)
     {
+        $this->logEntry(['name' => $request->name, 'level' => $request->level]);
         $validated = $request->validate([
             'name'                => 'required|string|max:100',
             'category'            => 'nullable|string|max:60',
@@ -37,6 +38,7 @@ class SalaryGridController extends Controller
 
     public function update(Request $request, SalaryGrid $salaryGrid)
     {
+        $this->logEntry(['grid_id' => $salaryGrid->id, 'name' => $salaryGrid->name]);
         $validated = $request->validate([
             'name'                => 'required|string|max:100',
             'category'            => 'nullable|string|max:60',
@@ -59,6 +61,7 @@ class SalaryGridController extends Controller
 
     public function destroy(SalaryGrid $salaryGrid)
     {
+        $this->logEntry(['grid_id' => $salaryGrid->id, 'name' => $salaryGrid->name]);
         if ($salaryGrid->contracts()->exists()) {
             return back()->with('error', 'Impossible de supprimer une grille utilisée par des contrats.');
         }

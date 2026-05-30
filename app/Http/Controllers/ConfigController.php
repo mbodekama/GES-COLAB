@@ -26,6 +26,7 @@ class ConfigController extends Controller
 
     public function updateGeneral(Request $request)
     {
+        $this->logEntry();
         $validated = $request->validate([
             'company_name'          => 'required|string|max:100',
             'company_initials'      => 'nullable|string|max:3',
@@ -45,6 +46,7 @@ class ConfigController extends Controller
 
     public function updatePayroll(Request $request)
     {
+        $this->logEntry();
         $validated = $request->validate([
             'cnps_employer_rate'  => 'required|numeric|min:0|max:30',
             'cnps_employee_rate'  => 'required|numeric|min:0|max:30',
@@ -60,6 +62,7 @@ class ConfigController extends Controller
 
     public function updateLeaves(Request $request)
     {
+        $this->logEntry();
         $validated = $request->validate([
             'annual_leave_days'        => 'required|integer|min:1|max:90',
             'sick_leave_days'          => 'required|integer|min:1',

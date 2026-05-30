@@ -237,6 +237,7 @@ class EmployeeController extends Controller
 
     public function update(Request $request, Employee $employee)
     {
+        $this->logEntry(['matricule' => $employee->matricule, 'employee_id' => $employee->id]);
         $validated = $request->validate([
             'first_name'     => 'required|string|max:100',
             'last_name'      => 'required|string|max:100',

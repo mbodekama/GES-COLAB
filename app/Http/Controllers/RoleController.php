@@ -39,6 +39,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
+        $this->logEntry(['role' => $role->name]);
         if (in_array($role->name, ['superadmin', 'admin', 'user'])) {
             return back()->with('error', 'Ce rôle système ne peut pas être supprimé.');
         }
@@ -51,6 +52,7 @@ class RoleController extends Controller
 
     public function store(Request $request)
     {
+        $this->logEntry(['name' => $request->name]);
         $validated = $request->validate([
             'name'          => 'required|string|max:60|unique:roles,name',
             'permissions'   => 'nullable|array',
@@ -71,6 +73,7 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
+        $this->logEntry(['role' => $role->name]);
         $validated = $request->validate([
             'name'          => 'required|string|max:60|unique:roles,name,'.$role->id,
             'permissions'   => 'nullable|array',
@@ -89,6 +92,7 @@ class RoleController extends Controller
 
     public function updatePermissions(Request $request, Role $role)
     {
+        $this->logEntry(['role' => $role->name, 'permissions_count' => count($request->permissions ?? [])]);
         $request->validate([
             'permissions'   => 'nullable|array',
             'permissions.*' => 'exists:permissions,id',
@@ -103,6 +107,7 @@ class RoleController extends Controller
 
     public function assignRole(Request $request, User $user)
     {
+        $this->logEntry(['user_id' => $user->id, 'role' => $request->role]);
         $request->validate([
             'role' => 'required|string|exists:roles,name',
         ]);

@@ -179,6 +179,7 @@ class LeaveController extends Controller
     // ── Enregistrer une nouvelle demande ──────────────────────
     public function store(Request $request)
     {
+        $this->logEntry(['employee_id' => $request->employee_id, 'type' => $request->type]);
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'type'        => 'required|in:annual,sick,permission,exceptional,maternity,paternity',
@@ -282,6 +283,7 @@ class LeaveController extends Controller
     // ── Mettre à jour une demande ─────────────────────────────
     public function update(Request $request, Leave $leave)
     {
+        $this->logEntry(['leave_number' => $leave->leave_number]);
         abort_if($leave->status !== 'pending', 403);
 
         $validated = $request->validate([
@@ -308,6 +310,7 @@ class LeaveController extends Controller
     // ── Supprimer une demande ─────────────────────────────────
     public function destroy(Leave $leave)
     {
+        $this->logEntry(['leave_number' => $leave->leave_number]);
         abort_if($leave->status !== 'pending', 403,
             'Seules les demandes en attente peuvent être supprimées.');
 
@@ -328,6 +331,7 @@ class LeaveController extends Controller
     // ── Validation N+1 ────────────────────────────────────────
     public function approveN1(Request $request, Leave $leave)
     {
+        $this->logEntry(['leave_number' => $leave->leave_number, 'employee' => $leave->employee_id]);
         $user     = auth()->user();
         $employee = $user->employee;
 
@@ -360,6 +364,7 @@ class LeaveController extends Controller
     // ── Refus N+1 ─────────────────────────────────────────────
     public function rejectN1(Request $request, Leave $leave)
     {
+        $this->logEntry(['leave_number' => $leave->leave_number, 'employee' => $leave->employee_id]);
         $request->validate([
             'comment' => 'required|string|max:500',
         ]);
@@ -397,6 +402,7 @@ class LeaveController extends Controller
     // ── Validation RH (validateur final) ──────────────────────
     public function approve(Leave $leave)
     {
+        $this->logEntry(['leave_number' => $leave->leave_number, 'employee' => $leave->employee_id]);
         abort_unless(
             auth()->user()->hasRole(['rh', 'admin', 'superadmin']),
             403, 'Action réservée au service RH.'
@@ -432,6 +438,7 @@ class LeaveController extends Controller
     // ── Refus RH ──────────────────────────────────────────────
     public function reject(Request $request, Leave $leave)
     {
+        $this->logEntry(['leave_number' => $leave->leave_number, 'employee' => $leave->employee_id]);
         $request->validate([
             'reason' => 'required|string|max:500',
         ]);

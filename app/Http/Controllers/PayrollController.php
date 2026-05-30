@@ -101,6 +101,7 @@ class PayrollController extends Controller
 
     public function generate(Request $request)
     {
+        $this->logEntry(['period' => $request->period, 'department' => $request->department]);
         $request->validate([
             'period'     => 'required|date_format:Y-m',
             'department' => 'nullable|string',

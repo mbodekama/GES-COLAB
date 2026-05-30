@@ -23,6 +23,7 @@ class PosteController extends Controller
 
     public function store(Request $request)
     {
+        $this->logEntry(['title' => $request->title, 'code' => $request->code]);
         $validated = $request->validate([
             'title'       => 'required|string|max:100',
             'code'        => 'required|string|max:20|unique:postes,code',
@@ -45,6 +46,7 @@ class PosteController extends Controller
 
     public function update(Request $request, Poste $poste)
     {
+        $this->logEntry(['poste_id' => $poste->id, 'code' => $poste->code]);
         $validated = $request->validate([
             'title'       => 'required|string|max:100',
             'code'        => 'required|string|max:20|unique:postes,code,'.$poste->id,
@@ -67,6 +69,7 @@ class PosteController extends Controller
 
     public function destroy(Poste $poste)
     {
+        $this->logEntry(['poste_id' => $poste->id, 'code' => $poste->code]);
         if ($poste->employees()->exists()) {
             return back()->with('error',
                 "Impossible de supprimer le poste « {$poste->title} » "

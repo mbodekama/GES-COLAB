@@ -17,6 +17,7 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        $this->logEntry(['user_id' => $request->user()->id]);
         $user = $request->user();
 
         $validated = $request->validate([
@@ -37,6 +38,7 @@ class ProfileController extends Controller
 
     public function updatePassword(Request $request)
     {
+        $this->logEntry(['user_id' => $request->user()->id]);
         $validated = $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
             'password'         => ['required', Password::defaults(), 'confirmed'],
@@ -51,6 +53,7 @@ class ProfileController extends Controller
 
     public function destroy(Request $request)
     {
+        $this->logEntry(['user_id' => $request->user()->id]);
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);

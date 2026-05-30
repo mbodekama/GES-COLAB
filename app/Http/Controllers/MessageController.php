@@ -89,6 +89,7 @@ class MessageController extends Controller
 
     public function send(Request $request, User $user)
     {
+        $this->logEntry(['to_user_id' => $user->id]);
         $request->validate([
             'body' => 'required|string|max:2000',
         ]);
@@ -109,6 +110,7 @@ class MessageController extends Controller
 
     public function destroy(Message $message)
     {
+        $this->logEntry(['message_id' => $message->id]);
         abort_if($message->sender_id !== auth()->id(), 403);
         $message->delete();
 

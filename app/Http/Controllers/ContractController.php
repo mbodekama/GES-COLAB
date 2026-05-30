@@ -94,6 +94,7 @@ class ContractController extends Controller
 
     public function store(Request $request)
     {
+        $this->logEntry(['employee_id' => $request->employee_id, 'type' => $request->type]);
         $validated = $request->validate([
             'employee_id'    => 'required|exists:employees,id',
             'type'           => 'required|in:cdi,cdd,internship,consulting',
@@ -144,6 +145,7 @@ class ContractController extends Controller
 
     public function update(Request $request, Contract $contract)
     {
+        $this->logEntry(['contract_number' => $contract->contract_number]);
         $validated = $request->validate([
             'type'                => 'required|in:cdi,cdd,internship,consulting',
             'start_date'          => 'required|date',
@@ -174,6 +176,7 @@ class ContractController extends Controller
 
     public function destroy(Contract $contract)
     {
+        $this->logEntry(['contract_number' => $contract->contract_number]);
         $contract->update([
             'status'           => 'terminated',
             'date_resiliation' => now()->toDateString(),
@@ -184,6 +187,7 @@ class ContractController extends Controller
 
     public function renew(Request $request, Contract $contract)
     {
+        $this->logEntry(['contract_number' => $contract->contract_number]);
         $request->validate([
             'end_date' => 'required|date|after:today',
         ]);
