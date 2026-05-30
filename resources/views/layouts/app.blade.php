@@ -293,28 +293,17 @@
     </div>
 </header>
 
+{{-- ── TOAST CONTAINER ─────────────────────────────────────── --}}
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
 {{-- ── CONTENT ─────────────────────────────────────────────── --}}
 <div id="content-wrapper">
     <div class="content-inner">
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
-                <i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>{{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            </div>
-        @endif
-
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>
-                <strong>Erreurs :</strong>
+                <strong>Veuillez corriger les erreurs suivantes :</strong>
                 <ul class="mb-0 mt-1 ps-3">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -382,6 +371,54 @@
             }
         }
     });
+})();
+
+// ── Système de toasts ─────────────────────────────────────────
+(function () {
+    var ICONS = {
+        success: 'bi-check-circle-fill',
+        error:   'bi-exclamation-triangle-fill',
+        warning: 'bi-exclamation-circle-fill',
+        info:    'bi-info-circle-fill',
+    };
+
+    window.showToast = function (message, type, duration) {
+        type     = type     || 'success';
+        duration = duration || 4000;
+
+        var container = document.getElementById('toast-container');
+        var el = document.createElement('div');
+        el.className = 'toast-item toast-' + type;
+        el.setAttribute('role', 'status');
+        el.innerHTML =
+            '<i class="bi ' + (ICONS[type] || ICONS.info) + '" aria-hidden="true"></i>' +
+            '<span>' + message + '</span>' +
+            '<button class="toast-close" onclick="this.parentElement.remove()" aria-label="Fermer">' +
+            '&times;</button>';
+        container.appendChild(el);
+
+        setTimeout(function () {
+            el.classList.add('toast-out');
+            setTimeout(function () { el.remove(); }, 320);
+        }, duration);
+    };
+
+    // Afficher automatiquement les messages de session au chargement
+    @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function () {
+            showToast(@json(session('success')), 'success');
+        });
+    @endif
+    @if(session('error'))
+        document.addEventListener('DOMContentLoaded', function () {
+            showToast(@json(session('error')), 'error');
+        });
+    @endif
+    @if(session('warning'))
+        document.addEventListener('DOMContentLoaded', function () {
+            showToast(@json(session('warning')), 'warning');
+        });
+    @endif
 })();
 </script>
 @stack('scripts')

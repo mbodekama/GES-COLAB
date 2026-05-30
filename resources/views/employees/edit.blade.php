@@ -198,19 +198,6 @@
                     </div>
                 @endif
 
-                {{-- ACTIONS --}}
-                <div class="card">
-                    <div class="card-body d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle me-2"></i>
-                            Enregistrer les modifications
-                        </button>
-                        <a href="{{ route('employees.show', $employee) }}"
-                           class="btn btn-outline-secondary">
-                            Annuler
-                        </a>
-                    </div>
-                </div>
             </div>
 
         {{-- ── INFOS PROFESSIONNELLES (pleine largeur) ───────────── --}}
@@ -319,6 +306,21 @@
         </div>
 
         </div>
+
+<div class="form-sticky-actions">
+    <span class="form-sticky-hint">
+        <span class="text-danger">*</span> Champs obligatoires
+    </span>
+    <div class="d-flex gap-2 justify-content-end">
+        <a href="{{ route('employees.show', $employee) }}" class="btn btn-outline-secondary">
+            Annuler
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-2" aria-hidden="true"></i>Enregistrer les modifications
+        </button>
+    </div>
+</div>
+
     </form>
 @endsection
 

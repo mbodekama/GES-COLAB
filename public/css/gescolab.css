@@ -2,6 +2,82 @@
    GES-COLAB — Styles applicatifs
    ═══════════════════════════════════════════════════════════ */
 
+/* ── BARRE D'ACTIONS STICKY (formulaires longs) ───────────── */
+.form-sticky-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    background: #fff;
+    border-top: 1px solid #e8ecf0;
+    padding: 14px 26px;
+    margin: 0 -26px -26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 -4px 12px rgba(0,0,0,.06);
+}
+.form-sticky-actions .form-sticky-hint {
+    font-size: 12px;
+    color: #adb5bd;
+}
+@media (max-width: 768px) {
+    .form-sticky-actions {
+        margin: 0 -16px -16px;
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .form-sticky-actions .form-sticky-hint { display: none; }
+    .form-sticky-actions .d-flex { width: 100%; }
+}
+
+/* ── TOASTS ───────────────────────────────────────────────── */
+#toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+.toast-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    min-width: 280px;
+    max-width: 400px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    pointer-events: all;
+    animation: toast-in .25s ease;
+}
+.toast-item.toast-out { animation: toast-out .3s ease forwards; }
+.toast-item.toast-success { background: #198754; }
+.toast-item.toast-error   { background: #dc3545; }
+.toast-item.toast-warning { background: #fd7e14; }
+.toast-item.toast-info    { background: #185FA5; }
+.toast-item i { font-size: 16px; flex-shrink: 0; }
+.toast-item span { flex: 1; }
+.toast-close {
+    background: none; border: none; color: rgba(255,255,255,.7);
+    cursor: pointer; padding: 0 0 0 4px; font-size: 16px; line-height: 1;
+}
+.toast-close:hover { color: #fff; }
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-out {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(8px); }
+}
+
 /* ── BASE ─────────────────────────────────────────────────── */
 html { font-size: 16px; }
 
