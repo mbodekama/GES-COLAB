@@ -384,7 +384,7 @@
 
     window.showToast = function (message, type, duration) {
         type     = type     || 'success';
-        duration = duration || 4000;
+        duration = duration || 7000;
 
         var container = document.getElementById('toast-container');
         var el = document.createElement('div');
