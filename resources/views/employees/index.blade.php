@@ -65,7 +65,11 @@
 <div class="card">
     <div class="card-header">
         <span>Employés <span class="text-muted fw-normal">({{ $employees->total() }})</span></span>
-        <small class="text-muted fw-normal">Mis à jour le {{ now()->format('d M Y') }}</small>
+        <a href="{{ route('employees.export', request()->query()) }}"
+           class="btn btn-outline-success btn-sm"
+           title="Télécharger la liste filtrée en Excel">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
+        </a>
     </div>
 
     <div class="table-responsive">

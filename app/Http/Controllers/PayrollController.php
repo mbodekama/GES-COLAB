@@ -40,6 +40,51 @@ class PayrollController extends Controller
         ));
     }
 
+    public function export(Request $request)
+    {
+        $period = $request->get('period', now()->format('Y-m'));
+        $query  = Payroll::with('employee')->forPeriod($period);
+
+        if ($request->filled('department')) {
+            $query->whereHas('employee', fn($q) => $q->where('department', $request->department));
+        }
+        if (auth()->user()->hasRole('user')) {
+            $query->whereHas('employee', fn($q) => $q->where('user_id', auth()->id()));
+        }
+
+        $payrolls = $query->orderBy('created_at')->get();
+        $filename = 'paie_' . $period . '_' . now()->format('Ymd') . '.csv';
+
+        return response()->streamDownload(function () use ($payrolls, $period) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+
+            fputcsv($out, [
+                'Période', 'Matricule', 'Employé', 'Département', 'Poste',
+                'Salaire brut (FCFA)', 'CNPS salarié (FCFA)', 'IGR (FCFA)', 'Net à payer (FCFA)',
+            ], ';');
+
+            foreach ($payrolls as $p) {
+                fputcsv($out, [
+                    $period,
+                    $p->employee->matricule,
+                    $p->employee->full_name,
+                    $p->employee->department ?? '',
+                    $p->employee->position_label,
+                    $p->gross_salary,
+                    $p->cnps_employee,
+                    $p->igr,
+                    $p->net_salary,
+                ], ';');
+            }
+
+            fclose($out);
+        }, $filename, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
     public function show(Payroll $payroll)
     {
         // Un employé ne peut voir que sa propre fiche

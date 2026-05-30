@@ -64,9 +64,16 @@
     <div class="card">
         <div class="card-header">
             <span>Contrats <span class="text-muted fw-normal">({{ $contracts->total() }})</span></span>
-            @if(isset($expiringCount) && $expiringCount > 0)
-                <span class="badge bg-warning text-dark">{{ $expiringCount }} expirent bientôt</span>
-            @endif
+            <div class="d-flex align-items-center gap-2">
+                @if(isset($expiringCount) && $expiringCount > 0)
+                    <span class="badge bg-warning text-dark">{{ $expiringCount }} expirent bientôt</span>
+                @endif
+                <a href="{{ route('contracts.export', request()->query()) }}"
+                   class="btn btn-outline-success btn-sm"
+                   title="Télécharger la liste filtrée en Excel">
+                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
+                </a>
+            </div>
         </div>
 
         <div class="table-responsive">

@@ -218,7 +218,41 @@
         .dropdown-item { font-size: 14px; }
 
         /* ── PAGINATION ──────────────────────────────────────── */
-        .pagination { font-size: 14px; }
+        .pagination {
+            gap: 4px;
+            font-size: 13px;
+            flex-wrap: nowrap;
+        }
+        .page-link {
+            border-radius: 8px !important;
+            border: 1.5px solid #e8ecf0;
+            color: #495057;
+            font-weight: 500;
+            padding: 5px 11px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,.04);
+            transition: color .15s, background .15s, border-color .15s, box-shadow .15s;
+            margin-left: 0 !important;
+            line-height: 1.4;
+        }
+        .page-link:hover {
+            background: var(--blue-light);
+            border-color: var(--blue);
+            color: var(--blue);
+            box-shadow: none;
+        }
+        .page-item.active .page-link {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(24,95,165,.25);
+        }
+        .page-item.disabled .page-link {
+            background: #f8f9fa;
+            border-color: #e8ecf0;
+            color: #adb5bd;
+            box-shadow: none;
+        }
 
         /* ── SMALL ───────────────────────────────────────────── */
         small, .small { font-size: 12.5px !important; }
@@ -282,13 +316,19 @@
 
         /* Toggle button */
         .sidebar-toggle-btn {
-            background: none; border: none; cursor: pointer;
-            color: #6c757d; padding: 6px 8px; border-radius: 6px;
+            background: #fff; cursor: pointer;
+            color: #6c757d; padding: 8px 12px; border-radius: 8px;
+            border: 1.5px solid #d1d5db;
             align-items: center; display: none;
-            font-size: 18px; line-height: 1;
-            transition: color .15s, background .15s;
+            font-size: 20px; line-height: 1;
+            transition: color .15s, background .15s, border-color .15s, box-shadow .15s;
+            box-shadow: 0 1px 3px rgba(0,0,0,.06);
         }
-        .sidebar-toggle-btn:hover { background: #f0f2f5; color: #1a1a2e; }
+        .sidebar-toggle-btn:hover {
+            background: #f0f2f5; color: #185FA5;
+            border-color: #185FA5;
+            box-shadow: 0 1px 4px rgba(24,95,165,.15);
+        }
         @media (min-width: 769px) { .sidebar-toggle-btn { display: flex; } }
     </style>
 
@@ -454,27 +494,31 @@
 
 {{-- ── TOPBAR ──────────────────────────────────────────────── --}}
 <header id="topbar">
-    <button class="btn btn-link d-md-none p-0 me-2 text-dark"
-            onclick="document.getElementById('sidebar').classList.toggle('show')">
-        <i class="bi bi-list fs-4"></i>
+    <button class="d-md-none me-2"
+            onclick="document.getElementById('sidebar').classList.toggle('show')"
+            aria-label="Ouvrir le menu"
+            style="background:#fff; border:1.5px solid #d1d5db; border-radius:8px;
+                   padding:8px 12px; font-size:20px; line-height:1; cursor:pointer;
+                   color:#6c757d; box-shadow:0 1px 3px rgba(0,0,0,.06);
+                   transition:color .15s, border-color .15s, box-shadow .15s;"
+            onmouseover="this.style.color='#185FA5';this.style.borderColor='#185FA5';this.style.boxShadow='0 1px 4px rgba(24,95,165,.15)'"
+            onmouseout="this.style.color='#6c757d';this.style.borderColor='#d1d5db';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06)'">
+        <i class="bi bi-list"></i>
     </button>
 
-    <button id="sidebar-toggle" class="sidebar-toggle-btn me-1" title="Réduire la barre latérale">
-        <i class="bi bi-layout-sidebar"></i>
+    <button id="sidebar-toggle"
+            class="sidebar-toggle-btn sidebar-open me-1"
+            aria-label="Réduire la barre latérale"
+            data-open="true">
+        <i class="bi bi-layout-sidebar-reverse"></i>
     </button>
 
-    <span class="page-title">@yield('page-title', 'Tableau de bord')</span>
+    <span class="page-title @hasSection('breadcrumb') d-md-none @endif">@yield('page-title', 'Tableau de bord')</span>
+    @hasSection('breadcrumb')
+        @yield('breadcrumb')
+    @endif
 
     <div class="d-flex align-items-center gap-2">
-
-        {{-- Recherche globale --}}
-        <div class="search-wrapper d-none d-lg-block">
-            <i class="bi bi-search"></i>
-            <input type="text" id="global-search"
-                   class="form-control form-control-sm"
-                   placeholder="Rechercher un employé..."
-                   style="width:210px;font-size:13.5px">
-        </div>
 
         {{-- Notifications --}}
         <div class="dropdown">
@@ -588,8 +632,6 @@
             </div>
         @endif
 
-        @yield('breadcrumb')
-
         @yield('content')
     </div>
 </div>
@@ -597,14 +639,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script src="{{ asset('js/app.js') }}"></script>
-<script>
-    document.getElementById('global-search')?.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && this.value.trim()) {
-            window.location.href = '{{ route('employees.index') }}?search='
-                + encodeURIComponent(this.value.trim());
-        }
-    });
-</script>
 <script>
 (function () {
     var STORAGE_KEY = 'gescolab_sidebar_collapsed';
@@ -623,9 +657,13 @@
 
     function syncIcon(collapsed) {
         if (!toggle) return;
-        var icon = toggle.querySelector('i');
-        icon.className    = collapsed ? 'bi bi-layout-sidebar-reverse' : 'bi bi-layout-sidebar';
-        toggle.title      = collapsed ? 'Agrandir la barre latérale' : 'Réduire la barre latérale';
+        var open = !collapsed;
+        toggle.dataset.open = open;
+        toggle.setAttribute('aria-label',
+            open ? 'Réduire la barre latérale' : 'Ouvrir la barre latérale');
+        toggle.classList.toggle('sidebar-open', open);
+        toggle.querySelector('i').className =
+            open ? 'bi bi-layout-sidebar-reverse' : 'bi bi-layout-sidebar';
     }
 
     // Apply initial state (body class was set by inline script; sync UI)

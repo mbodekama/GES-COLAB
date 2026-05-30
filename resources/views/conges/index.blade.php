@@ -79,7 +79,14 @@
 <div class="card">
     <div class="card-header">
         <span>Demandes <span class="text-muted fw-normal">({{ $leaves->total() }})</span></span>
-        <span class="badge bg-warning text-dark">{{ $pendingCount }} en attente</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning text-dark">{{ $pendingCount }} en attente</span>
+            <a href="{{ route('leaves.export', request()->query()) }}"
+               class="btn btn-outline-success btn-sm"
+               title="Télécharger la liste filtrée en Excel">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
+            </a>
+        </div>
     </div>
 
     <div class="table-responsive">

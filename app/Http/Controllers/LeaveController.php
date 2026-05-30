@@ -83,6 +83,90 @@ class LeaveController extends Controller
         return view('conges.index', compact('leaves', 'pendingCount'));
     }
 
+    // ── Export CSV ────────────────────────────────────────────
+    public function export(Request $request)
+    {
+        $user     = auth()->user();
+        $employee = $user->employee;
+
+        $query = Leave::with(['employee', 'n1Validator', 'approvedBy']);
+
+        // Même logique de visibilité que index()
+        if ($user->hasRole(['superadmin', 'admin'])) {
+            // tout voir
+        } elseif ($user->hasRole('rh')) {
+            $query->whereIn('workflow_step', ['pending_rh', 'approved', 'rejected']);
+        } elseif ($this->isN1($user) && $employee) {
+            $subordinateIds = $this->getSubordinateIds($employee);
+            $query->where(function ($q) use ($user, $subordinateIds) {
+                $q->whereHas('employee', fn($s) => $s->where('user_id', $user->id));
+                if (!empty($subordinateIds)) {
+                    $q->orWhereHas('employee', fn($s) => $s->whereIn('id', $subordinateIds));
+                }
+            });
+        } else {
+            $query->whereHas('employee', fn($q) => $q->where('user_id', $user->id));
+        }
+
+        // Filtres
+        if ($request->filled('type'))          $query->where('type', $request->type);
+        if ($request->filled('status'))        $query->where('status', $request->status);
+        if ($request->filled('workflow_step')) $query->where('workflow_step', $request->workflow_step);
+        if ($request->filled('month')) {
+            $query->whereYear('start_date',  substr($request->month, 0, 4))
+                  ->whereMonth('start_date', substr($request->month, 5, 2));
+        }
+        if ($request->filled('search')) {
+            $query->whereHas('employee', fn($q) => $q->search($request->search));
+        }
+
+        $leaves   = $query->orderBy('start_date', 'desc')->get();
+        $filename = 'conges_' . now()->format('Y-m-d') . '.csv';
+
+        $typeLabels = [
+            'annual' => 'Congé annuel', 'sick' => 'Maladie',
+            'permission' => 'Permission', 'exceptional' => 'Exceptionnel',
+            'maternity' => 'Maternité', 'paternity' => 'Paternité',
+        ];
+        $stepLabels = [
+            'pending_n1' => 'En attente N+1', 'pending_rh' => 'En attente RH',
+            'approved' => 'Approuvé', 'rejected' => 'Refusé',
+        ];
+
+        return response()->streamDownload(function () use ($leaves, $typeLabels, $stepLabels) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+
+            fputcsv($out, [
+                'N° Demande', 'Employé', 'Matricule', 'Département',
+                'Type', 'Étape', 'Date début', 'Date fin', 'Durée (j)',
+                'Valideur N+1', 'Validé N+1 le', 'Approuvé/Refusé par',
+            ], ';');
+
+            foreach ($leaves as $l) {
+                fputcsv($out, [
+                    $l->leave_number,
+                    $l->employee->full_name,
+                    $l->employee->matricule,
+                    $l->employee->department ?? '',
+                    $typeLabels[$l->type] ?? $l->type,
+                    $stepLabels[$l->workflow_step] ?? $l->workflow_step,
+                    $l->start_date->format('d/m/Y'),
+                    $l->end_date->format('d/m/Y'),
+                    $l->duration_days,
+                    $l->n1Validator?->employee?->full_name ?? '',
+                    $l->n1_validated_at?->format('d/m/Y') ?? '',
+                    $l->approvedBy?->employee?->full_name ?? '',
+                ], ';');
+            }
+
+            fclose($out);
+        }, $filename, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
     // ── Formulaire de création ────────────────────────────────
     public function create()
     {

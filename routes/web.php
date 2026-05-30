@@ -35,12 +35,16 @@ Route::middleware(['auth'])->group(function () {
          ->name('profile.destroy');
 
     // ── Employés ──────────────────────────────────────────────
+    Route::get('/employees/export', [EmployeeController::class, 'export'])
+        ->name('employees.export');
     Route::resource('employees', EmployeeController::class);
     Route::get('/employees/{employee}/print-design',
         [EmployeeController::class, 'printDesign'])
         ->name('employees.print.design');
 
     // ── Contrats ──────────────────────────────────────────────
+    Route::get('/contracts/export', [ContractController::class, 'export'])
+        ->name('contracts.export');
     Route::resource('contracts', ContractController::class);
     Route::post('/contracts/{contract}/renew',
         [ContractController::class, 'renew'])
@@ -50,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('contracts.print.design');
 
     // ── Congés & Permissions ──────────────────────────────────
+    Route::get('/leaves/export', [LeaveController::class, 'export'])
+        ->name('leaves.export');
     Route::resource('leaves', LeaveController::class)->parameters(['leaves' => 'leave']);;
 
     // Workflow N+1
@@ -74,6 +80,8 @@ Route::middleware(['auth'])->group(function () {
 
     // ── Paie ──────────────────────────────────────────────────
     Route::middleware(['role:superadmin|admin|comptable|rh'])->group(function () {
+        Route::get('/payroll/export', [PayrollController::class, 'export'])
+            ->name('payroll.export');
         Route::resource('payroll', PayrollController::class)
              ->except(['create', 'store', 'edit', 'update', 'destroy']);
         Route::post('/payroll/generate',

@@ -71,7 +71,14 @@
 <div class="card">
     <div class="card-header">
         <span>Fiches de paie — {{ $currentPeriod }}</span>
-        <span class="badge bg-success">{{ $generatedCount }} générées</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success">{{ $generatedCount }} générées</span>
+            <a href="{{ route('payroll.export', request()->query()) }}"
+               class="btn btn-outline-success btn-sm"
+               title="Télécharger les fiches de la période en Excel">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
+            </a>
+        </div>
     </div>
 
     <div class="table-responsive">

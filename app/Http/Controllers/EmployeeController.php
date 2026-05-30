@@ -52,6 +52,60 @@ class EmployeeController extends Controller
         ));
     }
 
+    public function export(Request $request)
+    {
+        $this->logEntry();
+
+        $query = Employee::with(['activeContract', 'poste']);
+
+        if ($request->filled('department'))    $query->byDepartment($request->department);
+        if ($request->filled('status'))        $query->where('status', $request->status);
+        if ($request->filled('contract_type')) $query->whereHas('activeContract',
+            fn($q) => $q->where('type', $request->contract_type));
+        if ($request->filled('search'))        $query->search($request->search);
+
+        $employees = $query->orderBy('last_name')->orderBy('first_name')->get();
+
+        $filename = 'employes_' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        return response()->streamDownload(function () use ($employees) {
+            $out = fopen('php://output', 'w');
+
+            // BOM UTF-8 pour ouverture correcte dans Excel (Windows)
+            fwrite($out, "\xEF\xBB\xBF");
+
+            fputcsv($out, [
+                'Matricule', 'Prénom', 'Nom', 'Email', 'Téléphone',
+                'Département', 'Poste', 'Date d\'embauche',
+                'Ancienneté (ans)', 'Statut', 'Type contrat', 'Solde congés',
+            ], ';');
+
+            foreach ($employees as $emp) {
+                fputcsv($out, [
+                    $emp->matricule,
+                    $emp->first_name,
+                    $emp->last_name,
+                    $emp->email,
+                    $emp->phone ?? '',
+                    $emp->department ?? '',
+                    $emp->position_label,
+                    $emp->hire_date?->format('d/m/Y') ?? '',
+                    $emp->seniority_years,
+                    $emp->status,
+                    $emp->activeContract?->type ?? '',
+                    $emp->leave_balance ?? 0,
+                ], ';');
+            }
+
+            fclose($out);
+        }, $filename, $headers);
+    }
+
     public function create()
     {
         $postes      = Poste::active()->orderedByLevel()->get();

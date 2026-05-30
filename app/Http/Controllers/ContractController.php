@@ -29,6 +29,59 @@ class ContractController extends Controller
         return view('contracts.index', compact('contracts', 'expiringCount'));
     }
 
+    public function export(Request $request)
+    {
+        $query = Contract::with('employee');
+
+        if ($request->filled('type'))   $query->where('type', $request->type);
+        if ($request->filled('status')) $query->where('status', $request->status);
+        if ($request->filled('search')) {
+            $query->where('contract_number', 'like', "%{$request->search}%")
+                  ->orWhereHas('employee', fn($q) => $q->search($request->search));
+        }
+
+        $contracts = $query->orderBy('start_date', 'desc')->get();
+        $filename  = 'contrats_' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($contracts) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+
+            fputcsv($out, [
+                'N° Contrat', 'Employé', 'Email', 'Département', 'Poste',
+                'Type', 'Statut', 'Date début', 'Date fin', 'Salaire de base (FCFA)',
+            ], ';');
+
+            foreach ($contracts as $c) {
+                $statusLabels = [
+                    'active' => 'En cours', 'expired' => 'Expiré',
+                    'terminated' => 'Résilié', 'renewed' => 'Renouvelé',
+                ];
+                $typeLabels = [
+                    'cdi' => 'CDI', 'cdd' => 'CDD',
+                    'internship' => 'Stage', 'consulting' => 'Consulting',
+                ];
+                fputcsv($out, [
+                    $c->contract_number,
+                    $c->employee->full_name,
+                    $c->employee->email,
+                    $c->department ?? '',
+                    $c->position ?? '',
+                    $typeLabels[$c->type] ?? $c->type,
+                    $statusLabels[$c->status] ?? $c->status,
+                    $c->start_date->format('d/m/Y'),
+                    $c->end_date?->format('d/m/Y') ?? 'Indéterminé',
+                    $c->base_salary,
+                ], ';');
+            }
+
+            fclose($out);
+        }, $filename, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
     public function create()
     {
         $employees   = Employee::active()->orderBy('last_name')->get();
