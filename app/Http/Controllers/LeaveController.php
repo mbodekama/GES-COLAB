@@ -254,7 +254,9 @@ class LeaveController extends Controller
         $leave->load(['employee', 'approvedBy', 'n1Validator',
             'employee.supervisor']);
 
-        return view('conges.show', compact('leave'));
+        $activityLogs = $leave->activityLogs()->with('user')->take(30)->get();
+
+        return view('conges.show', compact('leave', 'activityLogs'));
     }
 
     // ── Formulaire d'édition ──────────────────────────────────
@@ -382,6 +384,7 @@ class LeaveController extends Controller
             'n1_validated_at'  => now(),
             'n1_comment'       => $request->comment,
             'rejection_reason' => $request->comment,
+            'date_rejet'       => now()->toDateString(),
         ]);
 
         Mail::to($leave->employee->email)->send(new CongeRefuse($leave, $request->comment));
@@ -404,10 +407,11 @@ class LeaveController extends Controller
         );
 
         $leave->update([
-            'status'        => 'approved',
-            'workflow_step' => 'approved',
-            'approved_by'   => auth()->id(),
-            'approved_at'   => now(),
+            'status'           => 'approved',
+            'workflow_step'    => 'approved',
+            'approved_by'      => auth()->id(),
+            'approved_at'      => now(),
+            'date_approbation' => now()->toDateString(),
         ]);
 
         // Déduire du solde de congés
@@ -446,6 +450,7 @@ class LeaveController extends Controller
             'workflow_step'    => 'rejected',
             'approved_by'      => auth()->id(),
             'rejection_reason' => $request->reason,
+            'date_rejet'       => now()->toDateString(),
         ]);
 
         Mail::to($leave->employee->email)->send(new CongeRefuse($leave, $request->reason));

@@ -121,14 +121,12 @@
                                        placeholder="ex: G3 — Agents de maîtrise" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Niveau <span class="text-danger">*</span></label>
-                                <select name="level" class="form-select" required>
-                                    <option value="1">Niveau 1 — Employés</option>
-                                    <option value="2">Niveau 2 — Employés qualifiés</option>
-                                    <option value="3">Niveau 3 — Agents de maîtrise</option>
-                                    <option value="4">Niveau 4 — Cadres</option>
-                                    <option value="5">Niveau 5 — Cadres supérieurs</option>
-                                </select>
+                                <x-select
+                                    name="level"
+                                    label="Niveau"
+                                    :options="['1'=>'Niveau 1 — Employés','2'=>'Niveau 2 — Employés qualifiés','3'=>'Niveau 3 — Agents de maîtrise','4'=>'Niveau 4 — Cadres','5'=>'Niveau 5 — Cadres supérieurs']"
+                                    required
+                                />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-medium">Salaire minimum (FCFA) <span class="text-danger">*</span></label>
@@ -155,11 +153,11 @@
                                 <input type="number" name="meal_allowance" class="form-control" min="0" value="0">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Statut</label>
-                                <select name="is_active" class="form-select">
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
+                                <x-select
+                                    name="is_active"
+                                    label="Statut"
+                                    :options="['1' => 'Active', '0' => 'Inactive']"
+                                />
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-medium">Description</label>
@@ -196,14 +194,13 @@
                                 <input type="text" name="name" id="edit-name" class="form-control" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Niveau <span class="text-danger">*</span></label>
-                                <select name="level" id="edit-level" class="form-select" required>
-                                    <option value="1">Niveau 1 — Employés</option>
-                                    <option value="2">Niveau 2 — Employés qualifiés</option>
-                                    <option value="3">Niveau 3 — Agents de maîtrise</option>
-                                    <option value="4">Niveau 4 — Cadres</option>
-                                    <option value="5">Niveau 5 — Cadres supérieurs</option>
-                                </select>
+                                <x-select
+                                    name="level"
+                                    label="Niveau"
+                                    :options="['1'=>'Niveau 1 — Employés','2'=>'Niveau 2 — Employés qualifiés','3'=>'Niveau 3 — Agents de maîtrise','4'=>'Niveau 4 — Cadres','5'=>'Niveau 5 — Cadres supérieurs']"
+                                    id="edit-level"
+                                    required
+                                />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-medium">Salaire minimum (FCFA) <span class="text-danger">*</span></label>
@@ -230,11 +227,12 @@
                                 <input type="number" name="meal_allowance" id="edit-meal" class="form-control" min="0">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Statut</label>
-                                <select name="is_active" id="edit-active" class="form-select">
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
+                                <x-select
+                                    name="is_active"
+                                    label="Statut"
+                                    :options="['1' => 'Active', '0' => 'Inactive']"
+                                    id="edit-active"
+                                />
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-medium">Description</label>

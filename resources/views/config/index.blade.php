@@ -56,35 +56,29 @@
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label small fw-medium">Langue par défaut</label>
-                                <select name="default_language" class="form-select">
-                                    <option value="fr" {{ $cfg['default_language'] === 'fr' ? 'selected' : '' }}>
-                                        Français
-                                    </option>
-                                    <option value="en" {{ $cfg['default_language'] === 'en' ? 'selected' : '' }}>
-                                        English
-                                    </option>
-                                </select>
+                                <x-select
+                                    name="default_language"
+                                    label="Langue par défaut"
+                                    :options="['fr' => 'Français', 'en' => 'English']"
+                                    :value="$cfg['default_language']"
+                                />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-medium">Devise</label>
-                                <select name="currency" class="form-select">
-                                    <option value="FCFA" {{ $cfg['currency'] === 'FCFA' ? 'selected' : '' }}>FCFA (XOF)</option>
-                                    <option value="EUR"  {{ $cfg['currency'] === 'EUR'  ? 'selected' : '' }}>EUR (€)</option>
-                                    <option value="USD"  {{ $cfg['currency'] === 'USD'  ? 'selected' : '' }}>USD ($)</option>
-                                </select>
+                                <x-select
+                                    name="currency"
+                                    label="Devise"
+                                    :options="['FCFA' => 'FCFA (XOF)', 'EUR' => 'EUR (€)', 'USD' => 'USD ($)']"
+                                    :value="$cfg['currency']"
+                                />
                             </div>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small fw-medium">Jours ouvrables / semaine</label>
-                            <select name="working_days_per_week" class="form-select">
-                                <option value="5" {{ $cfg['working_days_per_week'] == 5 ? 'selected' : '' }}>
-                                    5 jours (Lun–Ven)
-                                </option>
-                                <option value="6" {{ $cfg['working_days_per_week'] == 6 ? 'selected' : '' }}>
-                                    6 jours (Lun–Sam)
-                                </option>
-                            </select>
+                            <x-select
+                                name="working_days_per_week"
+                                label="Jours ouvrables / semaine"
+                                :options="['5' => '5 jours (Lun–Ven)', '6' => '6 jours (Lun–Sam)']"
+                                :value="$cfg['working_days_per_week']"
+                            />
                         </div>
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="bi bi-floppy me-2"></i>Enregistrer
@@ -132,12 +126,12 @@
                             </div>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small fw-medium">Jour de génération des fiches</label>
-                            <select name="payroll_day" class="form-select">
-                                <option value="25" {{ $cfg['payroll_day'] == 25 ? 'selected' : '' }}>25 du mois</option>
-                                <option value="28" {{ $cfg['payroll_day'] == 28 ? 'selected' : '' }}>28 du mois</option>
-                                <option value="31" {{ $cfg['payroll_day'] == 31 ? 'selected' : '' }}>Dernier jour du mois</option>
-                            </select>
+                            <x-select
+                                name="payroll_day"
+                                label="Jour de génération des fiches"
+                                :options="['25' => '25 du mois', '28' => '28 du mois', '31' => 'Dernier jour du mois']"
+                                :value="$cfg['payroll_day']"
+                            />
                         </div>
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="bi bi-floppy me-2"></i>Enregistrer

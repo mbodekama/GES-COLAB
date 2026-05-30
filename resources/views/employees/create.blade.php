@@ -88,15 +88,12 @@
                                class="form-control">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-medium">Situation familiale</label>
-                        <select name="marital_status" class="form-select">
-                            @foreach(['single'=>'Célibataire','married'=>'Marié(e)','divorced'=>'Divorcé(e)','widowed'=>'Veuf/Veuve'] as $val => $lbl)
-                            <option value="{{ $val }}"
-                                {{ old('marital_status') === $val ? 'selected' : '' }}>
-                                {{ $lbl }}
-                            </option>
-                            @endforeach
-                        </select>
+                        <x-select
+                            name="marital_status"
+                            label="Situation familiale"
+                            :options="['single' => 'Célibataire', 'married' => 'Marié(e)', 'divorced' => 'Divorcé(e)', 'widowed' => 'Veuf/Veuve']"
+                            :value="old('marital_status')"
+                        />
                     </div>
                     <div class="col-md-3">
                         <label class="form-label small fw-medium">Nb. enfants</label>
@@ -225,17 +222,15 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label small fw-medium">
-                            Type de contrat <span class="text-danger">*</span>
-                        </label>
-                        <select name="contract_type" id="contract-type"
-                                class="form-select" required
-                                onchange="toggleEndDate()">
-                            <option value="cdi">CDI</option>
-                            <option value="cdd">CDD</option>
-                            <option value="internship">Stage</option>
-                            <option value="consulting">Consulting</option>
-                        </select>
+                        <x-select
+                            name="contract_type"
+                            label="Type de contrat"
+                            :options="['cdi' => 'CDI', 'cdd' => 'CDD', 'internship' => 'Stage', 'consulting' => 'Consulting']"
+                            :value="old('contract_type', 'cdi')"
+                            id="contract-type"
+                            onchange="toggleEndDate()"
+                            required
+                        />
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-medium">
@@ -250,18 +245,15 @@
                         @enderror
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label small fw-medium">
-                            Grille salariale
-                        </label>
-                        <select name="salary_grid_id" class="form-select">
-                            <option value="">— Aucune —</option>
-                            @foreach($salaryGrids as $grid)
-                            <option value="{{ $grid->id }}"
-                                {{ old('salary_grid_id') == $grid->id ? 'selected' : '' }}>
-                                {{ $grid->name }}
-                            </option>
-                            @endforeach
-                        </select>
+                        <x-select
+                            name="salary_grid_id"
+                            label="Grille salariale"
+                            :options="$salaryGrids"
+                            option-value="id"
+                            option-label="name"
+                            :value="old('salary_grid_id')"
+                            placeholder="— Aucune —"
+                        />
                     </div>
                     <div class="col-md-6" id="end-date-field" style="display:none">
                         <label class="form-label small fw-medium">
@@ -285,19 +277,13 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label small fw-medium">
-                        Rôle <span class="text-danger">*</span>
-                    </label>
-                    <select name="role"
-                            class="form-select @error('role') is-invalid @enderror"
-                            required>
-                        @foreach($roles as $role)
-                        <option value="{{ $role->name }}"
-                            {{ old('role') === $role->name ? 'selected' : '' }}>
-                            {{ ucfirst($role->name) }}
-                        </option>
-                        @endforeach
-                    </select>
+                    <x-select
+                        name="role"
+                        label="Rôle"
+                        :options="$roles->pluck('name')->mapWithKeys(fn($n) => [$n => ucfirst($n)])->all()"
+                        :value="old('role')"
+                        required
+                    />
                     <div class="form-text">
                         Détermine les accès dans l'application.
                     </div>

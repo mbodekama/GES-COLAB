@@ -15,33 +15,33 @@
     <form method="GET" action="{{ route('employees.index') }}" class="row g-2 align-items-end">
         <div class="col-6 col-md-2">
             <label>Département</label>
-            <select name="department" class="form-select form-select-sm">
-                <option value="">Tous</option>
-                @foreach($departments as $dept)
-                    <option value="{{ $dept }}" {{ request('department') === $dept ? 'selected' : '' }}>
-                        {{ $dept }}
-                    </option>
-                @endforeach
-            </select>
+            <x-select
+                name="department"
+                :options="$departments->mapWithKeys(fn($d) => [$d => $d])->all()"
+                :value="request('department')"
+                placeholder="Tous"
+                class="form-select-sm"
+            />
         </div>
         <div class="col-6 col-md-2">
             <label>Statut</label>
-            <select name="status" class="form-select form-select-sm">
-                <option value="">Tous</option>
-                <option value="active"     {{ request('status') === 'active'     ? 'selected' : '' }}>Actif</option>
-                <option value="on_leave"   {{ request('status') === 'on_leave'   ? 'selected' : '' }}>En congé</option>
-                <option value="suspended"  {{ request('status') === 'suspended'  ? 'selected' : '' }}>Suspendu</option>
-                <option value="terminated" {{ request('status') === 'terminated' ? 'selected' : '' }}>Parti</option>
-            </select>
+            <x-select
+                name="status"
+                :options="['active' => 'Actif', 'on_leave' => 'En congé', 'suspended' => 'Suspendu', 'terminated' => 'Parti']"
+                :value="request('status')"
+                placeholder="Tous"
+                class="form-select-sm"
+            />
         </div>
         <div class="col-6 col-md-2">
             <label>Contrat</label>
-            <select name="contract_type" class="form-select form-select-sm">
-                <option value="">Tous</option>
-                <option value="cdi"        {{ request('contract_type') === 'cdi'        ? 'selected' : '' }}>CDI</option>
-                <option value="cdd"        {{ request('contract_type') === 'cdd'        ? 'selected' : '' }}>CDD</option>
-                <option value="internship" {{ request('contract_type') === 'internship' ? 'selected' : '' }}>Stage</option>
-            </select>
+            <x-select
+                name="contract_type"
+                :options="['cdi' => 'CDI', 'cdd' => 'CDD', 'internship' => 'Stage']"
+                :value="request('contract_type')"
+                placeholder="Tous"
+                class="form-select-sm"
+            />
         </div>
         <div class="col-6 col-md-4">
             <label>Recherche</label>

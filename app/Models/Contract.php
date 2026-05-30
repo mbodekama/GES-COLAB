@@ -2,26 +2,30 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivityLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Contract extends Model
 {
-    use HasFactory;
+    use HasFactory, HasActivityLog;
 
     protected $fillable = [
         'employee_id', 'salary_grid_id', 'contract_number', 'type',
         'start_date', 'end_date', 'trial_end_date', 'position',
         'department', 'base_salary', 'status', 'signed_at', 'notes',
+        'date_renouvellement', 'date_resiliation',
     ];
 
     protected $casts = [
-        'start_date'     => 'date',
-        'end_date'       => 'date',
-        'trial_end_date' => 'date',
-        'signed_at'      => 'datetime',
-        'base_salary'    => 'decimal:2',
+        'start_date'          => 'date',
+        'end_date'            => 'date',
+        'trial_end_date'      => 'date',
+        'signed_at'           => 'datetime',
+        'base_salary'         => 'decimal:2',
+        'date_renouvellement' => 'date',
+        'date_resiliation'    => 'date',
     ];
 
     // ── Relations ────────────────────────────────────────────

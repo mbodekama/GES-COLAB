@@ -2,19 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivityLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Leave extends Model
 {
-    use HasFactory;
+    use HasFactory, HasActivityLog;
 
     protected $fillable = [
         'employee_id', 'approved_by', 'leave_number', 'type',
         'start_date', 'end_date', 'duration_days', 'reason',
         'attachment', 'status', 'rejection_reason', 'approved_at',
         'workflow_step', 'n1_validator_id', 'n1_validated_at', 'n1_comment',
+        'date_approbation', 'date_rejet',
     ];
 
     protected $casts = [
@@ -22,6 +24,8 @@ class Leave extends Model
         'end_date'         => 'date',
         'approved_at'      => 'datetime',
         'n1_validated_at'  => 'datetime',
+        'date_approbation' => 'date',
+        'date_rejet'       => 'date',
     ];
 
     // Types nécessitant validation N+1
@@ -29,6 +33,12 @@ class Leave extends Model
 
     // Types allant directement au RH
     const DIRECT_RH = ['annual', 'sick', 'exceptional', 'maternity', 'paternity'];
+
+    // FK et timestamps redondants avec user_id/created_at du log
+    public function getAuditExcludeColumns(): array
+    {
+        return ['n1_validator_id', 'n1_validated_at', 'approved_by', 'approved_at'];
+    }
 
     // ── Relations ────────────────────────────────────────────
     public function employee(): BelongsTo

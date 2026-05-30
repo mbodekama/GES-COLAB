@@ -18,7 +18,7 @@
 @endsection
 
 @section('content')
-<div class="row justify-content-center">
+<div class="row justify-content-center g-3">
 <div class="col-md-7">
     <div class="card">
         <div class="card-header" style="background:#185FA5;color:white;border-radius:12px 12px 0 0 !important">
@@ -122,6 +122,10 @@
 
         </div>
     </div>
+
+    {{-- HISTORIQUE DES MODIFICATIONS --}}
+    @include('partials.activity-log', ['activityLogs' => $activityLogs])
+
 </div>
 </div>
 @endsection

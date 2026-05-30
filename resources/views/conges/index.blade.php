@@ -15,43 +15,33 @@
     <form method="GET" class="row g-2 align-items-end">
         <div class="col-6 col-md-2">
             <label>Type</label>
-            <select name="type" class="form-select form-select-sm">
-                <option value="">Tous</option>
-                <option value="annual"      {{ request('type') === 'annual'      ? 'selected' : '' }}>Congé annuel</option>
-                <option value="sick"        {{ request('type') === 'sick'        ? 'selected' : '' }}>Maladie</option>
-                <option value="permission"  {{ request('type') === 'permission'  ? 'selected' : '' }}>Permission</option>
-                <option value="exceptional" {{ request('type') === 'exceptional' ? 'selected' : '' }}>Exceptionnel</option>
-                <option value="maternity"   {{ request('type') === 'maternity'   ? 'selected' : '' }}>Maternité</option>
-                <option value="paternity"   {{ request('type') === 'paternity'   ? 'selected' : '' }}>Paternité</option>
-            </select>
+            <x-select
+                name="type"
+                :options="['annual' => 'Congé annuel', 'sick' => 'Maladie', 'permission' => 'Permission', 'exceptional' => 'Exceptionnel', 'maternity' => 'Maternité', 'paternity' => 'Paternité']"
+                :value="request('type')"
+                placeholder="Tous"
+                class="form-select-sm"
+            />
         </div>
         <div class="col-6 col-md-2">
             <label>Statut</label>
-            <select name="status" class="form-select form-select-sm">
-                <option value="">Tous</option>
-                <option value="pending"  {{ request('status') === 'pending'  ? 'selected' : '' }}>En attente</option>
-                <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approuvé</option>
-                <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Refusé</option>
-            </select>
+            <x-select
+                name="status"
+                :options="['pending' => 'En attente', 'approved' => 'Approuvé', 'rejected' => 'Refusé']"
+                :value="request('status')"
+                placeholder="Tous"
+                class="form-select-sm"
+            />
         </div>
-        {{-- Ajouter dans le filtre --}}
         <div class="col-6 col-md-2">
             <label>Étape</label>
-            <select name="workflow_step" class="form-select form-select-sm">
-                <option value="">Toutes</option>
-                <option value="pending_n1" {{ request('workflow_step') === 'pending_n1' ? 'selected' : '' }}>
-                    En attente N+1
-                </option>
-                <option value="pending_rh" {{ request('workflow_step') === 'pending_rh' ? 'selected' : '' }}>
-                    En attente RH
-                </option>
-                <option value="approved"   {{ request('workflow_step') === 'approved'   ? 'selected' : '' }}>
-                    Approuvé
-                </option>
-                <option value="rejected"   {{ request('workflow_step') === 'rejected'   ? 'selected' : '' }}>
-                    Refusé
-                </option>
-            </select>
+            <x-select
+                name="workflow_step"
+                :options="['pending_n1' => 'En attente N+1', 'pending_rh' => 'En attente RH', 'approved' => 'Approuvé', 'rejected' => 'Refusé']"
+                :value="request('workflow_step')"
+                placeholder="Toutes"
+                class="form-select-sm"
+            />
         </div>
         <div class="col-6 col-md-2">
             <label>Mois</label>

@@ -50,15 +50,15 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Type de contrat <span class="text-danger">*</span></label>
-                                <select name="type" class="form-select @error('type') is-invalid @enderror"
-                                        required id="contract-type" onchange="toggleEndDate()">
-                                    <option value="cdi"        {{ old('type') === 'cdi'        ? 'selected' : '' }}>CDI</option>
-                                    <option value="cdd"        {{ old('type') === 'cdd'        ? 'selected' : '' }}>CDD</option>
-                                    <option value="internship" {{ old('type') === 'internship' ? 'selected' : '' }}>Stage</option>
-                                    <option value="consulting" {{ old('type') === 'consulting' ? 'selected' : '' }}>Consulting</option>
-                                </select>
-                                @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <x-select
+                                    name="type"
+                                    label="Type de contrat"
+                                    :options="['cdi' => 'CDI', 'cdd' => 'CDD', 'internship' => 'Stage', 'consulting' => 'Consulting']"
+                                    :value="old('type', 'cdi')"
+                                    id="contract-type"
+                                    onchange="toggleEndDate()"
+                                    required
+                                />
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-medium">Date de début <span class="text-danger">*</span></label>

@@ -160,93 +160,8 @@
             @endif
         </div>
 
-        {{-- COL DROITE — Détails + Workflow --}}
+        {{-- COL DROITE — Workflow --}}
         <div class="col-md-8">
-
-            {{-- DÉTAILS DE LA DEMANDE --}}
-            <div class="card mb-3">
-                <div class="card-header">
-                    <span><i class="bi bi-file-earmark-text me-2"></i>Détails de la demande</span>
-                    {!! $leave->workflow_badge !!}
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="text-muted"
-                                 style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                Type
-                            </div>
-                            <span class="badge bg-secondary badge-status">
-                            {{ $leave->type_label }}
-                        </span>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-muted"
-                                 style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                Date de début
-                            </div>
-                            <div class="fw-medium">{{ $leave->start_date->format('d M Y') }}</div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-muted"
-                                 style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                Date de fin
-                            </div>
-                            <div class="fw-medium">{{ $leave->end_date->format('d M Y') }}</div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-muted"
-                                 style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                Durée
-                            </div>
-                            <div class="fw-bold fs-5">{{ $leave->duration_days }} jour(s)</div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-muted"
-                                 style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                Solde avant demande
-                            </div>
-                            <div class="fw-medium">
-                                {{ $leave->employee->leave_balance }} jour(s) restants
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-muted"
-                                 style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                Soumis le
-                            </div>
-                            <div class="fw-medium">
-                                {{ $leave->created_at->format('d M Y à H:i') }}
-                            </div>
-                        </div>
-
-                        @if($leave->reason)
-                            <div class="col-12">
-                                <div class="text-muted"
-                                     style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                    Motif
-                                </div>
-                                <div class="p-3 rounded mt-1" style="background:#f8f9fa;font-size:13.5px">
-                                    {{ $leave->reason }}
-                                </div>
-                            </div>
-                        @endif
-
-                        @if($leave->rejection_reason)
-                            <div class="col-12">
-                                <div class="text-muted"
-                                     style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
-                                    Motif de refus
-                                </div>
-                                <div class="p-3 rounded mt-1"
-                                     style="background:#FCEBEB;color:#A32D2D;font-size:13.5px">
-                                    <i class="bi bi-x-circle me-2"></i>{{ $leave->rejection_reason }}
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
 
             {{-- TIMELINE WORKFLOW --}}
             <div class="card">
@@ -420,6 +335,84 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    {{-- PLEINE LARGEUR --}}
+    <div class="row g-3 mt-0">
+
+        {{-- DÉTAILS DE LA DEMANDE --}}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <span><i class="bi bi-file-earmark-text me-2"></i>Détails de la demande</span>
+                    {!! $leave->workflow_badge !!}
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Type</div>
+                            <span class="badge bg-secondary badge-status">{{ $leave->type_label }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Date de début</div>
+                            <div class="fw-medium">{{ $leave->start_date->format('d M Y') }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Date de fin</div>
+                            <div class="fw-medium">{{ $leave->end_date->format('d M Y') }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Durée</div>
+                            <div class="fw-bold fs-5">{{ $leave->duration_days }} jour(s)</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Solde restant</div>
+                            <div class="fw-medium">{{ $leave->employee->leave_balance }} jour(s)</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Soumis le</div>
+                            <div class="fw-medium">{{ $leave->created_at->format('d M Y à H:i') }}</div>
+                        </div>
+                        @if($leave->date_approbation)
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
+                                <i class="bi bi-check-circle me-1 text-success"></i>Date d'approbation
+                            </div>
+                            <div class="fw-medium text-success">{{ $leave->date_approbation->format('d M Y') }}</div>
+                        </div>
+                        @endif
+                        @if($leave->date_rejet)
+                        <div class="col-md-2">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">
+                                <i class="bi bi-x-circle me-1 text-danger"></i>Date de rejet
+                            </div>
+                            <div class="fw-medium text-danger">{{ $leave->date_rejet->format('d M Y') }}</div>
+                        </div>
+                        @endif
+                        @if($leave->reason)
+                        <div class="col-12">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Motif</div>
+                            <div class="p-3 rounded mt-1" style="background:#f8f9fa;font-size:13.5px">{{ $leave->reason }}</div>
+                        </div>
+                        @endif
+                        @if($leave->rejection_reason)
+                        <div class="col-12">
+                            <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.04em">Motif de refus</div>
+                            <div class="p-3 rounded mt-1" style="background:#FCEBEB;color:#A32D2D;font-size:13.5px">
+                                <i class="bi bi-x-circle me-2"></i>{{ $leave->rejection_reason }}
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- HISTORIQUE DES MODIFICATIONS --}}
+        <div class="col-12">
+            @include('partials.activity-log', ['activityLogs' => $activityLogs])
+        </div>
+
     </div>
 
     {{-- ── MODAL REFUS N+1 ────────────────────────────────────── --}}

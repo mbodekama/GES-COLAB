@@ -23,23 +23,23 @@
         <form method="GET" action="{{ route('contracts.index') }}" class="row g-2 align-items-end">
             <div class="col-6 col-md-2">
                 <label>Type</label>
-                <select name="type" class="form-select form-select-sm">
-                    <option value="">Tous</option>
-                    <option value="cdi"        {{ request('type') === 'cdi'        ? 'selected' : '' }}>CDI</option>
-                    <option value="cdd"        {{ request('type') === 'cdd'        ? 'selected' : '' }}>CDD</option>
-                    <option value="internship" {{ request('type') === 'internship' ? 'selected' : '' }}>Stage</option>
-                    <option value="consulting" {{ request('type') === 'consulting' ? 'selected' : '' }}>Consulting</option>
-                </select>
+                <x-select
+                    name="type"
+                    :options="['cdi' => 'CDI', 'cdd' => 'CDD', 'internship' => 'Stage', 'consulting' => 'Consulting']"
+                    :value="request('type')"
+                    placeholder="Tous"
+                    class="form-select-sm"
+                />
             </div>
             <div class="col-6 col-md-2">
                 <label>Statut</label>
-                <select name="status" class="form-select form-select-sm">
-                    <option value="">Tous</option>
-                    <option value="active"     {{ request('status') === 'active'     ? 'selected' : '' }}>En cours</option>
-                    <option value="expired"    {{ request('status') === 'expired'    ? 'selected' : '' }}>Expiré</option>
-                    <option value="terminated" {{ request('status') === 'terminated' ? 'selected' : '' }}>Résilié</option>
-                    <option value="renewed"    {{ request('status') === 'renewed'    ? 'selected' : '' }}>Renouvelé</option>
-                </select>
+                <x-select
+                    name="status"
+                    :options="['active' => 'En cours', 'expired' => 'Expiré', 'terminated' => 'Résilié', 'renewed' => 'Renouvelé']"
+                    :value="request('status')"
+                    placeholder="Tous"
+                    class="form-select-sm"
+                />
             </div>
             <div class="col-12 col-md-5">
                 <label>Recherche</label>

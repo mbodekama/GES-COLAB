@@ -93,7 +93,10 @@ class PayrollController extends Controller
         }
 
         $payroll->load('employee');
-        return view('paie.show', compact('payroll'));
+
+        $activityLogs = $payroll->activityLogs()->with('user')->take(30)->get();
+
+        return view('paie.show', compact('payroll', 'activityLogs'));
     }
 
     public function generate(Request $request)

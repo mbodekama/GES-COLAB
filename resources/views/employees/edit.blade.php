@@ -90,20 +90,12 @@
                                        class="form-control">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label small fw-medium">Situation familiale</label>
-                                <select name="marital_status" class="form-select">
-                                    @foreach([
-                                        'single'   => 'Célibataire',
-                                        'married'  => 'Marié(e)',
-                                        'divorced' => 'Divorcé(e)',
-                                        'widowed'  => 'Veuf/Veuve',
-                                    ] as $val => $lbl)
-                                        <option value="{{ $val }}"
-                                            {{ old('marital_status', $employee->marital_status) === $val ? 'selected' : '' }}>
-                                            {{ $lbl }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <x-select
+                                    name="marital_status"
+                                    label="Situation familiale"
+                                    :options="['single' => 'Célibataire', 'married' => 'Marié(e)', 'divorced' => 'Divorcé(e)', 'widowed' => 'Veuf/Veuve']"
+                                    :value="old('marital_status', $employee->marital_status)"
+                                />
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label small fw-medium">Nb. enfants</label>
@@ -202,20 +194,12 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Statut</label>
-                                <select name="status" class="form-select">
-                                    @foreach([
-                                        'active'     => 'Actif',
-                                        'on_leave'   => 'En congé',
-                                        'suspended'  => 'Suspendu',
-                                        'terminated' => 'Parti',
-                                    ] as $val => $lbl)
-                                        <option value="{{ $val }}"
-                                            {{ old('status', $employee->status) === $val ? 'selected' : '' }}>
-                                            {{ $lbl }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <x-select
+                                    name="status"
+                                    label="Statut"
+                                    :options="['active' => 'Actif', 'on_leave' => 'En congé', 'suspended' => 'Suspendu', 'terminated' => 'Parti']"
+                                    :value="old('status', $employee->status)"
+                                />
                             </div>
 
                             {{-- N+1 : chargé dynamiquement + valeur actuelle pré-sélectionnée --}}
@@ -259,16 +243,13 @@
                         <i class="bi bi-shield-lock me-2"></i>Rôle applicatif
                     </div>
                     <div class="card-body">
-                        <label class="form-label small fw-medium">Rôle</label>
-                        <select name="role" class="form-select">
-                            @foreach($roles as $role)
-                                <option value="{{ $role->name }}"
-                                    {{ $employee->user?->hasRole($role->name) ? 'selected' : '' }}>
-                                    {{ ucfirst($role->name) }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="form-text">
+                        <x-select
+                            name="role"
+                            label="Rôle"
+                            :options="$roles->pluck('name')->mapWithKeys(fn($n) => [$n => ucfirst($n)])->all()"
+                            :value="old('role', $employee->user?->roles->first()?->name)"
+                        />
+                        <div class="form-text mt-1">
                             Rôle actuel :
                             <strong>{{ $employee->user?->primary_role_label ?? '—' }}</strong>
                         </div>

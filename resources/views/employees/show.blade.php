@@ -194,7 +194,14 @@
         </div>
         @endif
 
-        {{-- HISTORIQUE CONGÉS --}}
+    </div>
+</div>
+
+{{-- PLEINE LARGEUR --}}
+<div class="row g-3 mt-0">
+
+    {{-- HISTORIQUE CONGÉS --}}
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
                 <span><i class="bi bi-calendar-event me-2"></i>Historique des congés</span>
@@ -233,5 +240,11 @@
             </div>
         </div>
     </div>
+
+    {{-- HISTORIQUE DES MODIFICATIONS --}}
+    <div class="col-12">
+        @include('partials.activity-log', ['activityLogs' => $activityLogs])
+    </div>
+
 </div>
 @endsection

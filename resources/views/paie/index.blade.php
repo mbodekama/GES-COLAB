@@ -50,12 +50,13 @@
         </div>
         <div class="col-6 col-md-3">
             <label>Département</label>
-            <select name="department" class="form-select form-select-sm">
-                <option value="">Tous</option>
-                @foreach($departments as $dept)
-                    <option value="{{ $dept }}" {{ request('department') === $dept ? 'selected' : '' }}>{{ $dept }}</option>
-                @endforeach
-            </select>
+            <x-select
+                name="department"
+                :options="$departments->mapWithKeys(fn($d) => [$d => $d])->all()"
+                :value="request('department')"
+                placeholder="Tous"
+                class="form-select-sm"
+            />
         </div>
         <div class="col-12 col-md-auto ms-auto d-flex justify-content-end gap-2 align-items-end">
             <button class="btn btn-primary btn-sm">
@@ -164,13 +165,12 @@
                     <input type="month" name="period" value="{{ date('Y-m') }}" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label small fw-medium">Département</label>
-                    <select name="department" class="form-select">
-                        <option value="">Tous les départements</option>
-                        @foreach($departments as $dept)
-                            <option value="{{ $dept }}">{{ $dept }}</option>
-                        @endforeach
-                    </select>
+                    <x-select
+                        name="department"
+                        label="Département"
+                        :options="$departments->mapWithKeys(fn($d) => [$d => $d])->all()"
+                        placeholder="Tous les départements"
+                    />
                 </div>
                 <div class="alert alert-warning small py-2">
                     <i class="bi bi-exclamation-triangle me-1"></i>

@@ -2,13 +2,20 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasActivityLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payroll extends Model
 {
-    use HasFactory;
+    use HasFactory, HasActivityLog;
+
+    // Champs dérivés/employeur exclus du diff pour réduire le bruit
+    public function getAuditExcludeColumns(): array
+    {
+        return ['seniority_rate', 'cnps_employer'];
+    }
 
     protected $fillable = [
         'employee_id', 'period', 'base_salary', 'seniority_bonus',

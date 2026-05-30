@@ -237,22 +237,12 @@
                         </datalist>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-medium">
-                            Niveau hiérarchique <span class="text-danger">*</span>
-                        </label>
-                        <select name="level" class="form-select" required>
-                            @for($i = 10; $i >= 1; $i--)
-                            <option value="{{ $i }}">
-                                Niveau {{ $i }} —
-                                @if($i >= 9) Direction
-                                @elseif($i >= 7) Management supérieur
-                                @elseif($i >= 5) Management intermédiaire
-                                @elseif($i >= 3) Supervision
-                                @else Exécution
-                                @endif
-                            </option>
-                            @endfor
-                        </select>
+                        <x-select
+                            name="level"
+                            label="Niveau hiérarchique"
+                            :options="collect(range(10,1))->mapWithKeys(fn($i) => [$i => 'Niveau '.$i.' — '.match(true) { $i>=9=>'Direction', $i>=7=>'Management supérieur', $i>=5=>'Management intermédiaire', $i>=3=>'Supervision', default=>'Exécution' }])->all()"
+                            required
+                        />
                     </div>
                     <div class="col-md-3 d-flex align-items-end pb-1">
                         <div class="form-check">
@@ -331,22 +321,13 @@
                                class="form-control" list="dept-list-pos">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-medium">
-                            Niveau hiérarchique <span class="text-danger">*</span>
-                        </label>
-                        <select name="level" id="edit-level" class="form-select" required>
-                            @for($i = 10; $i >= 1; $i--)
-                            <option value="{{ $i }}">
-                                Niveau {{ $i }} —
-                                @if($i >= 9) Direction
-                                @elseif($i >= 7) Management supérieur
-                                @elseif($i >= 5) Management intermédiaire
-                                @elseif($i >= 3) Supervision
-                                @else Exécution
-                                @endif
-                            </option>
-                            @endfor
-                        </select>
+                        <x-select
+                            name="level"
+                            label="Niveau hiérarchique"
+                            :options="collect(range(10,1))->mapWithKeys(fn($i) => [$i => 'Niveau '.$i.' — '.match(true) { $i>=9=>'Direction', $i>=7=>'Management supérieur', $i>=5=>'Management intermédiaire', $i>=3=>'Supervision', default=>'Exécution' }])->all()"
+                            id="edit-level"
+                            required
+                        />
                     </div>
                     <div class="col-md-3 d-flex align-items-end pb-1">
                         <div class="form-check">

@@ -119,7 +119,16 @@ class ContractController extends Controller
     public function show(Contract $contract)
     {
         $contract->load(['employee', 'salaryGrid']);
-        return view('contracts.show', compact('contract'));
+
+        $activityLogs = $contract->activityLogs()->with('user')->take(30)->get();
+
+        $previousContracts = Contract::with('salaryGrid')
+            ->where('employee_id', $contract->employee_id)
+            ->where('id', '!=', $contract->id)
+            ->orderByDesc('start_date')
+            ->get();
+
+        return view('contracts.show', compact('contract', 'activityLogs', 'previousContracts'));
     }
 
     public function edit(Contract $contract)
@@ -133,16 +142,26 @@ class ContractController extends Controller
     public function update(Request $request, Contract $contract)
     {
         $validated = $request->validate([
-            'type'           => 'required|in:cdi,cdd,internship,consulting',
-            'start_date'     => 'required|date',
-            'end_date'       => 'nullable|date|after:start_date',
-            'position'       => 'required|string|max:100',
-            'department'     => 'required|string|max:100',
-            'base_salary'    => 'required|numeric|min:0',
-            'salary_grid_id' => 'nullable|exists:salary_grids,id',
-            'status'         => 'required|in:active,expired,terminated,renewed',
-            'notes'          => 'nullable|string',
+            'type'                => 'required|in:cdi,cdd,internship,consulting',
+            'start_date'          => 'required|date',
+            'end_date'            => 'nullable|date|after:start_date',
+            'position'            => 'required|string|max:100',
+            'department'          => 'required|string|max:100',
+            'base_salary'         => 'required|numeric|min:0',
+            'salary_grid_id'      => 'nullable|exists:salary_grids,id',
+            'status'              => 'required|in:active,expired,terminated,renewed',
+            'notes'               => 'nullable|string',
+            'date_resiliation'    => 'nullable|date',
+            'date_renouvellement' => 'nullable|date',
         ]);
+
+        // Auto-renseigner la date si non fournie et statut change
+        if ($validated['status'] === 'terminated' && empty($validated['date_resiliation'])) {
+            $validated['date_resiliation'] = now()->toDateString();
+        }
+        if ($validated['status'] === 'renewed' && empty($validated['date_renouvellement'])) {
+            $validated['date_renouvellement'] = now()->toDateString();
+        }
 
         $contract->update($validated);
 
@@ -152,7 +171,10 @@ class ContractController extends Controller
 
     public function destroy(Contract $contract)
     {
-        $contract->update(['status' => 'terminated']);
+        $contract->update([
+            'status'           => 'terminated',
+            'date_resiliation' => now()->toDateString(),
+        ]);
         return redirect()->route('contracts.index')
                          ->with('success', 'Contrat résilié.');
     }
@@ -163,7 +185,10 @@ class ContractController extends Controller
             'end_date' => 'required|date|after:today',
         ]);
 
-        $contract->update(['status' => 'renewed']);
+        $contract->update([
+            'status'              => 'renewed',
+            'date_renouvellement' => now()->toDateString(),
+        ]);
 
         $newContract = $contract->replicate();
         $newContract->contract_number = Contract::generateNumber();

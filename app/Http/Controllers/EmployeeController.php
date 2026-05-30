@@ -42,7 +42,7 @@ class EmployeeController extends Controller
             $query->search($request->search);
         }
 
-        $employees   = $query->paginate(5)->withQueryString();
+        $employees   = $query->paginate(20)->withQueryString();
         $departments = Employee::distinct()->orderBy('department')->pluck('department');
         $postes      = Poste::active()->orderedByLevel()->get();
         $salaryGrids = SalaryGrid::active()->orderByDesc('level')->get();
@@ -219,7 +219,9 @@ class EmployeeController extends Controller
             'subordinates.poste',
         ]);
 
-        return view('employees.show', compact('employee'));
+        $activityLogs = $employee->activityLogs()->with('user')->take(30)->get();
+
+        return view('employees.show', compact('employee', 'activityLogs'));
     }
 
     public function edit(Employee $employee)

@@ -135,12 +135,12 @@
                         </select>
                     </div>
                     <div class="col-md-5">
-                        <label class="form-label small fw-medium">Nouveau rôle</label>
-                        <select name="role" class="form-select form-select-sm">
-                            @foreach($roles as $role)
-                                <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
-                            @endforeach
-                        </select>
+                        <x-select
+                            name="role"
+                            label="Nouveau rôle"
+                            :options="$roles->pluck('name')->mapWithKeys(fn($n) => [$n => ucfirst($n)])->all()"
+                            class="form-select-sm"
+                        />
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-primary btn-sm w-100">Assigner</button>
