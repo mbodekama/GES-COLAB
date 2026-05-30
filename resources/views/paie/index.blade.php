@@ -133,7 +133,7 @@
     </table>
     </div>
 
-    <div class="card-footer d-flex justify-content-between py-2">
+    <div class="card-footer d-flex justify-content-between align-items-center py-2">
         <small class="text-muted">
             {{ $payrolls->firstItem() ?? 0 }}–{{ $payrolls->lastItem() ?? 0 }} sur {{ $payrolls->total() }}
         </small>
