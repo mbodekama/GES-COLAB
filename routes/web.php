@@ -76,6 +76,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/payroll/generate',
             [PayrollController::class, 'generate'])
             ->name('payroll.generate');
+        Route::get('/payroll/{payroll}/print-design',
+            [PayrollController::class, 'printDesign'])
+            ->name('payroll.print.design');
         // Grilles salariales
         Route::resource('salary-grids', SalaryGridController::class)
              ->except(['show', 'create', 'edit']);

@@ -111,6 +111,9 @@
                     <a href="{{ route('payroll.show', $payroll) }}" class="btn btn-outline-primary" title="Voir">
                         <i class="bi bi-eye"></i>
                     </a>
+                    <a href="{{ route('payroll.print.design', $payroll) }}" class="btn btn-primary" title="Bulletin PDF" target="_blank">
+                        <i class="bi bi-file-earmark-richtext"></i>
+                    </a>
                 </div>
             </td>
         </tr>

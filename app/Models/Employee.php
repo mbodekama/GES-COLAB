@@ -113,8 +113,8 @@ class Employee extends Model
 
     public function getSeniorityLabelAttribute(): string
     {
-        $years  = $this->hire_date->diffInYears(now());
-        $months = $this->hire_date->diffInMonths(now()) % 12;
+        $years  = (int) $this->hire_date->diffInYears(now());
+        $months = (int) $this->hire_date->diffInMonths(now()) % 12;
 
         if ($years === 0) return "{$months} mois";
         if ($months === 0) return "{$years} an(s)";
@@ -123,7 +123,7 @@ class Employee extends Model
 
     public function getSeniorityYearsAttribute(): int
     {
-        return $this->hire_date->diffInYears(now());
+        return (int) $this->hire_date->diffInYears(now());
     }
 
     public function getStatusBadgeAttribute(): string
