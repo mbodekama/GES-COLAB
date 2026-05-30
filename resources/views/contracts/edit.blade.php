@@ -24,7 +24,10 @@
 
             {{-- Employé (lecture seule) --}}
             <div class="card mb-3">
-                <div class="card-header"><i class="bi bi-person me-2"></i>Employé</div>
+                <div class="card-header d-flex align-items-center gap-2"
+                     style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                    <span style="color:#185FA5"><i class="bi bi-person me-1"></i>Employé</span>
+                </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center gap-3">
                         <div class="avatar-initials"
@@ -46,7 +49,12 @@
 
             {{-- Détails du contrat --}}
             <div class="card mb-3">
-                <div class="card-header"><i class="bi bi-file-earmark-text me-2"></i>Détails du contrat</div>
+                <div class="card-header d-flex align-items-center gap-2"
+                     style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                          style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">1</span>
+                    <span style="color:#185FA5"><i class="bi bi-file-earmark-text me-1"></i>Détails du contrat</span>
+                </div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-4">
@@ -138,7 +146,12 @@
 
             {{-- Rémunération --}}
             <div class="card mb-3">
-                <div class="card-header"><i class="bi bi-cash me-2"></i>Rémunération</div>
+                <div class="card-header d-flex align-items-center gap-2"
+                     style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                          style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">2</span>
+                    <span style="color:#185FA5"><i class="bi bi-cash me-1"></i>Rémunération</span>
+                </div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-5">

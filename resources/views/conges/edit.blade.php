@@ -23,7 +23,12 @@
 @method('PUT')
 
 <div class="card mb-3">
-    <div class="card-header"><i class="bi bi-calendar-plus me-2"></i>Modifier la demande</div>
+    <div class="card-header d-flex align-items-center gap-2"
+         style="background:#E6F1FB; border-left:4px solid #185FA5;">
+        <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+              style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">1</span>
+        <span style="color:#185FA5"><i class="bi bi-calendar-plus me-1"></i>Modifier la demande</span>
+    </div>
     <div class="card-body">
         <div class="row g-3">
 
