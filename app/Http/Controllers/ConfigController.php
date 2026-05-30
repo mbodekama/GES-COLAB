@@ -28,9 +28,11 @@ class ConfigController extends Controller
     {
         $validated = $request->validate([
             'company_name'          => 'required|string|max:100',
+            'company_initials'      => 'nullable|string|max:3',
             'company_address'       => 'nullable|string|max:200',
             'company_phone'         => 'nullable|string|max:30',
             'company_email'         => 'nullable|email',
+            'company_website'       => 'nullable|url|max:100',
             'default_language'      => 'required|in:fr,en',
             'currency'              => 'required|string|max:10',
             'working_days_per_week' => 'required|integer|in:5,6',
@@ -81,10 +83,12 @@ class ConfigController extends Controller
         // Fusionner avec les valeurs par défaut de config/gescolab.php
         return array_merge([
             // Généraux
-            'company_name'          => config('gescolab.company_name',    'GES-COLAB'),
+            'company_name'          => config('gescolab.company_name',     'GES-COLAB'),
+            'company_initials'      => config('gescolab.company_initials', ''),
             'company_address'       => config('gescolab.company_address',  ''),
             'company_phone'         => config('gescolab.company_phone',    ''),
             'company_email'         => config('gescolab.company_email',    ''),
+            'company_website'       => config('gescolab.company_website',  ''),
             'default_language'      => config('gescolab.default_language', 'fr'),
             'currency'              => config('gescolab.currency',         'FCFA'),
             'working_days_per_week' => config('gescolab.working_days_per_week', 5),

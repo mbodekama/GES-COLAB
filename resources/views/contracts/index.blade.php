@@ -50,12 +50,12 @@
                            placeholder="Nom employé, N° contrat...">
                 </div>
             </div>
-            <div class="col-12 col-md-3 d-flex gap-2">
-                <button class="btn btn-primary btn-sm w-100">
-                    <i class="bi bi-funnel me-1"></i>Filtrer
+            <div class="col-12 col-md-auto ms-auto d-flex justify-content-end gap-2">
+                <button class="btn btn-primary btn-sm">
+                    <i class="bi bi-search me-1"></i> Lancer la recherche
                 </button>
                 <a href="{{ route('contracts.index') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-x"></i>
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
                 </a>
             </div>
         </form>
@@ -161,10 +161,6 @@
                                         <i class="bi bi-arrow-clockwise"></i>
                                     </button>
                                 @endif
-                                <a href="{{ route('contracts.print', $contract) }}"
-                                   class="btn btn-outline-dark" title="PDF" target="_blank">
-                                    <i class="bi bi-printer"></i>
-                                </a>
                             </div>
                         </td>
                     </tr>

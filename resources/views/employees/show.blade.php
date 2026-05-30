@@ -7,8 +7,8 @@
         <i class="bi bi-pencil me-1"></i> Modifier
     </a>
     @endcan
-    <a href="{{ route('employees.print', $employee) }}" class="btn btn-outline-dark btn-sm" target="_blank">
-        <i class="bi bi-printer me-1"></i> PDF
+    <a href="{{ route('employees.print.design', $employee) }}" class="btn btn-primary btn-sm" target="_blank">
+        <i class="bi bi-file-earmark-person me-1"></i> PDF
     </a>
     <a href="{{ route('employees.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Retour

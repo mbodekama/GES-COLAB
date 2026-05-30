@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Contract;
 use App\Models\Employee;
 use App\Models\SalaryGrid;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class ContractController extends Controller
@@ -121,12 +120,4 @@ class ContractController extends Controller
         return back()->with('success', 'Contrat renouvelé avec succès.');
     }
 
-    public function print(Contract $contract)
-    {
-        $contract->load(['employee', 'salaryGrid']);
-        $pdf = Pdf::loadView('contracts.pdf.contrat', compact('contract'))
-                  ->setPaper('a4', 'portrait');
-
-        return $pdf->stream("contrat-{$contract->contract_number}.pdf");
-    }
 }

@@ -11,10 +11,22 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('config.general') }}">
                         @csrf
-                        <div class="mb-3">
-                            <label class="form-label small fw-medium">Nom de l'entreprise</label>
-                            <input type="text" name="company_name" class="form-control"
-                                   value="{{ $cfg['company_name'] }}">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-9">
+                                <label class="form-label small fw-medium">Nom de l'entreprise</label>
+                                <input type="text" name="company_name" class="form-control"
+                                       value="{{ $cfg['company_name'] }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-medium">
+                                    Initiales
+                                    <span class="text-muted fw-normal">(badge PDF)</span>
+                                </label>
+                                <input type="text" name="company_initials" class="form-control"
+                                       value="{{ $cfg['company_initials'] }}"
+                                       maxlength="3" placeholder="Auto"
+                                       style="text-transform:uppercase">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-medium">Adresse</label>
@@ -32,6 +44,15 @@
                                 <input type="email" name="company_email" class="form-control"
                                        value="{{ $cfg['company_email'] }}">
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium">
+                                Site web
+                                <span class="text-muted fw-normal">(affiché dans le pied de page PDF)</span>
+                            </label>
+                            <input type="url" name="company_website" class="form-control"
+                                   value="{{ $cfg['company_website'] }}"
+                                   placeholder="https://www.exemple.com">
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-md-6">

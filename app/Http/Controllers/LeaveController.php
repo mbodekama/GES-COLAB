@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CongeApprouve;
+use App\Mail\CongeRefuse;
 use App\Models\Employee;
 use App\Models\Leave;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class LeaveController extends Controller
 {
@@ -295,6 +297,8 @@ class LeaveController extends Controller
             'rejection_reason' => $request->comment,
         ]);
 
+        Mail::to($leave->employee->email)->send(new CongeRefuse($leave, $request->comment));
+
         return back()->with('success',
             "Demande de {$leave->employee->full_name} refusée."
         );
@@ -327,6 +331,8 @@ class LeaveController extends Controller
             $leave->employee->update(['status' => 'on_leave']);
         }
 
+        Mail::to($leave->employee->email)->send(new CongeApprouve($leave->fresh('employee')));
+
         return back()->with('success',
             "Congé de {$leave->employee->full_name} approuvé."
         );
@@ -355,13 +361,15 @@ class LeaveController extends Controller
             'rejection_reason' => $request->reason,
         ]);
 
+        Mail::to($leave->employee->email)->send(new CongeRefuse($leave, $request->reason));
+
         return back()->with('success',
             "Demande de {$leave->employee->full_name} refusée."
         );
     }
 
-    // ── Imprimer l'attestation PDF ────────────────────────────
-    public function print(Leave $leave)
+    // ── Imprimer l'attestation design ────────────────────────
+    public function printDesign(Leave $leave)
     {
         abort_if($leave->status !== 'approved', 403,
             'Seuls les congés approuvés peuvent être imprimés.'
@@ -369,10 +377,42 @@ class LeaveController extends Controller
 
         $leave->load(['employee', 'approvedBy', 'n1Validator']);
 
-        $pdf = Pdf::loadView('conges.pdf.attestation', compact('leave'))
-            ->setPaper('a4', 'portrait');
+        $data = [
+            'reference'           => $leave->leave_number,
+            'type_label'          => $leave->type_label,
+            'start_date'          => $leave->start_date->format('d/m/Y'),
+            'end_date'            => $leave->end_date->format('d/m/Y'),
+            'start_iso'           => $leave->start_date->isoFormat('D MMMM YYYY'),
+            'end_iso'             => $leave->end_date->isoFormat('D MMMM YYYY'),
+            'duration_days'       => $leave->duration_days,
+            'employee_name'       => $leave->employee->full_name,
+            'employee_matricule'  => $leave->employee->matricule,
+            'employee_position'   => $leave->employee->position,
+            'employee_department' => $leave->employee->department,
+            'approved_by'         => $leave->approvedBy?->name ?? '—',
+            'approved_at'         => $leave->approved_at?->format('d/m/Y') ?? '—',
+            'n1_validator'        => $leave->n1Validator?->name,
+            'n1_validated_at'     => $leave->n1_validated_at?->format('d/m/Y'),
+            'company_name'        => setting('company_name', 'GES-COLAB'),
+            'company_initials'    => setting('company_initials', ''),
+            'company_address'     => setting('company_address', ''),
+            'company_phone'       => setting('company_phone', ''),
+            'company_website'     => setting('company_website', ''),
+            'generated_at'        => now()->format('d/m/Y à H:i'),
+            'generated_date'      => now()->isoFormat('D MMMM YYYY'),
+        ];
 
-        return $pdf->stream("conge-{$leave->leave_number}.pdf");
+        ob_start();
+        $content = (new \App\Pdf\CongeAttestation($data))->build()->Output('S', '');
+        ob_end_clean();
+
+        return response()->make($content, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => "inline; filename=\"attestation-design-{$leave->leave_number}.pdf\"",
+            'Content-Length'      => strlen($content),
+            'Cache-Control'       => 'private, max-age=0, must-revalidate',
+            'Pragma'              => 'public',
+        ]);
     }
 
     // ─────────────────────────────────────────────────────────

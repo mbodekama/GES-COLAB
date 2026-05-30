@@ -36,15 +36,12 @@ Route::middleware(['auth'])->group(function () {
 
     // ── Employés ──────────────────────────────────────────────
     Route::resource('employees', EmployeeController::class);
-    Route::get('/employees/{employee}/print',
-        [EmployeeController::class, 'print'])
-        ->name('employees.print');
+    Route::get('/employees/{employee}/print-design',
+        [EmployeeController::class, 'printDesign'])
+        ->name('employees.print.design');
 
     // ── Contrats ──────────────────────────────────────────────
     Route::resource('contracts', ContractController::class);
-    Route::get('/contracts/{contract}/print',
-        [ContractController::class, 'print'])
-        ->name('contracts.print');
     Route::post('/contracts/{contract}/renew',
         [ContractController::class, 'renew'])
         ->name('contracts.renew');
@@ -68,10 +65,9 @@ Route::middleware(['auth'])->group(function () {
         [LeaveController::class, 'reject'])
         ->name('leaves.reject');
 
-    // Impression attestation
-    Route::get('/leaves/{leave}/print',
-        [LeaveController::class, 'print'])
-        ->name('leaves.print');
+    Route::get('/leaves/{leave}/print-design',
+        [LeaveController::class, 'printDesign'])
+        ->name('leaves.print.design');
 
     // ── Paie ──────────────────────────────────────────────────
     Route::middleware(['role:superadmin|admin|comptable|rh'])->group(function () {
@@ -80,10 +76,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/payroll/generate',
             [PayrollController::class, 'generate'])
             ->name('payroll.generate');
-        Route::get('/payroll/{payroll}/pdf',
-            [PayrollController::class, 'pdf'])
-            ->name('payroll.pdf');
-
         // Grilles salariales
         Route::resource('salary-grids', SalaryGridController::class)
              ->except(['show', 'create', 'edit']);

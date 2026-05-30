@@ -65,10 +65,12 @@
                        class="form-control form-control-sm" placeholder="Nom de l'employé...">
             </div>
         </div>
-        <div class="col-12 col-md-2 d-flex gap-2">
-            <button class="btn btn-primary btn-sm w-100">Filtrer</button>
+        <div class="col-12 col-md-auto ms-auto d-flex justify-content-end gap-2">
+            <button class="btn btn-primary btn-sm">
+                <i class="bi bi-search me-1"></i> Lancer la recherche
+            </button>
             <a href="{{ route('leaves.index') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-x"></i>
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
             </a>
         </div>
     </form>
@@ -170,13 +172,11 @@
 
                     {{-- Impression : uniquement si approuvé --}}
                     @if($leave->status === 'approved')
-                        <div>
-                        <a href="{{ route('leaves.print', $leave) }}"
-                           class="btn btn-outline-dark"
+                        <a href="{{ route('leaves.print.design', $leave) }}"
+                           class="btn btn-primary btn-sm"
                            title="Attestation PDF" target="_blank">
-                            <i class="bi bi-printer"></i> &nbsp; Télécharger PDF
+                            <i class="bi bi-file-earmark-richtext"></i> PDF
                         </a>
-                        </div>
                     @endif
                 </div>
             </td>

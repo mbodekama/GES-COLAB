@@ -2,9 +2,6 @@
 @section('page-title', 'Bulletin de paie')
 
 @section('header-actions')
-    <a href="{{ route('payroll.pdf', $payroll) }}" class="btn btn-outline-dark btn-sm" target="_blank">
-        <i class="bi bi-printer me-1"></i> Imprimer PDF
-    </a>
     <a href="{{ route('payroll.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Retour
     </a>

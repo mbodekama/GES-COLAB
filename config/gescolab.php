@@ -3,10 +3,12 @@
 return [
 
     // ── Entreprise ────────────────────────────────────────────
-    'company_name'    => env('COMPANY_NAME', 'GES-COLAB'),
-    'company_address' => env('COMPANY_ADDRESS', 'Abidjan, Côte d\'Ivoire'),
-    'company_phone'   => env('COMPANY_PHONE', ''),
-    'company_email'   => env('COMPANY_EMAIL', ''),
+    'company_name'     => env('COMPANY_NAME', 'GES-COLAB'),
+    'company_initials' => env('COMPANY_INITIALS', ''),
+    'company_address'  => env('COMPANY_ADDRESS', 'Abidjan, Côte d\'Ivoire'),
+    'company_phone'    => env('COMPANY_PHONE', ''),
+    'company_email'    => env('COMPANY_EMAIL', ''),
+    'company_website'  => env('COMPANY_WEBSITE', ''),
 
     // ── Application ───────────────────────────────────────────
     'default_language'      => env('APP_LOCALE', 'fr'),

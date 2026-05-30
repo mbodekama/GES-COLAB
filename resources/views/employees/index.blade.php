@@ -51,12 +51,12 @@
                        class="form-control form-control-sm" placeholder="Nom, prénom, matricule, poste...">
             </div>
         </div>
-        <div class="col-12 col-md-2 d-flex gap-2">
-            <button class="btn btn-primary btn-sm w-100">
-                <i class="bi bi-funnel me-1"></i>Filtrer
+        <div class="col-12 col-md-auto ms-auto d-flex justify-content-end gap-2">
+            <button class="btn btn-primary btn-sm">
+                <i class="bi bi-search me-1"></i> Lancer la recherche
             </button>
             <a href="{{ route('employees.index') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-x"></i>
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
             </a>
         </div>
     </form>
@@ -124,9 +124,9 @@
                         <i class="bi bi-pencil"></i>
                     </a>
                     @endcan
-                    <a href="{{ route('employees.print', $employee) }}"
-                       class="btn btn-outline-dark" title="Fiche PDF" target="_blank">
-                        <i class="bi bi-printer"></i>
+                    <a href="{{ route('employees.print.design', $employee) }}"
+                       class="btn btn-primary" title="Fiche PDF" target="_blank">
+                        <i class="bi bi-file-earmark-person"></i>
                     </a>
                 </div>
             </td>

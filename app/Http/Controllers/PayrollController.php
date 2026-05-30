@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Payroll;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -75,19 +74,6 @@ class PayrollController extends Controller
 
         return redirect()->route('payroll.index', ['period' => $period])
                          ->with('success', "{$generated} fiche(s) de paie générée(s) pour {$period}.");
-    }
-
-    public function pdf(Payroll $payroll)
-    {
-        if (auth()->user()->hasRole('user')) {
-            abort_if($payroll->employee->user_id !== auth()->id(), 403);
-        }
-
-        $payroll->load('employee');
-        $pdf = Pdf::loadView('paie.pdf.bulletin', compact('payroll'))
-                  ->setPaper('a4', 'portrait');
-
-        return $pdf->stream("bulletin-{$payroll->employee->matricule}-{$payroll->period}.pdf");
     }
 
     // ── Logique de génération ────────────────────────────────

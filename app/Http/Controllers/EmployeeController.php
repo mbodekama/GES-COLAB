@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CompteCree;
 use App\Models\Employee;
 use App\Models\Poste;
 use App\Models\SalaryGrid;
 use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 
 class EmployeeController extends Controller
@@ -89,17 +90,19 @@ class EmployeeController extends Controller
         // Récupérer le titre du poste
         $poste = Poste::findOrFail($validated['poste_id']);
 
-        DB::transaction(function () use ($validated, $poste) {
+        $createdUser = null;
 
-            $user = User::create([
+        DB::transaction(function () use ($validated, $poste, &$createdUser) {
+
+            $createdUser = User::create([
                 'name'     => $validated['first_name'].' '.$validated['last_name'],
                 'email'    => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
-            $user->assignRole($validated['role']);
+            $createdUser->assignRole($validated['role']);
 
             $employee = Employee::create([
-                'user_id'        => $user->id,
+                'user_id'        => $createdUser->id,
                 'matricule'      => Employee::generateMatricule(),
                 'first_name'     => $validated['first_name'],
                 'last_name'      => $validated['last_name'],
@@ -134,6 +137,8 @@ class EmployeeController extends Controller
                 'signed_at'       => now(),
             ]);
         });
+
+        Mail::to($createdUser->email)->send(new CompteCree($createdUser, $validated['password']));
 
         Log::info('Nouvel employé créé', [
             'matricule'  => Employee::latest()->value('matricule'),
@@ -226,14 +231,77 @@ class EmployeeController extends Controller
                          ->with('success', 'Employé archivé.');
     }
 
-    public function print(Employee $employee)
+    public function printDesign(Employee $employee)
     {
+        $this->logEntry(['matricule' => $employee->matricule]);
+
         $employee->load(['activeContract', 'leaves', 'poste', 'supervisor']);
 
-        $pdf = Pdf::loadView('employees.pdf.fiche', compact('employee'))
-                  ->setPaper('a4', 'portrait');
+        $data = [
+            'company_name'     => setting('company_name', 'GES-COLAB'),
+            'company_initials' => setting('company_initials', ''),
+            'company_address'  => setting('company_address', ''),
+            'company_phone'    => setting('company_phone', ''),
+            'company_website'  => setting('company_website', ''),
+            'generated_at'     => now()->format('d/m/Y à H:i'),
+            'generated_date'  => now()->isoFormat('D MMMM YYYY'),
 
-        return $pdf->stream("fiche-{$employee->matricule}.pdf");
+            'matricule'       => $employee->matricule,
+            'full_name'       => $employee->full_name,
+            'initials'        => $employee->initials,
+            'position'        => $employee->position,
+            'department'      => $employee->department,
+            'status'          => $employee->status,
+            'status_label'    => ucfirst($employee->status),
+
+            'birth_date'      => $employee->birth_date?->format('d/m/Y') ?? '—',
+            'birth_place'     => $employee->birth_place ?? '—',
+            'nationality'     => $employee->nationality ?? '—',
+            'marital_status'  => $employee->marital_status_label,
+            'children_count'  => (string) $employee->children_count,
+            'cnps_number'     => $employee->cnps_number ?? '—',
+            'phone'           => $employee->phone ?? '—',
+            'email'           => $employee->email,
+            'address'         => $employee->address ?? '—',
+
+            'hire_date'       => $employee->hire_date->format('d/m/Y'),
+            'seniority'       => $employee->seniority_label,
+            'leave_balance'   => $employee->leave_balance . ' jours',
+
+            'contract_number' => $employee->activeContract?->contract_number ?? '—',
+            'contract_type'   => $employee->activeContract ? strtoupper($employee->activeContract->type) : '—',
+            'contract_start'  => $employee->activeContract?->start_date->format('d/m/Y') ?? '—',
+            'contract_end'    => $employee->activeContract?->end_date?->format('d/m/Y') ?? 'Indéterminé',
+            'base_salary'     => $employee->activeContract
+                ? number_format($employee->activeContract->base_salary, 0, ',', ' ') . ' FCFA'
+                : '—',
+
+            'leaves'          => $employee->leaves()
+                ->latest()
+                ->take(6)
+                ->get()
+                ->map(fn($l) => [
+                    'number' => $l->leave_number,
+                    'type'   => $l->type_label,
+                    'start'  => $l->start_date->format('d/m/Y'),
+                    'end'    => $l->end_date->format('d/m/Y'),
+                    'days'   => (string) $l->duration_days,
+                    'status' => ucfirst($l->status),
+                ])
+                ->toArray(),
+        ];
+
+        ob_start();
+        $content = (new \App\Pdf\EmployeeFiche($data))->build()->Output('S', '');
+        ob_end_clean();
+
+        return response()->make($content, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => "inline; filename=\"fiche-design-{$employee->matricule}.pdf\"",
+            'Content-Length'      => strlen($content),
+            'Cache-Control'       => 'private, max-age=0, must-revalidate',
+            'Pragma'              => 'public',
+        ]);
     }
 
     public function search(Request $request)

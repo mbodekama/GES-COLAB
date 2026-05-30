@@ -57,9 +57,13 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-12 col-md-6 d-flex gap-2 align-items-end">
-            <button class="btn btn-primary btn-sm">Filtrer</button>
-            <a href="{{ route('payroll.index') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-x"></i></a>
+        <div class="col-12 col-md-auto ms-auto d-flex justify-content-end gap-2 align-items-end">
+            <button class="btn btn-primary btn-sm">
+                <i class="bi bi-search me-1"></i> Lancer la recherche
+            </button>
+            <a href="{{ route('payroll.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
+            </a>
         </div>
     </form>
 </div>
@@ -106,9 +110,6 @@
                 <div class="btn-group btn-group-sm">
                     <a href="{{ route('payroll.show', $payroll) }}" class="btn btn-outline-primary" title="Voir">
                         <i class="bi bi-eye"></i>
-                    </a>
-                    <a href="{{ route('payroll.pdf', $payroll) }}" class="btn btn-outline-dark" title="PDF" target="_blank">
-                        <i class="bi bi-printer"></i>
                     </a>
                 </div>
             </td>

@@ -3,8 +3,8 @@
 
 @section('header-actions')
     @if($leave->status === 'approved')
-        <a href="{{ route('leaves.print', $leave) }}" class="btn btn-outline-dark btn-sm" target="_blank">
-            <i class="bi bi-printer me-1"></i> Attestation PDF
+        <a href="{{ route('leaves.print.design', $leave) }}" class="btn btn-primary btn-sm" target="_blank">
+            <i class="bi bi-file-earmark-richtext me-1"></i> Attestation PDF
         </a>
     @endif
     @if($leave->status === 'pending' && auth()->user()->can('modifier congés'))
@@ -400,10 +400,10 @@
                                     <div class="text-muted small">
                                         Solde mis à jour — {{ $leave->duration_days }} jour(s) déduit(s)
                                     </div>
-                                    <a href="{{ route('leaves.print', $leave) }}"
+                                    <a href="{{ route('leaves.print.design', $leave) }}"
                                        target="_blank"
-                                       class="btn btn-outline-dark btn-sm mt-2">
-                                        <i class="bi bi-printer me-1"></i>Imprimer l'attestation
+                                       class="btn btn-primary btn-sm mt-2">
+                                        <i class="bi bi-file-earmark-richtext me-1"></i>Imprimer l'attestation
                                     </a>
                                 </div>
                             </div>
