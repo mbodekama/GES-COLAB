@@ -148,14 +148,6 @@
                                         <i class="bi bi-eye"></i> &nbsp; Voir
                                     </a>
                                 </div>
-                                @can('modifier contrats')
-                                <div>
-                                    <a href="{{ route('contracts.edit', $contract) }}"
-                                       class="btn btn-outline-primary" title="Modifier">
-                                        <i class="bi bi-pencil"></i> &nbsp; Modifier
-                                    </a>
-                                </div>
-                                @endcan
                                 @if($contract->type !== 'cdi' && $contract->status === 'active')
                                 <div>
                                     <button class="btn btn-outline-warning" title="Renouveler"

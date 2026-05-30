@@ -120,14 +120,6 @@
                             <i class="bi bi-eye"></i> &nbsp; Voir
                         </a>
                     </div>
-                    @can('modifier employés')
-                    <div>
-                        <a href="{{ route('employees.edit', $employee) }}"
-                           class="btn btn-outline-primary" title="Modifier">
-                            <i class="bi bi-pencil"></i> &nbsp; Modifier
-                        </a>
-                    </div>
-                    @endcan
                     <div>
                         <a href="{{ route('employees.print.design', $employee) }}"
                            class="btn btn-primary" title="Fiche PDF" target="_blank">
