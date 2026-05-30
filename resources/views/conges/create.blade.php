@@ -70,21 +70,23 @@
             </div>
 
             <div class="col-md-3">
-                <label class="form-label small fw-medium">Date de début <span class="text-danger">*</span></label>
-                <input type="date" name="start_date" id="start-date"
-                       value="{{ old('start_date') }}"
-                       class="form-control @error('start_date') is-invalid @enderror"
-                       min="{{ date('Y-m-d') }}" required>
-                @error('start_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <x-date
+                    name="start_date"
+                    label="Date de début"
+                    id="start-date"
+                    min="{{ date('Y-m-d') }}"
+                    required
+                />
             </div>
 
             <div class="col-md-3">
-                <label class="form-label small fw-medium">Date de fin <span class="text-danger">*</span></label>
-                <input type="date" name="end_date" id="end-date"
-                       value="{{ old('end_date') }}"
-                       class="form-control @error('end_date') is-invalid @enderror"
-                       min="{{ date('Y-m-d') }}" required>
-                @error('end_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <x-date
+                    name="end_date"
+                    label="Date de fin"
+                    id="end-date"
+                    min="{{ date('Y-m-d') }}"
+                    required
+                />
             </div>
 
             <div class="col-12">

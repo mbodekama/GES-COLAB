@@ -61,10 +61,10 @@
                                class="form-control">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-medium">Date de naissance</label>
-                        <input type="date" name="birth_date"
-                               value="{{ old('birth_date') }}"
-                               class="form-control">
+                        <x-date
+                            name="birth_date"
+                            label="Date de naissance"
+                        />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-medium">Lieu de naissance</label>
@@ -267,13 +267,12 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label small fw-medium">
-                            Date d'embauche <span class="text-danger">*</span>
-                        </label>
-                        <input type="date" name="hire_date"
-                               value="{{ old('hire_date', date('Y-m-d')) }}"
-                               class="form-control @error('hire_date') is-invalid @enderror"
-                               required>
+                        <x-date
+                            name="hire_date"
+                            label="Date d'embauche"
+                            :value="date('Y-m-d')"
+                            required
+                        />
                     </div>
                     <div class="col-md-3">
                         <x-select
@@ -310,12 +309,10 @@
                         />
                     </div>
                     <div class="col-md-3" id="end-date-field" style="display:none">
-                        <label class="form-label small fw-medium">
-                            Date de fin <small class="text-muted">(CDD / Stage)</small>
-                        </label>
-                        <input type="date" name="contract_end_date"
-                               value="{{ old('contract_end_date') }}"
-                               class="form-control">
+                        <x-date
+                            name="contract_end_date"
+                            label="Date de fin"
+                        />
                     </div>
                 </div>
             </div>

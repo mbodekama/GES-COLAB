@@ -71,25 +71,24 @@
                                 />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Date de début <span class="text-danger">*</span></label>
-                                <input type="date" name="start_date"
-                                       value="{{ old('start_date', date('Y-m-d')) }}"
-                                       class="form-control @error('start_date') is-invalid @enderror" required>
-                                @error('start_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <x-date
+                                    name="start_date"
+                                    label="Date de début"
+                                    :value="date('Y-m-d')"
+                                    required
+                                />
                             </div>
                             <div class="col-md-4" id="end-date-wrap">
-                                <label class="form-label small fw-medium">
-                                    Date de fin <small class="text-muted">(CDD / Stage)</small>
-                                </label>
-                                <input type="date" name="end_date"
-                                       value="{{ old('end_date') }}"
-                                       class="form-control @error('end_date') is-invalid @enderror">
-                                @error('end_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <x-date
+                                    name="end_date"
+                                    label="Date de fin"
+                                />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Fin période d'essai</label>
-                                <input type="date" name="trial_end_date"
-                                       value="{{ old('trial_end_date') }}" class="form-control">
+                                <x-date
+                                    name="trial_end_date"
+                                    label="Fin période d'essai"
+                                />
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-medium">Poste <span class="text-danger">*</span></label>

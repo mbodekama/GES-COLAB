@@ -85,10 +85,7 @@
                             <label class="form-label small fw-medium">
                                 <i class="bi bi-calendar-x me-1 text-danger"></i>Date de résiliation
                             </label>
-                            <input type="date" name="date_resiliation"
-                                   value="{{ old('date_resiliation', $contract->date_resiliation?->format('Y-m-d')) }}"
-                                   class="form-control @error('date_resiliation') is-invalid @enderror">
-                            @error('date_resiliation')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <x-date name="date_resiliation" :value="$contract->date_resiliation?->format('Y-m-d')" />
                         </div>
 
                         {{-- Date renouvellement (visible si statut = renewed) --}}
@@ -96,26 +93,22 @@
                             <label class="form-label small fw-medium">
                                 <i class="bi bi-arrow-clockwise me-1 text-warning"></i>Date de renouvellement
                             </label>
-                            <input type="date" name="date_renouvellement"
-                                   value="{{ old('date_renouvellement', $contract->date_renouvellement?->format('Y-m-d')) }}"
-                                   class="form-control @error('date_renouvellement') is-invalid @enderror">
-                            @error('date_renouvellement')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <x-date name="date_renouvellement" :value="$contract->date_renouvellement?->format('Y-m-d')" />
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-medium">Date de début <span class="text-danger">*</span></label>
-                            <input type="date" name="start_date"
-                                   value="{{ old('start_date', $contract->start_date->format('Y-m-d')) }}"
-                                   class="form-control @error('start_date') is-invalid @enderror" required>
-                            @error('start_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <x-date
+                                name="start_date"
+                                label="Date de début"
+                                :value="$contract->start_date->format('Y-m-d')"
+                                required
+                            />
                         </div>
                         <div class="col-md-4" id="end-date-wrap">
-                            <label class="form-label small fw-medium">
-                                Date de fin <small class="text-muted">(CDD / Stage)</small>
-                            </label>
-                            <input type="date" name="end_date"
-                                   value="{{ old('end_date', $contract->end_date?->format('Y-m-d')) }}"
-                                   class="form-control @error('end_date') is-invalid @enderror">
-                            @error('end_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <x-date
+                                name="end_date"
+                                label="Date de fin"
+                                :value="$contract->end_date?->format('Y-m-d')"
+                            />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-medium">Poste <span class="text-danger">*</span></label>

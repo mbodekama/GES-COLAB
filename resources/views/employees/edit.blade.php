@@ -75,10 +75,11 @@
                                        class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-medium">Date de naissance</label>
-                                <input type="date" name="birth_date"
-                                       value="{{ old('birth_date', $employee->birth_date?->format('Y-m-d')) }}"
-                                       class="form-control">
+                                <x-date
+                                    name="birth_date"
+                                    label="Date de naissance"
+                                    :value="$employee->birth_date?->format('Y-m-d')"
+                                />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-medium">Lieu de naissance</label>
@@ -274,12 +275,12 @@
                             @enderror
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label small fw-medium">
-                                Date d'embauche <span class="text-danger">*</span>
-                            </label>
-                            <input type="date" name="hire_date"
-                                   value="{{ old('hire_date', $employee->hire_date->format('Y-m-d')) }}"
-                                   class="form-control" required>
+                            <x-date
+                                name="hire_date"
+                                label="Date d'embauche"
+                                :value="$employee->hire_date->format('Y-m-d')"
+                                required
+                            />
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small fw-medium">Solde congés (jours)</label>

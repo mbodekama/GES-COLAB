@@ -59,21 +59,23 @@
             </div>
 
             <div class="col-md-3">
-                <label class="form-label small fw-medium">Date de début <span class="text-danger">*</span></label>
-                <input type="date" name="start_date" id="start-date"
-                       value="{{ old('start_date', $leave->start_date->format('Y-m-d')) }}"
-                       class="form-control @error('start_date') is-invalid @enderror"
-                       required>
-                @error('start_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <x-date
+                    name="start_date"
+                    label="Date de début"
+                    :value="$leave->start_date->format('Y-m-d')"
+                    id="start-date"
+                    required
+                />
             </div>
 
             <div class="col-md-3">
-                <label class="form-label small fw-medium">Date de fin <span class="text-danger">*</span></label>
-                <input type="date" name="end_date" id="end-date"
-                       value="{{ old('end_date', $leave->end_date->format('Y-m-d')) }}"
-                       class="form-control @error('end_date') is-invalid @enderror"
-                       required>
-                @error('end_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <x-date
+                    name="end_date"
+                    label="Date de fin"
+                    :value="$leave->end_date->format('Y-m-d')"
+                    id="end-date"
+                    required
+                />
             </div>
 
             <div class="col-12">
