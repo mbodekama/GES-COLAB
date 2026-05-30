@@ -57,18 +57,6 @@
                                 @enderror
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-medium">
-                                    Email <span class="text-danger">*</span>
-                                </label>
-                                <input type="email" name="email"
-                                       value="{{ old('email', $employee->email) }}"
-                                       class="form-control @error('email') is-invalid @enderror"
-                                       required>
-                                @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
                                 <label class="form-label small fw-medium">Téléphone</label>
                                 <input type="text" name="phone"
                                        value="{{ old('phone', $employee->phone) }}"
@@ -136,6 +124,18 @@
                         <span style="color:#185FA5"><i class="bi bi-shield-lock me-1"></i>Rôle applicatif</span>
                     </div>
                     <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium">
+                                Email <span class="text-danger">*</span>
+                            </label>
+                            <input type="email" name="email"
+                                   value="{{ old('email', $employee->email) }}"
+                                   class="form-control @error('email') is-invalid @enderror"
+                                   required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <x-select
                             name="role"
                             label="Rôle"
