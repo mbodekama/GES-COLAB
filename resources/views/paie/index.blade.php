@@ -107,7 +107,7 @@
             <td class="text-danger small">- {{ number_format($payroll->igr, 0, ',', ' ') }}</td>
             <td><strong class="text-success">{{ number_format($payroll->net_salary, 0, ',', ' ') }} FCFA</strong></td>
             <td class="text-center">
-                <div class="btn-group btn-group-md d-flex justify-content-around">
+                <div class="btn-group btn-group-md d-flex justify-content-start gap-2">
                     <div>
                         <a href="{{ route('payroll.show', $payroll) }}" class="btn btn-outline-primary" title="Voir">
                             <i class="bi bi-eye"></i> &nbsp; Voir

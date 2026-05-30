@@ -133,7 +133,7 @@
                 @endif
             </td>
             <td class="text-center">
-                <div class="btn-group btn-group-md d-flex justify-content-around">
+                <div class="btn-group btn-group-md d-flex justify-content-start gap-2">
                     @role('superadmin|admin|rh')
                     <div>
                         <button class="btn btn-outline-primary"

@@ -47,7 +47,7 @@
                     <td>{{ $role->users->count() }}</td>
                     <td>{{ $role->permissions->count() }}</td>
                     <td class="text-center">
-                        <div class="btn-group btn-group-md d-flex justify-content-around">
+                        <div class="btn-group btn-group-md d-flex justify-content-start gap-2">
                             <div>
                                 <a href="{{ route('roles.edit', $role) }}" class="btn btn-outline-primary">
                                     <i class="bi bi-pencil"></i> &nbsp; Modifier

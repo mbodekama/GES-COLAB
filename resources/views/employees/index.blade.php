@@ -113,7 +113,7 @@
             <td class="small">{{ $employee->seniority_label }}</td>
             <td>{!! $employee->status_badge !!}</td>
             <td class="text-center">
-                <div class="btn-group btn-group-md d-flex justify-content-around">
+                <div class="btn-group btn-group-md d-flex justify-content-start gap-2">
                     <div>
                         <a href="{{ route('employees.show', $employee) }}"
                            class="btn btn-outline-secondary" title="Voir fiche">

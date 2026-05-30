@@ -115,7 +115,7 @@
             <td><strong>{{ $leave->duration_days }}j</strong></td>
             <td>{!! $leave->workflow_badge !!}</td>
             <td class="text-center">
-                <div class="btn-group btn-group-md d-flex justify-content-around">
+                <div class="btn-group btn-group-md d-flex justify-content-start gap-2">
                     <div>
                         <a href="{{ route('leaves.show', $leave) }}"
                            class="btn btn-outline-secondary" title="Voir">
