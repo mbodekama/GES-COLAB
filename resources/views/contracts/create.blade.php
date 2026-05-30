@@ -91,17 +91,32 @@
                                 />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Poste <span class="text-danger">*</span></label>
-                                <input type="text" name="position" id="position-field"
-                                       value="{{ old('position') }}"
-                                       class="form-control @error('position') is-invalid @enderror" required>
+                                <label for="position-select" class="form-label small fw-medium">
+                                    Poste <span class="text-danger">*</span>
+                                </label>
+                                <select name="position" id="position-select"
+                                        class="form-select @error('position') is-invalid @enderror"
+                                        required onchange="fillDepartmentFromPoste(this)">
+                                    <option value="">— Sélectionner un poste —</option>
+                                    @foreach($postes as $poste)
+                                        <option value="{{ $poste->title }}"
+                                                data-dept="{{ $poste->department }}"
+                                                {{ old('position') === $poste->title ? 'selected' : '' }}>
+                                            {{ $poste->title }}
+                                            @if($poste->department)({{ $poste->department }})@endif
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error('position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-medium">Département <span class="text-danger">*</span></label>
+                                <label for="department-field" class="form-label small fw-medium">
+                                    Département <span class="text-danger">*</span>
+                                </label>
                                 <input type="text" name="department" id="department-field"
                                        value="{{ old('department') }}"
                                        class="form-control @error('department') is-invalid @enderror"
+                                       placeholder="Auto-rempli selon le poste"
                                        list="dept-list" required>
                                 <datalist id="dept-list">
                                     <option>Direction</option>
@@ -173,11 +188,30 @@
 
 @push('scripts')
     <script>
+        // Pré-remplir département depuis le poste sélectionné
+        function fillDepartmentFromPoste(sel) {
+            const opt  = sel.options[sel.selectedIndex];
+            const dept = opt.dataset.dept || '';
+            if (dept && dept !== 'null') {
+                document.getElementById('department-field').value = dept;
+            }
+        }
+
         // Pré-remplir poste & département depuis l'employé sélectionné
         function fillFromEmployee(sel) {
             const opt = sel.options[sel.selectedIndex];
             if (opt.value) {
-                document.getElementById('position-field').value  = opt.dataset.position  || '';
+                // Chercher le poste correspondant dans le select position
+                const posSelect = document.getElementById('position-select');
+                const title     = opt.dataset.position || '';
+                for (let i = 0; i < posSelect.options.length; i++) {
+                    if (posSelect.options[i].value === title) {
+                        posSelect.selectedIndex = i;
+                        fillDepartmentFromPoste(posSelect);
+                        return;
+                    }
+                }
+                // Si pas trouvé dans la liste, laisser vide (poste libre non répertorié)
                 document.getElementById('department-field').value = opt.dataset.department || '';
             }
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\Employee;
+use App\Models\Poste;
 use App\Models\SalaryGrid;
 use Illuminate\Http\Request;
 
@@ -86,8 +87,9 @@ class ContractController extends Controller
     {
         $employees   = Employee::active()->orderBy('last_name')->get();
         $salaryGrids = SalaryGrid::active()->orderByDesc('level')->get();
+        $postes      = Poste::active()->orderByDesc('level')->orderBy('title')->get();
 
-        return view('contracts.create', compact('employees', 'salaryGrids'));
+        return view('contracts.create', compact('employees', 'salaryGrids', 'postes'));
     }
 
     public function store(Request $request)
@@ -135,8 +137,9 @@ class ContractController extends Controller
     {
         $employees   = Employee::active()->orderBy('last_name')->get();
         $salaryGrids = SalaryGrid::active()->orderByDesc('level')->get();
+        $postes      = Poste::active()->orderByDesc('level')->orderBy('title')->get();
 
-        return view('contracts.edit', compact('contract', 'employees', 'salaryGrids'));
+        return view('contracts.edit', compact('contract', 'employees', 'salaryGrids', 'postes'));
     }
 
     public function update(Request $request, Contract $contract)

@@ -108,17 +108,39 @@
                             />
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-medium">Poste <span class="text-danger">*</span></label>
-                            <input type="text" name="position"
-                                   value="{{ old('position', $contract->position) }}"
-                                   class="form-control @error('position') is-invalid @enderror" required>
+                            <label for="position-select" class="form-label small fw-medium">
+                                Poste <span class="text-danger">*</span>
+                            </label>
+                            @php $currentPosition = old('position', $contract->position); @endphp
+                            <select name="position" id="position-select"
+                                    class="form-select @error('position') is-invalid @enderror"
+                                    required onchange="fillDepartmentFromPoste(this)">
+                                <option value="">— Sélectionner un poste —</option>
+                                @foreach($postes as $poste)
+                                    <option value="{{ $poste->title }}"
+                                            data-dept="{{ $poste->department }}"
+                                            {{ $currentPosition === $poste->title ? 'selected' : '' }}>
+                                        {{ $poste->title }}
+                                        @if($poste->department)({{ $poste->department }})@endif
+                                    </option>
+                                @endforeach
+                                {{-- Si la valeur actuelle ne correspond à aucun poste connu, l'afficher quand même --}}
+                                @if($currentPosition && !$postes->contains('title', $currentPosition))
+                                    <option value="{{ $currentPosition }}" selected>
+                                        {{ $currentPosition }} (valeur actuelle)
+                                    </option>
+                                @endif
+                            </select>
                             @error('position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-medium">Département <span class="text-danger">*</span></label>
-                            <input type="text" name="department"
+                            <label for="department-field" class="form-label small fw-medium">
+                                Département <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="department" id="department-field"
                                    value="{{ old('department', $contract->department) }}"
                                    class="form-control @error('department') is-invalid @enderror"
+                                   placeholder="Auto-rempli selon le poste"
                                    list="dept-list" required>
                             <datalist id="dept-list">
                                 <option>Direction</option>
@@ -189,6 +211,13 @@
 @push('scripts')
 <script>
     const salaryGridMap = {!! $salaryGrids->mapWithKeys(fn($g) => [$g->id => (float) $g->base_salary]) !!};
+
+    function fillDepartmentFromPoste(sel) {
+        const dept = sel.options[sel.selectedIndex].dataset.dept || '';
+        if (dept && dept !== 'null') {
+            document.getElementById('department-field').value = dept;
+        }
+    }
 
     function fillFromGrid(sel) {
         const salary = salaryGridMap[sel.value];
