@@ -45,6 +45,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/contracts/{contract}/renew',
         [ContractController::class, 'renew'])
         ->name('contracts.renew');
+    Route::get('/contracts/{contract}/print-design',
+        [ContractController::class, 'printDesign'])
+        ->name('contracts.print.design');
 
     // ── Congés & Permissions ──────────────────────────────────
     Route::resource('leaves', LeaveController::class)->parameters(['leaves' => 'leave']);;

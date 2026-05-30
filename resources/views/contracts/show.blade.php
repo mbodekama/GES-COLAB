@@ -7,6 +7,9 @@
             <i class="bi bi-pencil me-1"></i> Modifier
         </a>
     @endcan
+    <a href="{{ route('contracts.print.design', $contract) }}" class="btn btn-primary btn-sm" target="_blank">
+        <i class="bi bi-file-earmark-richtext me-1"></i> Contrat PDF
+    </a>
     <a href="{{ route('contracts.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Retour
     </a>

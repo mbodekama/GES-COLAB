@@ -120,4 +120,56 @@ class ContractController extends Controller
         return back()->with('success', 'Contrat renouvelé avec succès.');
     }
 
+    public function printDesign(Contract $contract)
+    {
+        $contract->load(['employee', 'salaryGrid']);
+
+        $statusLabels = [
+            'active'     => 'En cours',
+            'expired'    => 'Expiré',
+            'terminated' => 'Résilié',
+            'renewed'    => 'Renouvelé',
+        ];
+
+        $data = [
+            'company_name'      => setting('company_name', 'GES-COLAB'),
+            'company_initials'  => setting('company_initials', ''),
+            'company_address'   => setting('company_address', ''),
+            'company_phone'     => setting('company_phone', ''),
+            'company_website'   => setting('company_website', ''),
+            'reference'         => $contract->contract_number,
+            'generated_date'    => now()->isoFormat('D MMMM YYYY'),
+            'generated_at'      => now()->format('d/m/Y à H:i'),
+            'type_label'        => $contract->type_label,
+            'type'              => $contract->type,
+            'contract_number'   => $contract->contract_number,
+            'position'          => $contract->position,
+            'department'        => $contract->department,
+            'start_date'        => $contract->start_date->isoFormat('D MMMM YYYY'),
+            'end_date'          => $contract->end_date?->isoFormat('D MMMM YYYY') ?? 'Indéterminé',
+            'trial_end_date'    => $contract->trial_end_date?->isoFormat('D MMMM YYYY'),
+            'base_salary'       => $contract->base_salary,
+            'salary_grid'       => $contract->salaryGrid?->name,
+            'signed_at'         => $contract->signed_at?->isoFormat('D MMMM YYYY') ?? '—',
+            'status'            => $contract->status,
+            'status_label'      => $statusLabels[$contract->status] ?? $contract->status,
+            'notes'             => $contract->notes,
+            'employee_name'     => $contract->employee->full_name,
+            'employee_matricule'=> $contract->employee->matricule,
+            'employee_email'    => $contract->employee->email,
+        ];
+
+        ob_start();
+        $content = (new \App\Pdf\ContratTravail($data))->build()->Output('S', '');
+        ob_end_clean();
+
+        return response()->make($content, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => "inline; filename=\"contrat-{$contract->contract_number}.pdf\"",
+            'Content-Length'      => strlen($content),
+            'Cache-Control'       => 'private, max-age=0, must-revalidate',
+            'Pragma'              => 'public',
+        ]);
+    }
+
 }

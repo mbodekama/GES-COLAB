@@ -161,6 +161,10 @@
                                         <i class="bi bi-arrow-clockwise"></i>
                                     </button>
                                 @endif
+                                <a href="{{ route('contracts.print.design', $contract) }}"
+                                   class="btn btn-primary" title="Contrat PDF" target="_blank">
+                                    <i class="bi bi-file-earmark-richtext"></i>
+                                </a>
                             </div>
                         </td>
                     </tr>
