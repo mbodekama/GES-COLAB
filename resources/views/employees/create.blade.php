@@ -22,8 +22,11 @@
     {{-- ── INFOS PERSONNELLES ─────────────────────────────── --}}
     <div class="col-md-8">
         <div class="card mb-3">
-            <div class="card-header">
-                <i class="bi bi-person me-2"></i>Informations personnelles
+            <div class="card-header d-flex align-items-center gap-2"
+                 style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                      style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">1</span>
+                <span style="color:#185FA5"><i class="bi bi-person me-1"></i>Informations personnelles</span>
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -48,18 +51,6 @@
                                class="form-control @error('last_name') is-invalid @enderror"
                                required>
                         @error('last_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-medium">
-                            Email professionnel <span class="text-danger">*</span>
-                        </label>
-                        <input type="email" name="email"
-                               value="{{ old('email') }}"
-                               class="form-control @error('email') is-invalid @enderror"
-                               required>
-                        @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -116,166 +107,30 @@
             </div>
         </div>
 
-        {{-- ── INFOS PROFESSIONNELLES ──────────────────────── --}}
-        <div class="card mb-3">
-            <div class="card-header">
-                <i class="bi bi-briefcase me-2"></i>Informations professionnelles
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-
-                    {{-- POSTE : sélection depuis la table postes --}}
-                    <div class="col-md-6">
-                        <label class="form-label small fw-medium">
-                            Poste <span class="text-danger">*</span>
-                        </label>
-                        <select name="poste_id" id="poste-select"
-                                class="form-select @error('poste_id') is-invalid @enderror"
-                                required onchange="onPosteChange(this)">
-                            <option value="">— Sélectionner un poste —</option>
-                            @foreach($postes as $poste)
-                            <option value="{{ $poste->id }}"
-                                    data-level="{{ $poste->level }}"
-                                    data-can_n1="{{ $poste->can_be_n1 ? 1 : 0 }}"
-                                    data-dept="{{ $poste->department }}"
-                                    {{ old('poste_id') == $poste->id ? 'selected' : '' }}>
-                                {{ $poste->title }}
-                                (Niv. {{ $poste->level }}
-                                — {{ $poste->department ?? 'Tous dépts' }})
-                                {{ $poste->can_be_n1 ? '⭐' : '' }}
-                            </option>
-                            @endforeach
-                        </select>
-                        <div class="form-text">
-                            ⭐ = poste pouvant être N+1
-                        </div>
-                        @error('poste_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-medium">
-                            Département <span class="text-danger">*</span>
-                        </label>
-                        <input type="text" name="department" id="dept-field"
-                               value="{{ old('department') }}"
-                               class="form-control @error('department') is-invalid @enderror"
-                               list="dept-list" required>
-                        <datalist id="dept-list">
-                            <option>Direction</option>
-                            <option>Ressources Humaines</option>
-                            <option>Finance & Comptabilité</option>
-                            <option>Informatique</option>
-                            <option>Commercial</option>
-                            <option>Logistique</option>
-                        </datalist>
-                        @error('department')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-medium">
-                            Date d'embauche <span class="text-danger">*</span>
-                        </label>
-                        <input type="date" name="hire_date"
-                               value="{{ old('hire_date', date('Y-m-d')) }}"
-                               class="form-control @error('hire_date') is-invalid @enderror"
-                               required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label small fw-medium">
-                            Solde congés initial (jours)
-                        </label>
-                        <input type="number" name="leave_balance"
-                               value="{{ old('leave_balance', 30) }}"
-                               class="form-control" min="0">
-                    </div>
-
-                    {{-- N+1 : chargé dynamiquement selon le poste --}}
-                    <div class="col-12">
-                        <label class="form-label small fw-medium">
-                            Supérieur hiérarchique (N+1)
-                            <span class="text-muted fw-normal" id="n1-hint"></span>
-                        </label>
-                        <select name="supervisor_id" id="supervisor-select"
-                                class="form-select">
-                            <option value="">
-                                — Sélectionnez d'abord un poste —
-                            </option>
-                        </select>
-                        <div class="form-text" id="n1-info">
-                            Le N+1 sera filtré selon le niveau du poste choisi.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- ── CONTRAT INITIAL ─────────────────────────────── --}}
-        <div class="card">
-            <div class="card-header">
-                <i class="bi bi-file-earmark-text me-2"></i>Contrat initial
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <x-select
-                            name="contract_type"
-                            label="Type de contrat"
-                            :options="['cdi' => 'CDI', 'cdd' => 'CDD', 'internship' => 'Stage', 'consulting' => 'Consulting']"
-                            :value="old('contract_type', 'cdi')"
-                            id="contract-type"
-                            onchange="toggleEndDate()"
-                            required
-                        />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-medium">
-                            Salaire de base (FCFA) <span class="text-danger">*</span>
-                        </label>
-                        <input type="number" name="base_salary"
-                               value="{{ old('base_salary') }}"
-                               class="form-control @error('base_salary') is-invalid @enderror"
-                               min="0" required>
-                        @error('base_salary')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-md-4">
-                        <x-select
-                            name="salary_grid_id"
-                            label="Grille salariale"
-                            :options="$salaryGrids"
-                            option-value="id"
-                            option-label="name"
-                            :value="old('salary_grid_id')"
-                            placeholder="— Aucune —"
-                        />
-                    </div>
-                    <div class="col-md-6" id="end-date-field" style="display:none">
-                        <label class="form-label small fw-medium">
-                            Date de fin
-                            <small class="text-muted">(CDD / Stage)</small>
-                        </label>
-                        <input type="date" name="contract_end_date"
-                               value="{{ old('contract_end_date') }}"
-                               class="form-control">
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     {{-- ── SIDEBAR DROITE ──────────────────────────────────── --}}
     <div class="col-md-4">
         <div class="card mb-3">
-            <div class="card-header">
-                <i class="bi bi-shield-lock me-2"></i>Accès applicatif
+            <div class="card-header d-flex align-items-center gap-2"
+                 style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                      style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">2</span>
+                <span style="color:#185FA5"><i class="bi bi-shield-lock me-1"></i>Accès applicatif</span>
             </div>
             <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small fw-medium">
+                        Email professionnel <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" name="email"
+                           value="{{ old('email') }}"
+                           class="form-control @error('email') is-invalid @enderror"
+                           required>
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
                 <div class="mb-3">
                     <x-select
                         name="role"
@@ -318,6 +173,151 @@
                    class="btn btn-outline-secondary">
                     Annuler
                 </a>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── INFOS PROFESSIONNELLES (pleine largeur) ───────────── --}}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2"
+                 style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                      style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">3</span>
+                <span style="color:#185FA5"><i class="bi bi-briefcase me-1"></i>Informations professionnelles</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-medium">
+                            Poste <span class="text-danger">*</span>
+                        </label>
+                        <select name="poste_id" id="poste-select"
+                                class="form-select @error('poste_id') is-invalid @enderror"
+                                required onchange="onPosteChange(this)">
+                            <option value="">— Sélectionner un poste —</option>
+                            @foreach($postes as $poste)
+                            <option value="{{ $poste->id }}"
+                                    data-level="{{ $poste->level }}"
+                                    data-can_n1="{{ $poste->can_be_n1 ? 1 : 0 }}"
+                                    data-dept="{{ $poste->department }}"
+                                    {{ old('poste_id') == $poste->id ? 'selected' : '' }}>
+                                {{ $poste->title }}
+                                (Niv. {{ $poste->level }}
+                                — {{ $poste->department ?? 'Tous dépts' }})
+                                {{ $poste->can_be_n1 ? '⭐' : '' }}
+                            </option>
+                            @endforeach
+                        </select>
+                        <div class="form-text">⭐ = poste pouvant être N+1</div>
+                        @error('poste_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-medium">
+                            Département <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="department" id="dept-field"
+                               value="{{ old('department') }}"
+                               class="form-control @error('department') is-invalid @enderror"
+                               list="dept-list" required>
+                        <datalist id="dept-list">
+                            <option>Direction</option>
+                            <option>Ressources Humaines</option>
+                            <option>Finance & Comptabilité</option>
+                            <option>Informatique</option>
+                            <option>Commercial</option>
+                            <option>Logistique</option>
+                        </datalist>
+                        @error('department')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-medium">Solde congés initial (jours)</label>
+                        <input type="number" name="leave_balance"
+                               value="{{ old('leave_balance', 30) }}"
+                               class="form-control" min="0">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-medium">
+                            Supérieur N+1
+                            <span class="text-muted fw-normal small" id="n1-hint"></span>
+                        </label>
+                        <select name="supervisor_id" id="supervisor-select" class="form-select">
+                            <option value="">— Sélectionnez d'abord un poste —</option>
+                        </select>
+                        <div class="form-text" id="n1-info"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── CONTRAT INITIAL (pleine largeur) ───────────────────── --}}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2"
+                 style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                      style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">4</span>
+                <span style="color:#185FA5"><i class="bi bi-file-earmark-text me-1"></i>Contrat initial</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-medium">
+                            Date d'embauche <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" name="hire_date"
+                               value="{{ old('hire_date', date('Y-m-d')) }}"
+                               class="form-control @error('hire_date') is-invalid @enderror"
+                               required>
+                    </div>
+                    <div class="col-md-3">
+                        <x-select
+                            name="contract_type"
+                            label="Type de contrat"
+                            :options="['cdi' => 'CDI', 'cdd' => 'CDD', 'internship' => 'Stage', 'consulting' => 'Consulting']"
+                            :value="old('contract_type', 'cdi')"
+                            id="contract-type"
+                            onchange="toggleEndDate()"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-medium">
+                            Salaire de base (FCFA) <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" name="base_salary"
+                               value="{{ old('base_salary') }}"
+                               class="form-control @error('base_salary') is-invalid @enderror"
+                               min="0" required>
+                        @error('base_salary')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-3">
+                        <x-select
+                            name="salary_grid_id"
+                            label="Grille salariale"
+                            :options="$salaryGrids"
+                            option-value="id"
+                            option-label="name"
+                            :value="old('salary_grid_id')"
+                            placeholder="— Aucune —"
+                        />
+                    </div>
+                    <div class="col-md-3" id="end-date-field" style="display:none">
+                        <label class="form-label small fw-medium">
+                            Date de fin <small class="text-muted">(CDD / Stage)</small>
+                        </label>
+                        <input type="date" name="contract_end_date"
+                               value="{{ old('contract_end_date') }}"
+                               class="form-control">
+                    </div>
+                </div>
             </div>
         </div>
     </div>

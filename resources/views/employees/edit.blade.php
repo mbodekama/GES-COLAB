@@ -24,8 +24,11 @@
             {{-- ── INFOS PERSONNELLES ─────────────────────────────── --}}
             <div class="col-md-8">
                 <div class="card mb-3">
-                    <div class="card-header">
-                        <i class="bi bi-person me-2"></i>Informations personnelles
+                    <div class="card-header d-flex align-items-center gap-2"
+                         style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                              style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">1</span>
+                        <span style="color:#185FA5"><i class="bi bi-person me-1"></i>Informations personnelles</span>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
@@ -118,120 +121,6 @@
                     </div>
                 </div>
 
-                {{-- ── INFOS PROFESSIONNELLES ──────────────────────── --}}
-                <div class="card">
-                    <div class="card-header">
-                        <i class="bi bi-briefcase me-2"></i>Informations professionnelles
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-
-                            {{-- POSTE --}}
-                            <div class="col-md-6">
-                                <label class="form-label small fw-medium">
-                                    Poste <span class="text-danger">*</span>
-                                </label>
-                                <select name="poste_id" id="poste-select"
-                                        class="form-select @error('poste_id') is-invalid @enderror"
-                                        required onchange="onPosteChange(this)">
-                                    <option value="">— Sélectionner un poste —</option>
-                                    @foreach($postes as $poste)
-                                        <option value="{{ $poste->id }}"
-                                                data-level="{{ $poste->level }}"
-                                                data-can_n1="{{ $poste->can_be_n1 ? 1 : 0 }}"
-                                                data-dept="{{ $poste->department }}"
-                                            {{ old('poste_id', $employee->poste_id) == $poste->id ? 'selected' : '' }}>
-                                            {{ $poste->title }}
-                                            (Niv. {{ $poste->level }}
-                                            — {{ $poste->department ?? 'Tous dépts' }})
-                                            {{ $poste->can_be_n1 ? '⭐' : '' }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="form-text">⭐ = poste pouvant être N+1</div>
-                                @error('poste_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label small fw-medium">
-                                    Département <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="department" id="dept-field"
-                                       value="{{ old('department', $employee->department) }}"
-                                       class="form-control @error('department') is-invalid @enderror"
-                                       list="dept-list" required>
-                                <datalist id="dept-list">
-                                    <option>Direction</option>
-                                    <option>Ressources Humaines</option>
-                                    <option>Finance & Comptabilité</option>
-                                    <option>Informatique</option>
-                                    <option>Commercial</option>
-                                    <option>Logistique</option>
-                                </datalist>
-                                @error('department')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label small fw-medium">
-                                    Date d'embauche <span class="text-danger">*</span>
-                                </label>
-                                <input type="date" name="hire_date"
-                                       value="{{ old('hire_date', $employee->hire_date->format('Y-m-d')) }}"
-                                       class="form-control" required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label small fw-medium">
-                                    Solde congés (jours)
-                                </label>
-                                <input type="number" name="leave_balance"
-                                       value="{{ old('leave_balance', $employee->leave_balance) }}"
-                                       class="form-control" min="0">
-                            </div>
-
-                            <div class="col-md-4">
-                                <x-select
-                                    name="status"
-                                    label="Statut"
-                                    :options="['active' => 'Actif', 'on_leave' => 'En congé', 'suspended' => 'Suspendu', 'terminated' => 'Parti']"
-                                    :value="old('status', $employee->status)"
-                                />
-                            </div>
-
-                            {{-- N+1 : chargé dynamiquement + valeur actuelle pré-sélectionnée --}}
-                            <div class="col-12">
-                                <label class="form-label small fw-medium">
-                                    Supérieur hiérarchique (N+1)
-                                    <span class="text-muted fw-normal" id="n1-hint"></span>
-                                </label>
-
-                                {{-- Affichage du N+1 actuel --}}
-                                @if($employee->supervisor)
-                                    <div class="alert alert-info py-2 small mb-2">
-                                        <i class="bi bi-person-check me-1"></i>
-                                        N+1 actuel :
-                                        <strong>{{ $employee->supervisor->full_name }}</strong>
-                                        — {{ $employee->supervisor->poste?->title ?? $employee->supervisor->position }}
-                                        (Niv. {{ $employee->supervisor->poste?->level ?? '?' }})
-                                    </div>
-                                @endif
-
-                                <select name="supervisor_id" id="supervisor-select"
-                                        class="form-select">
-                                    <option value="">Chargement en cours...</option>
-                                </select>
-                                <div class="form-text" id="n1-info">
-                                    Le N+1 est filtré selon le niveau du poste sélectionné.
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {{-- ── SIDEBAR DROITE ──────────────────────────────────── --}}
@@ -239,8 +128,11 @@
 
                 {{-- RÔLE --}}
                 <div class="card mb-3">
-                    <div class="card-header">
-                        <i class="bi bi-shield-lock me-2"></i>Rôle applicatif
+                    <div class="card-header d-flex align-items-center gap-2"
+                         style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                              style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">2</span>
+                        <span style="color:#185FA5"><i class="bi bi-shield-lock me-1"></i>Rôle applicatif</span>
                     </div>
                     <div class="card-body">
                         <x-select
@@ -259,8 +151,9 @@
                 {{-- INFOS POSTE ACTUEL --}}
                 @if($employee->poste)
                     <div class="card mb-3">
-                        <div class="card-header">
-                            <i class="bi bi-diagram-3 me-2"></i>Poste actuel
+                        <div class="card-header d-flex align-items-center gap-2"
+                             style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                            <span style="color:#185FA5"><i class="bi bi-diagram-3 me-1"></i>Poste actuel</span>
                         </div>
                         <div class="card-body">
                             <div class="d-flex align-items-center gap-2 mb-2">
@@ -281,9 +174,9 @@
                 {{-- SUBALTERNES --}}
                 @if($employee->subordinates->count())
                     <div class="card mb-3">
-                        <div class="card-header">
-                            <i class="bi bi-people me-2"></i>
-                            Subalternes ({{ $employee->subordinates->count() }})
+                        <div class="card-header d-flex align-items-center gap-2"
+                             style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                            <span style="color:#185FA5"><i class="bi bi-people me-1"></i>Subalternes ({{ $employee->subordinates->count() }})</span>
                         </div>
                         <div class="card-body p-2">
                             @foreach($employee->subordinates as $sub)
@@ -322,6 +215,111 @@
                     </div>
                 </div>
             </div>
+
+        {{-- ── INFOS PROFESSIONNELLES (pleine largeur) ───────────── --}}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center gap-2"
+                     style="background:#E6F1FB; border-left:4px solid #185FA5;">
+                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                          style="width:22px;height:22px;background:#185FA5;color:#fff;font-size:11px;font-weight:700">3</span>
+                    <span style="color:#185FA5"><i class="bi bi-briefcase me-1"></i>Informations professionnelles</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">
+                                Poste <span class="text-danger">*</span>
+                            </label>
+                            <select name="poste_id" id="poste-select"
+                                    class="form-select @error('poste_id') is-invalid @enderror"
+                                    required onchange="onPosteChange(this)">
+                                <option value="">— Sélectionner un poste —</option>
+                                @foreach($postes as $poste)
+                                    <option value="{{ $poste->id }}"
+                                            data-level="{{ $poste->level }}"
+                                            data-can_n1="{{ $poste->can_be_n1 ? 1 : 0 }}"
+                                            data-dept="{{ $poste->department }}"
+                                        {{ old('poste_id', $employee->poste_id) == $poste->id ? 'selected' : '' }}>
+                                        {{ $poste->title }}
+                                        (Niv. {{ $poste->level }}
+                                        — {{ $poste->department ?? 'Tous dépts' }})
+                                        {{ $poste->can_be_n1 ? '⭐' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="form-text">⭐ = poste pouvant être N+1</div>
+                            @error('poste_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">
+                                Département <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="department" id="dept-field"
+                                   value="{{ old('department', $employee->department) }}"
+                                   class="form-control @error('department') is-invalid @enderror"
+                                   list="dept-list" required>
+                            <datalist id="dept-list">
+                                <option>Direction</option>
+                                <option>Ressources Humaines</option>
+                                <option>Finance & Comptabilité</option>
+                                <option>Informatique</option>
+                                <option>Commercial</option>
+                                <option>Logistique</option>
+                            </datalist>
+                            @error('department')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-medium">
+                                Date d'embauche <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="hire_date"
+                                   value="{{ old('hire_date', $employee->hire_date->format('Y-m-d')) }}"
+                                   class="form-control" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-medium">Solde congés (jours)</label>
+                            <input type="number" name="leave_balance"
+                                   value="{{ old('leave_balance', $employee->leave_balance) }}"
+                                   class="form-control" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <x-select
+                                name="status"
+                                label="Statut"
+                                :options="['active' => 'Actif', 'on_leave' => 'En congé', 'suspended' => 'Suspendu', 'terminated' => 'Parti']"
+                                :value="old('status', $employee->status)"
+                            />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-medium">
+                                Supérieur hiérarchique (N+1)
+                                <span class="text-muted fw-normal" id="n1-hint"></span>
+                            </label>
+                            @if($employee->supervisor)
+                                <div class="alert alert-info py-2 small mb-2">
+                                    <i class="bi bi-person-check me-1"></i>
+                                    N+1 actuel :
+                                    <strong>{{ $employee->supervisor->full_name }}</strong>
+                                    — {{ $employee->supervisor->poste?->title ?? $employee->supervisor->position }}
+                                    (Niv. {{ $employee->supervisor->poste?->level ?? '?' }})
+                                </div>
+                            @endif
+                            <select name="supervisor_id" id="supervisor-select" class="form-select">
+                                <option value="">Chargement en cours...</option>
+                            </select>
+                            <div class="form-text" id="n1-info">
+                                Le N+1 est filtré selon le niveau du poste sélectionné.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         </div>
     </form>
