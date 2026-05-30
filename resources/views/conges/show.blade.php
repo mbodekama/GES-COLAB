@@ -32,10 +32,7 @@
 
             {{-- CARTE STATUT --}}
             <div class="card text-center p-4 mb-3">
-                <div class="avatar-initials mx-auto mb-3"
-                     style="width:64px;height:64px;font-size:22px;background:#E6F1FB;color:#185FA5">
-                    {{ $leave->employee->initials }}
-                </div>
+                <x-avatar :initials="$leave->employee->initials" size="xl" class="mx-auto mb-3" />
                 <h5 class="fw-semibold mb-0">{{ $leave->employee->full_name }}</h5>
                 <p class="text-muted mb-2">{{ $leave->employee->position }}</p>
                 {!! $leave->workflow_badge !!}
@@ -416,16 +413,17 @@
     </div>
 
     {{-- ── MODAL REFUS N+1 ────────────────────────────────────── --}}
-    <div class="modal fade" id="rejectN1Modal" tabindex="-1">
+    <div class="modal fade" id="rejectN1Modal" tabindex="-1"
+         aria-labelledby="rejectN1ModalTitle" aria-modal="true" role="dialog">
         <div class="modal-dialog">
             <form method="POST" action="{{ route('leaves.reject.n1', $leave) }}">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="bi bi-x-circle me-2 text-danger"></i>Refuser la demande (N+1)
+                        <h5 class="modal-title" id="rejectN1ModalTitle">
+                            <i class="bi bi-x-circle me-2 text-danger" aria-hidden="true"></i>Refuser la demande (N+1)
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-warning small py-2">
@@ -452,16 +450,17 @@
     </div>
 
     {{-- ── MODAL REFUS RH ──────────────────────────────────────── --}}
-    <div class="modal fade" id="rejectRhModal" tabindex="-1">
+    <div class="modal fade" id="rejectRhModal" tabindex="-1"
+         aria-labelledby="rejectRhModalTitle" aria-modal="true" role="dialog">
         <div class="modal-dialog">
             <form method="POST" action="{{ route('leaves.reject', $leave) }}">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="bi bi-x-circle me-2 text-danger"></i>Refuser la demande (RH)
+                        <h5 class="modal-title" id="rejectRhModalTitle">
+                            <i class="bi bi-x-circle me-2 text-danger" aria-hidden="true"></i>Refuser la demande (RH)
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-warning small py-2">

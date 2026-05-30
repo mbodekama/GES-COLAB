@@ -193,16 +193,17 @@
 </div>
 
 {{-- ── MODAL CRÉATION ──────────────────────────────────────── --}}
-<div class="modal fade" id="createModal" tabindex="-1">
+<div class="modal fade" id="createModal" tabindex="-1"
+     aria-labelledby="createModalTitle" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg">
         <form method="POST" action="{{ route('postes.store') }}">
         @csrf
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-plus-circle me-2"></i>Nouveau poste
+                <h5 class="modal-title" id="createModalTitle">
+                    <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>Nouveau poste
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
                 <div class="row g-3">
@@ -287,16 +288,17 @@
 </div>
 
 {{-- ── MODAL ÉDITION ───────────────────────────────────────── --}}
-<div class="modal fade" id="editModal" tabindex="-1">
+<div class="modal fade" id="editModal" tabindex="-1"
+     aria-labelledby="editModalTitle" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-lg">
         <form method="POST" id="edit-form" action="#">
         @csrf @method('PUT')
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-pencil me-2"></i>Modifier le poste
+                <h5 class="modal-title" id="editModalTitle">
+                    <i class="bi bi-pencil me-2" aria-hidden="true"></i>Modifier le poste
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
                 <div class="row g-3">

@@ -92,9 +92,7 @@
             <td class="text-muted small fw-medium">{{ $employee->matricule }}</td>
             <td>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="avatar-initials" style="background:#E6F1FB;color:#185FA5">
-                        {{ $employee->initials }}
-                    </div>
+                    <x-avatar :initials="$employee->initials" />
                     <div>
                         <div class="fw-medium">{{ $employee->full_name }}</div>
                         <div class="small text-muted">{{ $employee->email }}</div>

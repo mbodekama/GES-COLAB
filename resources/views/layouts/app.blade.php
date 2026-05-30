@@ -8,329 +8,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
-    <style>
-
-        /* ── BASE ────────────────────────────────────────────── */
-        html { font-size: 16px; }
-
-        :root {
-            --sidebar-w: 250px;
-            --topbar-h: 62px;
-            --blue: #185FA5;
-            --blue-light: #E6F1FB;
-            --sidebar-bg: #0d1b2e;
-        }
-
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            font-size: 15px;
-        }
-
-        /* ── SIDEBAR ─────────────────────────────────────────── */
-        #sidebar {
-            position: fixed; top: 0; left: 0; bottom: 0;
-            width: var(--sidebar-w);
-            background: var(--sidebar-bg);
-            display: flex; flex-direction: column;
-            z-index: 1040;
-            transition: transform .25s ease;
-        }
-
-        .sidebar-brand {
-            height: var(--topbar-h);
-            display: flex; align-items: center; gap: 12px;
-            padding: 0 18px;
-            border-bottom: 1px solid rgba(255,255,255,.06);
-            flex-shrink: 0;
-        }
-        .brand-icon {
-            width: 38px; height: 38px; background: var(--blue);
-            border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-size: 20px; font-weight: 700;
-            color: #fff; flex-shrink: 0;
-        }
-        .brand-name { color: #fff; font-weight: 600; font-size: 16px; line-height: 1.1; }
-        .brand-sub  { color: rgba(255,255,255,.4); font-size: 11px; }
-
-        .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
-        .sidebar-nav::-webkit-scrollbar { width: 4px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
-
-        .nav-section {
-            padding: 14px 18px 4px;
-            font-size: 11px; font-weight: 600;
-            letter-spacing: .08em; text-transform: uppercase;
-            color: rgba(255,255,255,.3);
-        }
-        .nav-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 18px; color: rgba(255,255,255,.65);
-            font-size: 14.5px; text-decoration: none;
-            transition: background .15s, color .15s;
-            position: relative; cursor: pointer;
-        }
-        .nav-item:hover  { background: rgba(255,255,255,.06); color: #fff; }
-        .nav-item.active { background: rgba(24,95,165,.35); color: #fff; }
-        .nav-item.active::before {
-            content: ''; position: absolute; left: 0; top: 4px; bottom: 4px;
-            width: 3px; background: var(--blue); border-radius: 0 2px 2px 0;
-        }
-        .nav-item i { font-size: 17px; width: 20px; flex-shrink: 0; }
-        .nav-badge {
-            margin-left: auto; padding: 2px 8px;
-            background: #dc3545; color: #fff;
-            font-size: 11px; font-weight: 600; border-radius: 99px;
-        }
-
-        .sidebar-footer {
-            border-top: 1px solid rgba(255,255,255,.06);
-            padding: 14px 18px; flex-shrink: 0;
-        }
-        .user-pill { display: flex; align-items: center; gap: 10px; }
-        .user-avatar {
-            width: 34px; height: 34px; border-radius: 50%;
-            background: var(--blue); color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 600; flex-shrink: 0;
-        }
-        .user-name { color: #fff; font-size: 14px; font-weight: 500; line-height: 1.2; }
-        .user-role { color: rgba(255,255,255,.45); font-size: 12px; }
-
-        /* ── TOPBAR ──────────────────────────────────────────── */
-        #topbar {
-            position: fixed; top: 0;
-            left: var(--sidebar-w); right: 0;
-            height: var(--topbar-h); z-index: 1030;
-            background: #fff;
-            border-bottom: 1px solid #e8ecf0;
-            display: flex; align-items: center;
-            padding: 0 22px; gap: 12px;
-        }
-        .page-title { font-size: 17px; font-weight: 600; color: #1a1a2e; flex: 1; }
-
-        /* ── CONTENT ─────────────────────────────────────────── */
-        #content-wrapper {
-            margin-left: var(--sidebar-w);
-            padding-top: var(--topbar-h);
-            min-height: 100vh;
-        }
-        .content-inner { padding: 26px; }
-
-        /* ── CARDS ───────────────────────────────────────────── */
-        .card {
-            border: 1px solid #e8ecf0;
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,.04);
-        }
-        .card-header {
-            background: #fff;
-            border-bottom: 1px solid #e8ecf0;
-            border-radius: 12px 12px 0 0 !important;
-            padding: 15px 18px;
-            font-weight: 600; font-size: 15px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .card-footer {
-            background: #fafbfc;
-            border-top: 1px solid #e8ecf0;
-            border-radius: 0 0 12px 12px !important;
-        }
-
-        /* ── TABLES ──────────────────────────────────────────── */
-        .table th {
-            font-size: 12px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: .05em;
-            color: #6c757d; border-bottom-width: 1px;
-            white-space: nowrap; padding: 11px 14px;
-        }
-        .table td {
-            font-size: 14px; vertical-align: middle; padding: 11px 14px;
-        }
-        .table-hover tbody tr:hover td { background: #f8f9ff; }
-
-        /* ── BADGES ──────────────────────────────────────────── */
-        .badge-status {
-            font-size: 12px; padding: 4px 11px;
-            border-radius: 99px; font-weight: 500;
-        }
-
-        /* ── FILTER CARD ─────────────────────────────────────── */
-        .filter-card {
-            background: #fff; border: 1px solid #e8ecf0;
-            border-radius: 12px; padding: 15px 18px; margin-bottom: 20px;
-        }
-        .filter-card label {
-            font-size: 12px; font-weight: 600; color: #6c757d;
-            margin-bottom: 3px;
-            text-transform: uppercase; letter-spacing: .04em;
-        }
-
-        /* ── BUTTONS ─────────────────────────────────────────── */
-        .btn { font-size: 14px; }
-        .btn-sm { font-size: 13px; }
-        .btn-primary { background: var(--blue); border-color: var(--blue); }
-        .btn-primary:hover { background: #0C447C; border-color: #0C447C; }
-        .btn-outline-primary { color: var(--blue); border-color: var(--blue); }
-        .btn-outline-primary:hover { background: var(--blue); border-color: var(--blue); }
-
-        /* ── AVATAR ──────────────────────────────────────────── */
-        .avatar-initials {
-            width: 36px; height: 36px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 600; flex-shrink: 0;
-        }
-
-        /* ── SEARCH ──────────────────────────────────────────── */
-        .search-wrapper { position: relative; }
-        .search-wrapper .bi-search {
-            position: absolute; left: 10px; top: 50%;
-            transform: translateY(-50%); color: #adb5bd; font-size: 14px;
-        }
-        .search-wrapper input { padding-left: 32px; }
-
-        /* ── ALERTS ──────────────────────────────────────────── */
-        .alert { border-radius: 10px; border: none; font-size: 14.5px; }
-
-        /* ── FORMULAIRES ─────────────────────────────────────── */
-        .form-control, .form-select {
-            font-size: 14px;
-        }
-        .form-label {
-            font-size: 13.5px;
-            font-weight: 500;
-        }
-        .form-text {
-            font-size: 12px;
-        }
-        .form-check-label {
-            font-size: 14px;
-        }
-
-        /* ── MODALES ─────────────────────────────────────────── */
-        .modal-title { font-size: 16px; }
-        .modal-body  { font-size: 14px; }
-
-        /* ── DROPDOWNS ───────────────────────────────────────── */
-        .dropdown-item { font-size: 14px; }
-
-        /* ── PAGINATION ──────────────────────────────────────── */
-        .pagination {
-            gap: 4px;
-            font-size: 13px;
-            flex-wrap: nowrap;
-        }
-        .page-link {
-            border-radius: 8px !important;
-            border: 1.5px solid #e8ecf0;
-            color: #495057;
-            font-weight: 500;
-            padding: 5px 11px;
-            background: #fff;
-            box-shadow: 0 1px 2px rgba(0,0,0,.04);
-            transition: color .15s, background .15s, border-color .15s, box-shadow .15s;
-            margin-left: 0 !important;
-            line-height: 1.4;
-        }
-        .page-link:hover {
-            background: var(--blue-light);
-            border-color: var(--blue);
-            color: var(--blue);
-            box-shadow: none;
-        }
-        .page-item.active .page-link {
-            background: var(--blue);
-            border-color: var(--blue);
-            color: #fff;
-            box-shadow: 0 2px 6px rgba(24,95,165,.25);
-        }
-        .page-item.disabled .page-link {
-            background: #f8f9fa;
-            border-color: #e8ecf0;
-            color: #adb5bd;
-            box-shadow: none;
-        }
-
-        /* ── SMALL ───────────────────────────────────────────── */
-        small, .small { font-size: 12.5px !important; }
-
-        /* ── RESPONSIVE ──────────────────────────────────────── */
-        @media (max-width: 768px) {
-            #sidebar { transform: translateX(-100%); }
-            #sidebar.show { transform: translateX(0); }
-            #topbar { left: 0; }
-            #content-wrapper { margin-left: 0; }
-        }
-
-        /* ── SORT HEADERS ───────────────────────────────────── */
-        .sort-th {
-            color: inherit;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            white-space: nowrap;
-            user-select: none;
-            gap: 2px;
-        }
-        .sort-th:hover { color: #1d4ed8; }
-        .sort-th--active { color: #1d4ed8; font-weight: 600; }
-
-        /* ── PRINT ───────────────────────────────────────────── */
-        @media print {
-            #sidebar, #topbar { display: none !important; }
-            #content-wrapper { margin: 0; padding: 0; }
-        }
-
-        /* ── SIDEBAR COLLAPSIBLE ─────────────────────────────── */
-        #sidebar         { transition: width .25s ease, transform .25s ease; }
-        #topbar          { transition: left .25s ease; }
-        #content-wrapper { transition: margin-left .25s ease; }
-
-        @media (min-width: 769px) {
-            body.sidebar-collapsed #sidebar         { width: 70px; }
-            body.sidebar-collapsed #topbar          { left: 70px; }
-            body.sidebar-collapsed #content-wrapper { margin-left: 70px; }
-
-            body.sidebar-collapsed .nav-label,
-            body.sidebar-collapsed .nav-section,
-            body.sidebar-collapsed .brand-name,
-            body.sidebar-collapsed .brand-sub,
-            body.sidebar-collapsed .user-name,
-            body.sidebar-collapsed .user-role { display: none; }
-
-            body.sidebar-collapsed .sidebar-brand   { justify-content: center; padding: 0; gap: 0; }
-            body.sidebar-collapsed .nav-item        { justify-content: center; padding: 11px 0; position: relative; }
-            body.sidebar-collapsed .nav-item i      { width: auto; }
-            body.sidebar-collapsed .nav-badge       {
-                position: absolute; top: 4px; right: 6px;
-                margin-left: 0; font-size: 9px; padding: 1px 5px;
-            }
-            body.sidebar-collapsed .sidebar-footer  { padding: 12px 0; }
-            body.sidebar-collapsed .user-pill       { justify-content: center; }
-            body.sidebar-collapsed .user-pill > div:not(.user-avatar),
-            body.sidebar-collapsed .user-pill > form { display: none; }
-        }
-
-        /* Toggle button */
-        .sidebar-toggle-btn {
-            background: #fff; cursor: pointer;
-            color: #6c757d; padding: 8px 12px; border-radius: 8px;
-            border: 1.5px solid #d1d5db;
-            align-items: center; display: none;
-            font-size: 20px; line-height: 1;
-            transition: color .15s, background .15s, border-color .15s, box-shadow .15s;
-            box-shadow: 0 1px 3px rgba(0,0,0,.06);
-        }
-        .sidebar-toggle-btn:hover {
-            background: #f0f2f5; color: #185FA5;
-            border-color: #185FA5;
-            box-shadow: 0 1px 4px rgba(24,95,165,.15);
-        }
-        @media (min-width: 769px) { .sidebar-toggle-btn { display: flex; } }
-    </style>
+    <link href="{{ asset('css/gescolab.css') }}" rel="stylesheet">
 
     @stack('styles')
 </head>
@@ -338,9 +16,9 @@
 <script>if(localStorage.getItem('gescolab_sidebar_collapsed')==='1')document.body.classList.add('sidebar-collapsed');</script>
 
 {{-- ── SIDEBAR ────────────────────────────────────────────── --}}
-<nav id="sidebar">
+<nav id="sidebar" role="navigation" aria-label="Menu principal">
     <div class="sidebar-brand">
-        <div class="brand-icon">G</div>
+        <div class="brand-icon" aria-hidden="true">G</div>
         <div>
             <div class="brand-name">GES-COLAB</div>
             <div class="brand-sub">Gestion RH v1.0</div>
@@ -354,16 +32,18 @@
         <a href="{{ route('dashboard') }}"
            class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}"
            data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Tableau de bord">
-            <i class="bi bi-grid-1x2-fill"></i> <span class="nav-label">Tableau de bord</span>
+            <i class="bi bi-grid-1x2-fill" aria-hidden="true"></i>
+            <span class="nav-label">Tableau de bord</span>
         </a>
 
         <a href="{{ route('messages.index') }}"
            class="nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}"
            data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Messagerie">
-            <i class="bi bi-chat-dots-fill"></i> <span class="nav-label">Messagerie</span>
+            <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
+            <span class="nav-label">Messagerie</span>
             @php $unread = auth()->user()->unreadMessagesCount(); @endphp
             @if($unread > 0)
-                <span class="nav-badge">{{ $unread }}</span>
+                <span class="nav-badge" aria-label="{{ $unread }} messages non lus">{{ $unread }}</span>
             @endif
         </a>
 
@@ -373,7 +53,8 @@
             <a href="{{ route('employees.index') }}"
                class="nav-item {{ request()->routeIs('employees.*') ? 'active' : '' }}"
                data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Employés">
-                <i class="bi bi-people-fill"></i> <span class="nav-label">Employés</span>
+                <i class="bi bi-people-fill" aria-hidden="true"></i>
+                <span class="nav-label">Employés</span>
             </a>
         @endcan
 
@@ -381,7 +62,8 @@
             <a href="{{ route('contracts.index') }}"
                class="nav-item {{ request()->routeIs('contracts.*') ? 'active' : '' }}"
                data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Contrats">
-                <i class="bi bi-file-earmark-text-fill"></i> <span class="nav-label">Contrats</span>
+                <i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i>
+                <span class="nav-label">Contrats</span>
             </a>
         @endcan
 
@@ -389,7 +71,8 @@
             <a href="{{ route('leaves.index') }}"
                class="nav-item {{ request()->routeIs('leaves.*') ? 'active' : '' }}"
                data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Congés &amp; Permissions">
-                <i class="bi bi-calendar-check-fill"></i> <span class="nav-label">Congés & Permissions</span>
+                <i class="bi bi-calendar-check-fill" aria-hidden="true"></i>
+                <span class="nav-label">Congés &amp; Permissions</span>
 
                 @php
                     $user     = auth()->user();
@@ -422,7 +105,7 @@
                 @endphp
 
                 @if($badgeCount > 0)
-                    <span class="nav-badge">{{ $badgeCount }}</span>
+                    <span class="nav-badge" aria-label="{{ $badgeCount }} demandes en attente">{{ $badgeCount }}</span>
                 @endif
             </a>
         @endcan
@@ -431,7 +114,8 @@
         <a href="{{ route('postes.index') }}"
            class="nav-item {{ request()->routeIs('postes.*') ? 'active' : '' }}"
            data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Postes &amp; Hiérarchie">
-            <i class="bi bi-diagram-3-fill"></i> <span class="nav-label">Postes & Hiérarchie</span>
+            <i class="bi bi-diagram-3-fill" aria-hidden="true"></i>
+            <span class="nav-label">Postes &amp; Hiérarchie</span>
         </a>
         @endrole
 
@@ -441,7 +125,8 @@
             <a href="{{ route('payroll.index') }}"
                class="nav-item {{ request()->routeIs('payroll.*') ? 'active' : '' }}"
                data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Gestion de la paie">
-                <i class="bi bi-receipt-cutoff"></i> <span class="nav-label">Gestion de la paie</span>
+                <i class="bi bi-receipt-cutoff" aria-hidden="true"></i>
+                <span class="nav-label">Gestion de la paie</span>
             </a>
         @endcan
 
@@ -449,7 +134,8 @@
             <a href="{{ route('salary-grids.index') }}"
                class="nav-item {{ request()->routeIs('salary-grids.*') ? 'active' : '' }}"
                data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Grilles salariales">
-                <i class="bi bi-table"></i> <span class="nav-label">Grilles salariales</span>
+                <i class="bi bi-table" aria-hidden="true"></i>
+                <span class="nav-label">Grilles salariales</span>
             </a>
         @endcan
 
@@ -459,13 +145,15 @@
         <a href="{{ route('roles.index') }}"
            class="nav-item {{ request()->routeIs('roles.*') ? 'active' : '' }}"
            data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Rôles &amp; Permissions">
-            <i class="bi bi-shield-lock-fill"></i> <span class="nav-label">Rôles & Permissions</span>
+            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+            <span class="nav-label">Rôles &amp; Permissions</span>
         </a>
 
         <a href="{{ route('config.index') }}"
            class="nav-item {{ request()->routeIs('config.*') ? 'active' : '' }}"
            data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Configuration">
-            <i class="bi bi-gear-fill"></i> <span class="nav-label">Configuration</span>
+            <i class="bi bi-gear-fill" aria-hidden="true"></i>
+            <span class="nav-label">Configuration</span>
         </a>
         @endrole
 
@@ -473,7 +161,7 @@
 
     <div class="sidebar-footer">
         <div class="user-pill">
-            <div class="user-avatar">{{ auth()->user()->initials }}</div>
+            <div class="user-avatar" aria-hidden="true">{{ auth()->user()->initials }}</div>
             <div style="flex:1;min-width:0">
                 <div class="user-name text-truncate">{{ auth()->user()->name }}</div>
                 <div class="user-role">{{ auth()->user()->primary_role_label }}</div>
@@ -481,11 +169,10 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                        style="background:none;border:none;
-                               color:rgba(255,255,255,.4);
-                               cursor:pointer;padding:4px"
-                        title="Déconnexion">
-                    <i class="bi bi-box-arrow-right" style="font-size:18px"></i>
+                        class="btn-sidebar-logout"
+                        title="Déconnexion"
+                        aria-label="Se déconnecter">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                 </button>
             </form>
         </div>
@@ -494,26 +181,22 @@
 
 {{-- ── TOPBAR ──────────────────────────────────────────────── --}}
 <header id="topbar">
-    <button class="d-md-none me-2"
+    <button class="btn-mobile-menu d-md-none me-2"
             onclick="document.getElementById('sidebar').classList.toggle('show')"
             aria-label="Ouvrir le menu"
-            style="background:#fff; border:1.5px solid #d1d5db; border-radius:8px;
-                   padding:8px 12px; font-size:20px; line-height:1; cursor:pointer;
-                   color:#6c757d; box-shadow:0 1px 3px rgba(0,0,0,.06);
-                   transition:color .15s, border-color .15s, box-shadow .15s;"
-            onmouseover="this.style.color='#185FA5';this.style.borderColor='#185FA5';this.style.boxShadow='0 1px 4px rgba(24,95,165,.15)'"
-            onmouseout="this.style.color='#6c757d';this.style.borderColor='#d1d5db';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06)'">
-        <i class="bi bi-list"></i>
+            aria-expanded="false"
+            aria-controls="sidebar">
+        <i class="bi bi-list" aria-hidden="true"></i>
     </button>
 
     <button id="sidebar-toggle"
             class="sidebar-toggle-btn sidebar-open me-1"
             aria-label="Réduire la barre latérale"
             data-open="true">
-        <i class="bi bi-layout-sidebar-reverse"></i>
+        <i class="bi bi-layout-sidebar-reverse" aria-hidden="true"></i>
     </button>
 
-    <span class="page-title @hasSection('breadcrumb') d-md-none @endif">@yield('page-title', 'Tableau de bord')</span>
+    <span class="page-title @hasSection('breadcrumb') d-none @endif">@yield('page-title', 'Tableau de bord')</span>
     @hasSection('breadcrumb')
         @yield('breadcrumb')
     @endif
@@ -523,24 +206,30 @@
         {{-- Notifications --}}
         <div class="dropdown">
             <button class="btn btn-light btn-sm position-relative"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-bell" style="font-size:16px"></i>
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label="Notifications">
+                <i class="bi bi-bell" style="font-size:16px" aria-hidden="true"></i>
                 @if(isset($unread) && $unread > 0)
                     <span class="position-absolute top-0 start-100 translate-middle
-                                 badge rounded-pill bg-danger" style="font-size:10px">
+                                 badge rounded-pill bg-danger" style="font-size:10px"
+                          aria-label="{{ $unread }} notifications">
                         {{ $unread }}
                     </span>
                 @endif
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm"
-                style="width:290px;padding:8px">
+                style="width:290px;padding:8px"
+                role="menu"
+                aria-label="Liste des notifications">
                 <li><h6 class="dropdown-header" style="font-size:12px">Notifications</h6></li>
                 @php $pendingLeaves = \App\Models\Leave::pending()->count(); @endphp
                 @if($pendingLeaves)
                     <li>
                         <a class="dropdown-item py-2" style="font-size:13.5px"
-                           href="{{ route('leaves.index') }}?status=pending">
-                            <i class="bi bi-calendar-x text-warning me-2"></i>
+                           href="{{ route('leaves.index') }}?status=pending"
+                           role="menuitem">
+                            <i class="bi bi-calendar-x text-warning me-2" aria-hidden="true"></i>
                             {{ $pendingLeaves }} demande(s) de congé en attente
                         </a>
                     </li>
@@ -557,29 +246,31 @@
         {{-- Menu profil --}}
         <div class="dropdown">
             <button class="btn btn-light btn-sm d-flex align-items-center gap-2"
-                    data-bs-toggle="dropdown">
-                <div class="avatar-initials"
-                     style="width:28px;height:28px;font-size:11px;
-                            background:#E6F1FB;color:#185FA5">
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label="Menu utilisateur">
+                <div class="avatar-initials avatar-sm avatar-blue" aria-hidden="true">
                     {{ auth()->user()->initials }}
                 </div>
                 <span class="d-none d-md-inline" style="font-size:13.5px">
                     {{ auth()->user()->name }}
                 </span>
-                <i class="bi bi-chevron-down" style="font-size:11px"></i>
+                <i class="bi bi-chevron-down" style="font-size:11px" aria-hidden="true"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" role="menu">
                 <li>
                     <a class="dropdown-item" style="font-size:14px"
-                       href="{{ route('profile.edit') }}">
-                        <i class="bi bi-person me-2"></i>Mon profil
+                       href="{{ route('profile.edit') }}"
+                       role="menuitem">
+                        <i class="bi bi-person me-2" aria-hidden="true"></i>Mon profil
                     </a>
                 </li>
                 @can('voir fiches de paie')
                     <li>
                         <a class="dropdown-item" style="font-size:14px"
-                           href="{{ route('payroll.index') }}">
-                            <i class="bi bi-receipt me-2"></i>Mes fiches de paie
+                           href="{{ route('payroll.index') }}"
+                           role="menuitem">
+                            <i class="bi bi-receipt me-2" aria-hidden="true"></i>Mes fiches de paie
                         </a>
                     </li>
                 @endcan
@@ -589,8 +280,9 @@
                         @csrf
                         <button type="submit"
                                 class="dropdown-item text-danger"
-                                style="font-size:14px">
-                            <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                                style="font-size:14px"
+                                role="menuitem">
+                            <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Déconnexion
                         </button>
                     </form>
                 </li>
@@ -606,29 +298,29 @@
     <div class="content-inner">
 
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
-                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
+                <i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
         @endif
 
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
         @endif
 
         @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>
                 <strong>Erreurs :</strong>
                 <ul class="mb-0 mt-1 ps-3">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
         @endif
 
@@ -680,6 +372,16 @@
             syncIcon(isCollapsed);
         });
     }
+
+    // Fermer la sidebar mobile en cliquant en dehors
+    document.addEventListener('click', function (e) {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('show')) {
+            if (!sidebar.contains(e.target) && !e.target.closest('.btn-mobile-menu')) {
+                sidebar.classList.remove('show');
+            }
+        }
+    });
 })();
 </script>
 @stack('scripts')

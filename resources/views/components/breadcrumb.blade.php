@@ -1,7 +1,7 @@
 @props(['items' => []])
 
 @if(count($items) > 0)
-<nav aria-label="breadcrumb" class="d-none d-md-flex align-items-center" style="flex:1;min-width:0">
+<nav aria-label="breadcrumb" class="d-flex align-items-center" style="flex:1;min-width:0">
     <ol class="breadcrumb mb-0 flex-nowrap align-items-center">
         @foreach($items as $item)
             @if(!$loop->last)

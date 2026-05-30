@@ -56,10 +56,11 @@
                             @if(!in_array($role->name, ['superadmin', 'admin', 'user']))
                             <div>
                                 <form method="POST" action="{{ route('roles.destroy', $role) }}" class="d-inline"
-                                      onsubmit="return confirm('Supprimer ce rôle ?')">
+                                      onsubmit="return confirm('Supprimer le rôle « {{ $role->name }} » ?')">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-outline-danger">
-                                        <i class="bi bi-trash"></i> &nbsp; Supprimer
+                                    <button class="btn btn-outline-danger"
+                                            aria-label="Supprimer le rôle {{ $role->name }}">
+                                        <i class="bi bi-trash" aria-hidden="true"></i> &nbsp; Supprimer
                                     </button>
                                 </form>
                             </div>

@@ -30,10 +30,7 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="avatar-initials"
-                             style="width:44px;height:44px;font-size:16px;background:#E6F1FB;color:#185FA5;flex-shrink:0">
-                            {{ $contract->employee->initials }}
-                        </div>
+                        <x-avatar :initials="$contract->employee->initials" size="lg" />
                         <div>
                             <div class="fw-semibold">{{ $contract->employee->full_name }}</div>
                             <div class="small text-muted">

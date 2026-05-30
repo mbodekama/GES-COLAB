@@ -66,10 +66,7 @@
                                         @if($isAdmin || auth()->user()->hasRole('rh'))
                                             <td>
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <div class="avatar-initials"
-                                                         style="background:#E6F1FB;color:#185FA5;width:30px;height:30px;font-size:11px">
-                                                        {{ $leave->employee->initials }}
-                                                    </div>
+                                                    <x-avatar :initials="$leave->employee->initials" size="sm" />
                                                     <span class="fw-medium">{{ $leave->employee->full_name }}</span>
                                                 </div>
                                             </td>
@@ -88,20 +85,25 @@
                                             @can('valider congés')
                                                 <form method="POST" action="{{ route('leaves.approve', $leave) }}" class="d-inline">
                                                     @csrf
-                                                    <button class="btn btn-sm btn-outline-success py-0 px-2" title="Approuver">
-                                                        <i class="bi bi-check-lg"></i>
+                                                    <button class="btn btn-sm btn-outline-success py-0 px-2"
+                                                            title="Approuver"
+                                                            aria-label="Approuver la demande de {{ $leave->employee->full_name }}">
+                                                        <i class="bi bi-check-lg" aria-hidden="true"></i>
                                                     </button>
                                                 </form>
                                                 <form method="POST" action="{{ route('leaves.reject', $leave) }}" class="d-inline">
                                                     @csrf
-                                                    <button class="btn btn-sm btn-outline-danger py-0 px-2" title="Refuser">
-                                                        <i class="bi bi-x-lg"></i>
+                                                    <button class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                            title="Refuser"
+                                                            aria-label="Refuser la demande de {{ $leave->employee->full_name }}">
+                                                        <i class="bi bi-x-lg" aria-hidden="true"></i>
                                                     </button>
                                                 </form>
                                             @endcan
                                             <a href="{{ route('leaves.show', $leave) }}"
-                                               class="btn btn-sm btn-outline-secondary py-0 px-2">
-                                                <i class="bi bi-eye"></i>
+                                               class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                               aria-label="Voir la demande de {{ $leave->employee->full_name }}">
+                                                <i class="bi bi-eye" aria-hidden="true"></i>
                                             </a>
                                         </td>
                                     </tr>

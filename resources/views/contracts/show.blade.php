@@ -64,10 +64,7 @@
 
                 {{-- Identité employé --}}
                 <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
-                    <div class="avatar-initials flex-shrink-0"
-                         style="width:48px;height:48px;font-size:18px;background:#E6F1FB;color:#185FA5">
-                        {{ $contract->employee->initials }}
-                    </div>
+                    <x-avatar :initials="$contract->employee->initials" size="lg" />
                     <div class="flex-grow-1">
                         <div class="fw-semibold">{{ $contract->employee->full_name }}</div>
                         <div class="text-muted small">{{ $contract->employee->position }} · {{ $contract->employee->department }}</div>
@@ -277,14 +274,15 @@
 
     {{-- MODAL RENOUVELLEMENT --}}
     @if($contract->type !== 'cdi' && $contract->status === 'active')
-        <div class="modal fade" id="renewModal" tabindex="-1">
+        <div class="modal fade" id="renewModal" tabindex="-1"
+             aria-labelledby="renewModalTitle" aria-modal="true" role="dialog">
             <div class="modal-dialog modal-sm">
                 <form method="POST" action="{{ route('contracts.renew', $contract) }}">
                     @csrf
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Renouveler le contrat</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <h5 class="modal-title" id="renewModalTitle">Renouveler le contrat</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
                             <label class="form-label small fw-medium">Nouvelle date de fin <span class="text-danger">*</span></label>

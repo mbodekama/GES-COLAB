@@ -99,10 +99,7 @@
             <td class="text-muted small">{{ $leave->leave_number }}</td>
             <td>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="avatar-initials"
-                         style="width:28px;height:28px;font-size:10px;background:#E6F1FB;color:#185FA5">
-                        {{ $leave->employee->initials }}
-                    </div>
+                    <x-avatar :initials="$leave->employee->initials" size="sm" />
                     <span class="fw-medium">{{ $leave->employee->full_name }}</span>
                 </div>
             </td>

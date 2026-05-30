@@ -100,9 +100,7 @@
         <tr>
             <td>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="avatar-initials" style="width:30px;height:30px;font-size:11px;background:#E6F1FB;color:#185FA5">
-                        {{ $payroll->employee->initials }}
-                    </div>
+                    <x-avatar :initials="$payroll->employee->initials" size="sm" />
                     <div>
                         <div class="fw-medium">{{ $payroll->employee->full_name }}</div>
                         <div class="small text-muted">{{ $payroll->employee->position }}</div>
@@ -150,14 +148,17 @@
 </div>
 
 {{-- MODAL GÉNÉRATION --}}
-<div class="modal fade" id="generateModal" tabindex="-1">
+<div class="modal fade" id="generateModal" tabindex="-1"
+     aria-labelledby="generateModalTitle" aria-modal="true" role="dialog">
     <div class="modal-dialog">
         <form method="POST" action="{{ route('payroll.generate') }}">
         @csrf
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-gear me-2"></i>Générer les fiches de paie</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="generateModalTitle">
+                    <i class="bi bi-gear me-2" aria-hidden="true"></i>Générer les fiches de paie
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">

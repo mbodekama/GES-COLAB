@@ -28,10 +28,7 @@
     {{-- CARTE PROFIL --}}
     <div class="col-md-4">
         <div class="card text-center p-4 mb-3">
-            <div class="avatar-initials mx-auto mb-3"
-                 style="width:72px;height:72px;font-size:26px;background:#E6F1FB;color:#185FA5">
-                {{ $employee->initials }}
-            </div>
+            <x-avatar :initials="$employee->initials" size="2xl" class="mx-auto mb-3" />
             <h5 class="fw-semibold mb-0">{{ $employee->full_name }}</h5>
             <p class="text-muted mb-2">{{ $employee->position }}</p>
             {!! $employee->status_badge !!}
@@ -114,11 +111,7 @@
                 <div class="fw-medium">
                     @if($employee->supervisor)
                         <div class="d-flex align-items-center gap-2">
-                            <div class="avatar-initials"
-                                 style="width:26px;height:26px;font-size:10px;
-                            background:#E6F1FB;color:#185FA5">
-                                {{ $employee->supervisor->initials }}
-                            </div>
+                            <x-avatar :initials="$employee->supervisor->initials" size="xs" />
                             <div>
                                 <div>{{ $employee->supervisor->full_name }}</div>
                                 <div class="small text-muted">

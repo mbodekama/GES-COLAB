@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
             locale: 'fr',
             dateFormat: 'Y-m-d',
             altInput: true,
-            altFormat: 'j F Y',
+            altFormat: 'd/m/Y',
             allowInput: true,
             disableMobile: true,
         };

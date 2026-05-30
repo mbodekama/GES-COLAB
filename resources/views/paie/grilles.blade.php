@@ -51,34 +51,41 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            <div class="btn-group btn-group-sm">
+                            <div class="btn-group btn-group-md d-flex justify-content-start gap-2">
                                 @can('gérer grilles salariales')
-                                    <button class="btn btn-outline-primary"
-                                            title="Modifier"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editModal"
-                                            data-id="{{ $grid->id }}"
-                                            data-name="{{ $grid->name }}"
-                                            data-level="{{ $grid->level }}"
-                                            data-min="{{ $grid->min_salary }}"
-                                            data-max="{{ $grid->max_salary }}"
-                                            data-base="{{ $grid->base_salary }}"
-                                            data-transport="{{ $grid->transport_allowance }}"
-                                            data-housing="{{ $grid->housing_allowance }}"
-                                            data-meal="{{ $grid->meal_allowance }}"
-                                            data-active="{{ $grid->is_active ? 1 : 0 }}"
-                                            data-description="{{ $grid->description }}"
-                                            data-url="{{ route('salary-grids.update', $grid) }}"
-                                            onclick="fillEditModal(this)">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <form method="POST" action="{{ route('salary-grids.destroy', $grid) }}" class="d-inline"
-                                          onsubmit="return confirm('Supprimer cette grille ?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-outline-danger" title="Supprimer">
-                                            <i class="bi bi-trash"></i>
+                                    <div>
+                                        <button class="btn btn-outline-primary"
+                                                title="Modifier"
+                                                aria-label="Modifier la grille {{ $grid->name }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editModal"
+                                                data-id="{{ $grid->id }}"
+                                                data-name="{{ $grid->name }}"
+                                                data-level="{{ $grid->level }}"
+                                                data-min="{{ $grid->min_salary }}"
+                                                data-max="{{ $grid->max_salary }}"
+                                                data-base="{{ $grid->base_salary }}"
+                                                data-transport="{{ $grid->transport_allowance }}"
+                                                data-housing="{{ $grid->housing_allowance }}"
+                                                data-meal="{{ $grid->meal_allowance }}"
+                                                data-active="{{ $grid->is_active ? 1 : 0 }}"
+                                                data-description="{{ $grid->description }}"
+                                                data-url="{{ route('salary-grids.update', $grid) }}"
+                                                onclick="fillEditModal(this)">
+                                            <i class="bi bi-pencil" aria-hidden="true"></i> &nbsp; Modifier
                                         </button>
-                                    </form>
+                                    </div>
+                                    <div>
+                                        <form method="POST" action="{{ route('salary-grids.destroy', $grid) }}" class="d-inline"
+                                              onsubmit="return confirm('Supprimer la grille « {{ $grid->name }} » ?')">
+                                            @csrf @method('DELETE')
+                                            <button class="btn btn-outline-danger"
+                                                    title="Supprimer"
+                                                    aria-label="Supprimer la grille {{ $grid->name }}">
+                                                <i class="bi bi-trash" aria-hidden="true"></i> &nbsp; Supprimer
+                                            </button>
+                                        </form>
+                                    </div>
                                 @endcan
                             </div>
                         </td>
@@ -104,14 +111,17 @@
     </div>
 
     {{-- ── MODAL CRÉATION ──────────────────────────────────────── --}}
-    <div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal fade" id="createModal" tabindex="-1"
+         aria-labelledby="createGridModalTitle" aria-modal="true" role="dialog">
         <div class="modal-dialog modal-lg">
             <form method="POST" action="{{ route('salary-grids.store') }}">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Nouvelle grille salariale</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title" id="createGridModalTitle">
+                            <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>Nouvelle grille salariale
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row g-3">
@@ -178,14 +188,17 @@
     </div>
 
     {{-- ── MODAL MODIFICATION ──────────────────────────────────── --}}
-    <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal fade" id="editModal" tabindex="-1"
+         aria-labelledby="editGridModalTitle" aria-modal="true" role="dialog">
         <div class="modal-dialog modal-lg">
             <form method="POST" id="edit-form" action="#">
                 @csrf @method('PUT')
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Modifier la grille</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title" id="editGridModalTitle">
+                            <i class="bi bi-pencil me-2" aria-hidden="true"></i>Modifier la grille
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row g-3">

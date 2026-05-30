@@ -185,11 +185,7 @@
                                    class="d-flex align-items-center gap-2 p-2 rounded text-decoration-none
                           text-dark mb-1"
                                    style="background:#f8f9fa">
-                                    <div class="avatar-initials"
-                                         style="width:26px;height:26px;font-size:10px;
-                                background:#E6F1FB;color:#185FA5">
-                                        {{ $sub->initials }}
-                                    </div>
+                                    <x-avatar :initials="$sub->initials" size="xs" />
                                     <div>
                                         <div class="small fw-medium">{{ $sub->full_name }}</div>
                                         <div style="font-size:10px;color:#6c757d">

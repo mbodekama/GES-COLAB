@@ -97,10 +97,7 @@
                         <td class="text-muted small fw-medium">{{ $contract->contract_number }}</td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-initials"
-                                     style="width:28px;height:28px;font-size:10px;background:#E6F1FB;color:#185FA5">
-                                    {{ $contract->employee->initials }}
-                                </div>
+                                <x-avatar :initials="$contract->employee->initials" size="sm" />
                                 <div>
                                     <div class="fw-medium">{{ $contract->employee->full_name }}</div>
                                     <div class="small text-muted">{{ $contract->employee->department }}</div>
@@ -197,14 +194,15 @@
     </div>
 
     {{-- MODAL RENOUVELLEMENT --}}
-    <div class="modal fade" id="renewModal" tabindex="-1">
+    <div class="modal fade" id="renewModal" tabindex="-1"
+         aria-labelledby="renewModalTitle" aria-modal="true" role="dialog">
         <div class="modal-dialog modal-sm">
             <form method="POST" id="renew-form" action="#">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Renouveler le contrat</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title" id="renewModalTitle">Renouveler le contrat</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
                         <label class="form-label small fw-medium">

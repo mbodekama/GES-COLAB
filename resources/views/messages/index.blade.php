@@ -10,8 +10,11 @@
         <div class="col-md-4 border-end h-100 d-flex flex-column">
             <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">Conversations</span>
-                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newMsgModal">
-                    <i class="bi bi-pencil-square"></i>
+                <button class="btn btn-sm btn-outline-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#newMsgModal"
+                        aria-label="Nouveau message">
+                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
                 </button>
             </div>
 
@@ -28,9 +31,7 @@
                        style="background:{{ $isActive ? '#E6F1FB' : 'transparent' }};transition:background .15s"
                        onmouseover="this.style.background='{{ $isActive ? '#E6F1FB' : '#f8f9ff' }}'"
                        onmouseout="this.style.background='{{ $isActive ? '#E6F1FB' : 'transparent' }}'">
-                        <div class="avatar-initials flex-shrink-0" style="background:#E6F1FB;color:#185FA5">
-                            {{ $interlocutor->initials }}
-                        </div>
+                        <x-avatar :initials="$interlocutor->initials" />
                         <div style="flex:1;min-width:0">
                             <div class="d-flex justify-content-between">
                                 <span class="fw-{{ $isUnread ? 'bold' : 'medium' }} text-dark" style="font-size:13px">
@@ -62,9 +63,7 @@
             @if($activeUser)
                 {{-- HEADER CONVERSATION --}}
                 <div class="p-3 border-bottom d-flex align-items-center gap-2">
-                    <div class="avatar-initials" style="background:#E6F1FB;color:#185FA5">
-                        {{ $activeUser->initials }}
-                    </div>
+                    <x-avatar :initials="$activeUser->initials" />
                     <div>
                         <div class="fw-semibold" style="font-size:14px">{{ $activeUser->name }}</div>
                         <div class="text-muted" style="font-size:11px">{{ $activeUser->primary_role_label }}</div>
@@ -127,12 +126,13 @@
 </div>
 
 {{-- MODAL NOUVEAU MESSAGE --}}
-<div class="modal fade" id="newMsgModal" tabindex="-1">
+<div class="modal fade" id="newMsgModal" tabindex="-1"
+     aria-labelledby="newMsgModalTitle" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title small">Nouveau message</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title small" id="newMsgModalTitle">Nouveau message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
                 <label class="form-label small fw-medium">Destinataire</label>
