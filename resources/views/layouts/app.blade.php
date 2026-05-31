@@ -390,11 +390,21 @@
         var el = document.createElement('div');
         el.className = 'toast-item toast-' + type;
         el.setAttribute('role', 'status');
-        el.innerHTML =
-            '<i class="bi ' + (ICONS[type] || ICONS.info) + '" aria-hidden="true"></i>' +
-            '<span>' + message + '</span>' +
-            '<button class="toast-close" onclick="this.parentElement.remove()" aria-label="Fermer">' +
-            '&times;</button>';
+
+        var icon = document.createElement('i');
+        icon.className = 'bi ' + (ICONS[type] || ICONS.info);
+        icon.setAttribute('aria-hidden', 'true');
+
+        var span = document.createElement('span');
+        span.textContent = message;
+
+        var btn = document.createElement('button');
+        btn.className = 'toast-close';
+        btn.setAttribute('aria-label', 'Fermer');
+        btn.innerHTML = '&times;';
+        btn.addEventListener('click', function () { el.remove(); });
+
+        el.append(icon, span, btn);
         container.appendChild(el);
 
         setTimeout(function () {

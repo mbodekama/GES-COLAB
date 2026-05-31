@@ -57,7 +57,121 @@ All routes live in `routes/web.php` (no `routes/api.php`; the JSON endpoints und
 
 Le canal `daily` (défaut via `LOG_CHANNEL`) n'est **pas** le driver Laravel standard : il pointe vers `App\Logging\DailyPathLogger` (`config/logging.php`). Ce logger custom écrit dans `storage/logs/YYYY/MM/DD/laravel.log` (arborescence hiérarchique par date), au lieu du fichier plat `laravel-YYYY-MM-DD.log`. À vérifier avant de changer le format/chemin des logs ou d'ajouter un outil qui parse `storage/logs/`.
 
-La classe de base `Controller` expose `$this->logEntry(array $extra = [])` : à appeler en **première ligne** de toute action à tracer. Elle auto-détecte `ClassName@method` via `debug_backtrace` et écrit un `Log::debug("[TRACE] …")` avec `http_method`, `url`, `user_id`, `ip` + les données métier passées dans `$extra`. Voir `EmployeeController::store` et `EmployeeController::destroy` pour des exemples d'utilisation.
+La classe de base `Controller` expose `$this->logEntry(array $extra = [])` : à appeler en **première ligne** de toute action à tracer. Elle auto-détecte `ClassName@method` via `debug_backtrace` et écrit un `Log::debug("[TRACE] …")` avec `http_method`, `url`, `user_id`, `ip` + les données métier passées dans `$extra`. `logEntry` est intégré dans **tous les contrôleurs** (`EmployeeController`, `ContractController`, `LeaveController`, `PayrollController`, `RoleController`, `PosteController`, `SalaryGridController`, `ConfigController`, `MessageController`, `ProfileController`). Toute nouvelle action doit l'appeler en première ligne.
+
+### Feuille de styles applicative (`public/css/gescolab.css`)
+
+`public/css/gescolab.css` est la feuille de styles centralisée pour tous les composants custom. Elle est chargée dans le layout principal. Tout nouveau style spécifique à l'application doit y être ajouté — **ne pas utiliser de styles inline**. Elle contient actuellement : `.form-sticky-actions`, `#toast-container`, `.toast-item`.
+
+### Composants Blade réutilisables (`resources/views/components`)
+
+| Composant | Usage |
+|---|---|
+| `<x-sort-th>` | En-têtes triables (déjà documenté ci-dessous) |
+| `<x-breadcrumb>` | Fil d'Ariane dans la navbar |
+| `<x-date>` | Input date avec Flatpickr |
+| `<x-select>` | Select Bootstrap avec gestion `old()` et collections |
+| `<x-avatar>` | Badge initiales / photo employé |
+
+#### `<x-breadcrumb>`
+
+Injecté dans le layout via `@section('breadcrumb')`. Remplace le `page-title` quand la section est définie.
+
+```blade
+@section('breadcrumb')
+<x-breadcrumb :items="[
+    ['label' => 'Employés', 'url' => route('employees.index')],
+    ['label' => $employee->full_name],
+]" />
+@endsection
+```
+
+Le dernier item (sans `url`) devient le titre actif. Tous les items précédents sont des liens cliquables.
+
+#### `<x-date>`
+
+Input date avec Flatpickr (locale FR, affichage `d/m/Y` via `altInput`, valeur soumise `Y-m-d`). Charge Flatpickr par CDN via `@push('styles'/'scripts')` — une seule fois par page grâce à `@once`.
+
+```blade
+<x-date name="start_date" label="Date de début" :value="$contract->start_date" required />
+{{-- Avec contraintes --}}
+<x-date name="end_date" label="Date de fin" :value="$contract->end_date" min="{{ now()->format('Y-m-d') }}" />
+```
+
+Supporte les attributs `min`, `max` (transmis à Flatpickr). Gère `old()`, `is-invalid`, et le label avec `*` si `required`.
+
+#### `<x-select>`
+
+Select Bootstrap avec gestion automatique de `old()`, validation `is-invalid`, et deux modes d'alimentation :
+
+```blade
+{{-- Tableau associatif simple --}}
+<x-select name="type" label="Type" :options="['cdi' => 'CDI', 'cdd' => 'CDD']" :value="$contract->type" />
+
+{{-- Collection Eloquent --}}
+<x-select name="poste_id" label="Poste" :options="$postes"
+    option-value="id" option-label="label"
+    placeholder="— Sélectionner —" required />
+```
+
+### Sections du layout (`resources/views/layouts/app.blade.php`)
+
+Le layout expose ces `@yield` / `@push` à utiliser dans les vues :
+
+| Section | Rôle |
+|---|---|
+| `@section('title')` | Titre de l'onglet navigateur |
+| `@section('breadcrumb')` | Fil d'Ariane dans la navbar (remplace `page-title`) |
+| `@section('header-actions')` | Boutons à droite de la barre supérieure (export, create…) |
+| `@section('content')` | Corps principal de la page |
+| `@push('styles')` | CSS supplémentaires dans `<head>` (utilisé par `x-date`) |
+| `@push('scripts')` | JS supplémentaires avant `</body>` (utilisé par `x-date`) |
+
+Toutes les flash sessions sont automatiquement transformées en toasts : `session('success')`, `session('error')`, `session('warning')`.
+
+### Système de toasts
+
+`window.showToast(message, type, duration)` est disponible globalement (défini dans le layout). Ne pas créer d'alertes inline pour les retours d'action — utiliser `redirect()->with('success', '...')` qui déclenche le toast automatiquement.
+
+- **Types** : `success` (vert), `error` (rouge), `warning` (orange), `info` (bleu)
+- **Durée par défaut** : 7 000 ms
+- **Position** : fixe haut-droite (`top:24px; right:24px`)
+- **Appel JS direct** : `showToast('Message', 'success')` ou `showToast('Erreur', 'error', 5000)`
+
+### Barre d'actions sticky (`form-sticky-actions`)
+
+Pour les formulaires longs (create/edit), la barre d'actions est sticky en bas de page. Pattern à reproduire sur tout nouveau formulaire long :
+
+```html
+<div class="form-sticky-actions">
+    <span class="form-sticky-hint">
+        <i class="bi bi-info-circle me-1"></i> Les champs marqués * sont obligatoires
+    </span>
+    <div class="d-flex gap-2">
+        <a href="{{ route('....index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-x-circle me-1"></i> Annuler
+        </a>
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-check-circle me-2" aria-hidden="true"></i>Enregistrer
+        </button>
+    </div>
+</div>
+```
+
+Le hint (texte à gauche) est masqué sur mobile (`display:none`). Le style est défini dans `gescolab.css`.
+
+### Export CSV
+
+Routes d'export disponibles, accessibles depuis les datatables concernés :
+
+| Route | Contrôleur | Accès |
+|---|---|---|
+| `employees.export` | `EmployeeController@export` | `admin\|rh\|superadmin` |
+| `contracts.export` | `ContractController@export` | `admin\|rh\|superadmin` |
+| `leaves.export` | `LeaveController@export` | `admin\|rh\|superadmin` |
+| `payroll.export` | `PayrollController@export` | `superadmin\|admin\|comptable\|rh` |
+
+Les boutons d'export sont dans `@section('header-actions')` de chaque vue index.
 
 ### Conventions UI — filtres des vues index
 
@@ -101,6 +215,8 @@ Tous les datatables utilisent le même bloc d'actions :
 ```
 
 Règles : `btn-group-md` (pas `btn-sm`), `justify-content-start gap-2`, chaque bouton dans son propre `<div>`, icône + `&nbsp;` + texte court. Les boutons POST (approve, reject, delete) restent dans un `<form class="d-inline">` à l'intérieur d'un `<div>`.
+
+**Exception** : les datatables `employees` et `contracts` n'ont **pas** de bouton "Modifier" — l'édition se fait depuis la vue de détail (`show`). Ne pas rajouter ce bouton sur ces deux vues.
 
 ### Conventions UI — en-têtes triables des datatables
 

@@ -212,6 +212,7 @@
                     }
                 }
                 // Si pas trouvé dans la liste, laisser vide (poste libre non répertorié)
+                posSelect.selectedIndex = 0;
                 document.getElementById('department-field').value = opt.dataset.department || '';
             }
         }
