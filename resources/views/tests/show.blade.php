@@ -1,16 +1,21 @@
-@extends('layouts.app')
+@extends('layouts.test-runner')
 
 @section('title', $scenario['id'] . ' — ' . $scenario['name'])
 
-@section('breadcrumb')
-<x-breadcrumb :items="[
-    ['label' => 'Scénarios de test', 'url' => route('tests.index')],
-    ['label' => $scenario['module'], 'url' => route('tests.index') . '#module-' . Str::slug($scenario['module'])],
-    ['label' => $scenario['id']],
-]" />
-@endsection
-
 @section('content')
+
+{{-- ── Fil d'Ariane ────────────────────────────────────────────── --}}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb mb-0" style="font-size:13px">
+        <li class="breadcrumb-item">
+            <a href="{{ route('tests.index') }}" class="text-decoration-none text-muted">
+                Scénarios de test
+            </a>
+        </li>
+        <li class="breadcrumb-item text-muted">{{ $scenario['module'] }}</li>
+        <li class="breadcrumb-item active fw-semibold">{{ $scenario['id'] }}</li>
+    </ol>
+</nav>
 <div class="row g-4 justify-content-center">
     <div class="col-12 col-xl-10">
 

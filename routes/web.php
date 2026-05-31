@@ -135,13 +135,6 @@ Route::middleware(['auth'])->group(function () {
              ->name('config.leaves');
     });
 
-    // ── Tests E2E ─────────────────────────────────────────────
-    Route::middleware(['role:superadmin|admin'])->group(function () {
-        Route::get('/tests',              [TestController::class, 'index'])  ->name('tests.index');
-        Route::get('/tests/{id}',         [TestController::class, 'show'])   ->name('tests.show');
-        Route::post('/tests/rapport',     [TestController::class, 'rapport'])->name('tests.rapport');
-    });
-
     // ── API JSON ──────────────────────────────────────────────
     Route::prefix('api')->name('api.')->group(function () {
 
@@ -166,3 +159,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('postes.n1');
     });
 });
+
+// ── Tests E2E — accès public (pas d'authentification requise) ──
+Route::get('/tests',          [TestController::class, 'index'])  ->name('tests.index');
+Route::get('/tests/{id}',     [TestController::class, 'show'])   ->name('tests.show');
+Route::post('/tests/rapport', [TestController::class, 'rapport'])->name('tests.rapport');

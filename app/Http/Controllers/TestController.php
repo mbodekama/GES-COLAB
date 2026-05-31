@@ -10,42 +10,37 @@ class TestController extends Controller
 {
     public function index()
     {
-        $this->logEntry();
-
-        $modules  = TestScenarios::modules();
-        $total    = count(TestScenarios::all());
-        $allIds   = TestScenarios::ids();
+        $modules = TestScenarios::modules();
+        $total   = count(TestScenarios::all());
+        $allIds  = TestScenarios::ids();
 
         return view('tests.index', compact('modules', 'total', 'allIds'));
     }
 
     public function show(string $id)
     {
-        $this->logEntry(['scenario' => $id]);
-
         $scenario = TestScenarios::find($id);
         abort_unless($scenario !== null, 404);
 
-        $allIds  = TestScenarios::ids();
-        $pos     = array_search($id, $allIds);
-        $prevId  = $pos > 0 ? $allIds[$pos - 1] : null;
-        $nextId  = $pos < count($allIds) - 1 ? $allIds[$pos + 1] : null;
+        $allIds = TestScenarios::ids();
+        $pos    = array_search($id, $allIds);
+        $prevId = $pos > 0 ? $allIds[$pos - 1] : null;
+        $nextId = $pos < count($allIds) - 1 ? $allIds[$pos + 1] : null;
 
         return view('tests.show', compact('scenario', 'prevId', 'nextId', 'allIds'));
     }
 
     public function rapport(Request $request)
     {
-        $this->logEntry();
-
         $request->validate([
-            'results' => ['required', 'string'],
+            'results'     => ['required', 'string'],
+            'tester_name' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $results = json_decode($request->input('results'), true) ?? [];
-        $tester  = auth()->user()->name;
-        $date    = now()->isoFormat('D MMMM YYYY');
-
+        $results   = json_decode($request->input('results'), true) ?? [];
+        $tester    = $request->filled('tester_name')
+                        ? $request->input('tester_name')
+                        : (auth()->check() ? auth()->user()->name : 'Testeur anonyme');
         $scenarios = TestScenarios::all();
 
         $data = [
@@ -54,7 +49,7 @@ class TestController extends Controller
             'company_address'  => setting('company_address', ''),
             'company_phone'    => setting('company_phone', ''),
             'company_website'  => setting('company_website', ''),
-            'generated_date'   => $date,
+            'generated_date'   => now()->isoFormat('D MMMM YYYY'),
             'tester'           => $tester,
             'scenarios'        => $scenarios,
             'results'          => $results,
