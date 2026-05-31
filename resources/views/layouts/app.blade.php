@@ -155,6 +155,13 @@
             <i class="bi bi-gear-fill" aria-hidden="true"></i>
             <span class="nav-label">Configuration</span>
         </a>
+
+        <a href="{{ route('tests.index') }}"
+           class="nav-item {{ request()->routeIs('tests.*') ? 'active' : '' }}"
+           data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Scénarios de test">
+            <i class="bi bi-clipboard2-check" aria-hidden="true"></i>
+            <span class="nav-label">Scénarios de test</span>
+        </a>
         @endrole
 
     </div>

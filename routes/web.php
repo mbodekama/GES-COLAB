@@ -11,6 +11,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
 // ── Redirection racine ────────────────────────────────────────
@@ -132,6 +133,13 @@ Route::middleware(['auth'])->group(function () {
              ->name('config.payroll');
         Route::post('/config/leaves',  [ConfigController::class, 'updateLeaves'])
              ->name('config.leaves');
+    });
+
+    // ── Tests E2E ─────────────────────────────────────────────
+    Route::middleware(['role:superadmin|admin'])->group(function () {
+        Route::get('/tests',              [TestController::class, 'index'])  ->name('tests.index');
+        Route::get('/tests/{id}',         [TestController::class, 'show'])   ->name('tests.show');
+        Route::post('/tests/rapport',     [TestController::class, 'rapport'])->name('tests.rapport');
     });
 
     // ── API JSON ──────────────────────────────────────────────
